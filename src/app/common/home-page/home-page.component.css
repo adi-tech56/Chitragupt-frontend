@@ -1,0 +1,45 @@
+.landing-container {
+  background: linear-gradient(135deg, #ffffff 50%, var(--primary-color) 50%);
+  max-height: 100vh;
+  min-width: 100vw;
+  font-family: "Poppins", sans-serif;
+  overflow: hidden;
+
+}
+/* Text Section */
+.text-section h1 {
+  color: var(--text-heading);
+}
+.text-section p {
+  color: #333;
+  max-width: 500px;
+  margin: 0 ;
+}
+.btn-primary {
+  background-color: var(--primary-color);
+  border: none;
+  transition: all 0.3s ease;
+}
+.btn-primary:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+}
+/* Image Section */
+.image-section img {
+  max-width: 80%;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Responsive tweaks */
+@media (max-width: 1000px) {
+  .landing-container {
+    background: linear-gradient(180deg, #ffffff 60%, #007bff 40%);
+    text-align: center;
+  }
+  .text-section p {
+    max-width: 90%;
+  }
+  .image-section img {
+    max-width: 90%;
+  }
+}

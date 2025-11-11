@@ -1,0 +1,27 @@
+<div class="auth-root">
+  <div class="auth-card shadow-lg">
+    <ng-container [ngSwitch]="currentStep">
+      <!-- Login -->
+      <app-login
+        *ngSwitchCase="'login'"
+        (signupRequest)="goToStep('signup')"
+        (loginSuccess)="onLoginSuccess($event)">
+      </app-login>
+      <!-- Signup -->
+      <app-register
+        *ngSwitchCase="'signup'"
+        (signupSuccess)="goToStep('otp')"
+        (cancelSignup)="goToStep('login')">
+      </app-register>
+      <!-- OTP -->
+      <app-verification
+        *ngSwitchCase="'otp'"
+        (otpVerified)="goToStep('login')">
+      </app-verification>
+      <!-- Personal Details -->
+      <app-patient-details
+        *ngSwitchCase="'details'">
+      </app-patient-details>
+    </ng-container>
+  </div>
+</div>

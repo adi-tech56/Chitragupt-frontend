@@ -1,0 +1,26 @@
+.user-layout {
+  display: flex;
+  flex-direction: row;
+}
+.content-area {
+  flex: 1;
+  margin-left: 221px; 
+  padding: 2rem;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  min-width: 100vw;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Responsive: when sidebar moves to bottom */
+@media (max-width: 768px) {
+  .user-layout {
+    flex-direction: column;
+  }
+
+  .content-area {
+    margin-left: 0;
+    margin-bottom: 60px; /* height of bottom sidebar */
+    padding: 1rem;
+  }
+}
