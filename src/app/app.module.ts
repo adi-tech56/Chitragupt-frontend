@@ -9,12 +9,17 @@ import { RegisterComponent } from './common/Authentication/register/register.com
 import { RouterOutlet } from '@angular/router';
 import { HomeLayoutModule } from './layout/home-layout/home-layout.module';
 import { AuthLayoutComponent } from './common/Authentication/auth-layout/auth-layout.component';
-import { PatientDetailsComponent } from './common/Authentication/patient-details/patient-details.component';
+import { PatientDetailsComponent } from './common/patient-details/patient-details.component';
 import { VerificationComponent } from './common/Authentication/verification/verification.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { SidebarComponent } from './common/sidebar/sidebar.component';
 import { UserLayoutModule } from './layout/user-layout/user-layout.module';
+import { HttpClientModule } from '@angular/common/http';
+import { ResetPasswordComponent } from './common/Authentication/reset-password/reset-password.component';
+import { SendEmailComponent } from './common/Authentication/send-email/send-email.component';
+
+import { MedicationPageComponent } from './common/user/medication-page/medication-page.component';
+
 
 @NgModule({
   declarations: [
@@ -22,8 +27,10 @@ import { UserLayoutModule } from './layout/user-layout/user-layout.module';
     LoginComponent,
     RegisterComponent,
     AuthLayoutComponent,
-    PatientDetailsComponent,
     VerificationComponent,
+    ResetPasswordComponent,
+    SendEmailComponent,
+    MedicationPageComponent,
    
   
   ],
@@ -31,11 +38,13 @@ import { UserLayoutModule } from './layout/user-layout/user-layout.module';
     BrowserModule,
     AppRoutingModule,
     RouterOutlet,
+    HttpClientModule,
     HomeLayoutModule,
     ReactiveFormsModule,
     CommonModule,
     FormsModule,
-    UserLayoutModule
+    UserLayoutModule,
+ 
   ],
   providers: [],
   bootstrap: [AppComponent]

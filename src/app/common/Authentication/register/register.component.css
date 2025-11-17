@@ -1,0 +1,16 @@
+/* styles.css or component-specific CSS */
+.google-btn {
+  background-color: #ffffff; /* keep white */
+  color: #000000; /* text color */
+  border: 1px solid #dcdcdc;
+  transition: none; /* disable transitions */
+}
+
+.google-btn:hover,
+.google-btn:focus,
+.google-btn:active {
+  background-color: #ffffff !important; /* same as default */
+  color: #000000 !important; /* same as default */
+  border-color: #dcdcdc !important;
+  box-shadow: none !important; /* remove any bootstrap shadow on focus/active */
+}

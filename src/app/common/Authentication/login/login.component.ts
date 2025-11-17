@@ -20,8 +20,12 @@ if (savedForm) {
 })
 
 export class LoginComponent implements OnInit {
+
   @Output() signupRequest = new EventEmitter<void>();
+  @Output() passwordReset = new EventEmitter<void>();
   @Output() loginSuccess = new EventEmitter<boolean>();
+  private auth = inject(AuthService);
+
   email = '';
   password = '';
   userReset: Boolean = false;
@@ -38,15 +42,21 @@ export class LoginComponent implements OnInit {
 
   loginForm = new FormGroup({
     email: new FormControl(initialEmail, [Validators.required, Validators.email]),
-    password: new FormControl('', [Validators.required, Validators.minLength(6)])
+    password: new FormControl('', [Validators.required, Validators.minLength(4)])
   });
-
+  response: any;
   get passwordIsInvalid() {
     return (this.loginForm.controls.password.touched && this.loginForm.controls.password.dirty &&
       this.loginForm.controls.password.invalid);
   }
+  googleSignIn() {
+ window.location.href = "http://localhost:8089/oauth2/authorization/google";
+}
   goToSignup() {
     this.signupRequest.emit();
+  }
+    goToSendMail() {
+    this.passwordReset.emit();
   }
   onLogin() {
     if (this.loginForm.invalid) {
@@ -61,10 +71,19 @@ export class LoginComponent implements OnInit {
     const userData: UserLoginDetails = {
       userEmail: <string>email,
       passWord: <string>password,
-
     }
-    const detailsIncomplete = true; // set according to response
-    this.loginSuccess.emit(detailsIncomplete);
-    console.log(userData.userEmail);
+
+    this.auth.login(userData).subscribe({
+      next: (res) => {
+        this.response = res;
+        console.log('Post created successfully:', res);
+        
+        this.loginSuccess.emit();
+      },
+      error: (err) => {
+        console.error('Error creating post:', err);
+      }
+    });
+
   }
 }

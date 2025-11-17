@@ -1,71 +1,80 @@
 <div class="p-4">
-<form [formGroup]="form" (ngSubmit)="onSignup()" class="m-2">
-  <h3 class="text-primary text-center mb-4 fw-bold">Sign Up</h3>
+  <form [formGroup]="form" (ngSubmit)="onSignup()" class="m-2">
+    <h3 class="text-primary text-center mb-4 fw-bold">Sign Up</h3>
 
-  <div>
+    <div>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="first-name" class="form-label text-primary fw-semibold">First Name</label>
+          <input type="text" class="form-control" id="first-name" name="first-name" formControlName="firstName" />
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label for="middle-name" class="form-label text-primary fw-semibold">Middle Name</label>
+          <input type="text" id="middle-name" class="form-control" name="middle-name" formControlName="middleName" />
+        </div>
+      </div>
+    </div>
     <div class="row">
       <div class="col-md-6 mb-3">
-        <label for="first-name" class="form-label text-primary fw-semibold">First Name</label>
-        <input type="text" class="form-control" id="first-name" name="first-name" formControlName="firstName" />
+        <label for="last-name" class="form-label text-primary fw-semibold">Last Name</label>
+        <input type="text" id="last-name" name="last-name" class="form-control" formControlName="lastName" />
       </div>
-
       <div class="col-md-6 mb-3">
-        <label for="middle-name"  class="form-label text-primary fw-semibold">Middle Name</label>
-        <input type="text" id="middle-name" class="form-control" name="middle-name" formControlName="middleName" />
-      </div>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-md-6 mb-3">
-      <label for="last-name" class="form-label text-primary fw-semibold">Last Name</label>
-      <input type="text" id="last-name" name="last-name" class="form-control" formControlName="lastName" />
-    </div>
-   <div class="col-md-6 mb-3">
         <label for="contact" class="form-label text-primary fw-semibold">Contact No</label>
         <input type="text" id="contact" class="form-control" name="Contact" formControlName="contactNo" />
       </div>
-   
-  </div>
-<hr />
-  <div>
-    <div class="mb-3">
-      <label for="email" class="form-label text-primary fw-semibold">Email</label>
-      <input id="email" type="email" name="email" class="form-control" formControlName="emailId" />
-    </div> 
-  </div>
-  <hr/>
-  <div class="row" formGroupName="passwords">
-    <div class="col-md-6 mb-3">
-      <label for="password"  class="form-label text-primary fw-semibold">Password</label>
-      <input id="password" type="password" name="password" class="form-control" formControlName="password" />
-    </div>
 
-    <div class="col-md-6 mb-3">
-      <label for="confirm-password" class="form-label text-primary fw-semibold">Confirm Password</label>
-      <input id="confirm-password" class="form-control" type="password" name="confirm-password" formControlName="confirmPassword" />
     </div>
-  </div>
-<p *ngIf="passwordCheck?.errors?.['valuesNotEqual'] && passwordCheck.touched" class="text-danger">
-  Passwords do not match.
-</p>
-<div class="row">
-  <div class="col-md-6 mb-3">
-     <button type="reset" class="btn btn-primary w-100 fw-bold " (click)="onReset()">Reset</button>
-  </div>
-    <div class="col-md-6 mb-3">
-       <button type="submit" class="btn btn-primary w-100 fw-bold col-md-6">Sign up</button>
+    <hr />
+    <div>
+      <div class="mb-3">
+        <label for="email" class="form-label text-primary fw-semibold">Email</label>
+        <input id="email" type="email" name="email" class="form-control" formControlName="emailId" />
+      </div>
     </div>
+    <hr />
+    <div class="row" formGroupName="passwords">
+      <div class="col-md-6 mb-3">
+        <label for="password" class="form-label text-primary fw-semibold">Password</label>
+        <input id="password" type="password" name="password" class="form-control" formControlName="password" />
+      </div>
 
-</div>
- <p *ngIf="form.invalid && form.touched" class="text-danger">
-  Form is Invalid
-</p>
+      <div class="col-md-6 mb-3">
+        <label for="confirm-password" class="form-label text-primary fw-semibold">Confirm Password</label>
+        <input id="confirm-password" class="form-control" type="password" name="confirm-password"
+          formControlName="confirmPassword" />
+      </div>
+    </div>
+    <p *ngIf="passwordCheck?.errors?.['valuesNotEqual'] && passwordCheck.touched" class="text-danger">
+      Passwords do not match.
+    </p>
+    <div class="row">
+      <div class="col-md-9 mb-3">
+        <button type="submit" class="btn btn-primary w-100 fw-bold col-md-6">Sign up</button>
+      </div>
 
-  <div class="text-center mt-3">
-    <button type="button" class="btn btn-link text-primary fw-semibold" (click)="cancel()">
-      Already have an account? Login
+      <div class="col-md-3 mb-3">
+        <button type="reset" class="btn btn-primary w-100 fw-bold " (click)="onReset()"><i class="fa fa-refresh" aria-hidden="true"></i></button>
+      </div>
+
+    </div>
+    <hr />
+    <button class="btn google-btn w-100 fw-bold d-flex align-items-center justify-content-center gap-2" type="submit"
+      (click)="googleSignIn()">
+      <img src="assets/google-icon.svg" width="20" height="20" alt="Google">
+      Sign in with Google
     </button>
-  </div>
 
-</form>
+    <p *ngIf="form.invalid && form.touched" class="text-danger">
+      Form is Invalid
+    </p>
+
+    <div class="text-center mt-3">
+      <button type="button" class="btn btn-link text-primary fw-semibold" (click)="cancel()">
+        Already have an account? Login
+      </button>
+    </div>
+
+  </form>
 </div>

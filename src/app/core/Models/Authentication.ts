@@ -4,13 +4,12 @@ export interface UserLoginDetails {
     // userRole:'MEMBER' | 'ADMIN';
 }
 
-export interface userRegisterDetails{
+export interface UserRegisterDetails{
     firstName : string;
     middleName: string | null;
     lastName : string | null;
     contactNo : string;
     email: string;
-    userRole: 'PATIENT'|'ADMIN';
     passWord:string;
 }
 
