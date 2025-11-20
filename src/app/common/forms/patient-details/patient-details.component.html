@@ -156,47 +156,6 @@
         </div>
 
 
-        <div *ngIf="currentStep === 4" formArrayName="patientContacts">
-
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="text-primary mb-0">Patient Contacts</h4>
-            <button type="button" class="btn btn-outline-primary" (click)="addContact()">
-              <i class="fa fa-plus" aria-hidden="true"></i>
-            </button>
-          </div>
-          <div class="scroll-section">
-            <div *ngFor="let contact of patientContacts.controls; let i = index" [formGroupName]="i"
-              class="mb-3 border rounded p-3">
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label>Relationship Type</label>
-                  <input class="form-control" formControlName="relationshipType" />
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label>First Name</label>
-                  <input class="form-control" formControlName="firstName" />
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label>Middle Name</label>
-                  <input class="form-control" formControlName="middleName" />
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label>Last Name</label>
-                  <input class="form-control" formControlName="lastName" />
-                </div>
-              </div>
-
-              <button type="button" class="btn btn-outline-danger btn-sm" (click)="removeContact(i)"
-                *ngIf="patientContacts.length > 1">
-                Remove Contact
-              </button>
-            </div>
-
-          </div>
-
-
-        </div>
-
         <div class="d-flex justify-content-between mt-4">
           <button type="button" class="btn btn-secondary" (click)="previousStep()" *ngIf="!(currentStep ===1)"
             [disabled]="currentStep === 1">Previous</button>

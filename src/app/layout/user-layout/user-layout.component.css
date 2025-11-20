@@ -1,6 +1,7 @@
 .user-layout {
   display: flex;
   flex-direction: row;
+  overflow-x: hidden;
 }
 .content-area {
   flex: 1;
@@ -8,8 +9,10 @@
   padding: 2rem;
   background-color: #f8f9fa;
   min-height: 100vh;
-  min-width: 100vw;
+min-width: calc(100vw - 221px);
+
   transition: all 0.3s ease-in-out;
+  
 }
 
 /* Responsive: when sidebar moves to bottom */

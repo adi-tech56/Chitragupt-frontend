@@ -9,6 +9,7 @@ import { CookieService } from 'ngx-cookie-service';
   providedIn: 'root'
 })
 export class AuthService {
+  constructor(private router: Router) { }
   verifyOtp(payload: { email: any; otp: any; }) {
     throw new Error('Method not implemented.');
   }
@@ -30,22 +31,30 @@ export class AuthService {
       return null;
     }
   }
+  getUserName(): string {
+    const token = this.getToken();
+    if (!token) return '';
+    const decoded = this.decodeToken(token);
+    if (!decoded) return '';
+    const userName = decoded.userName;
+    return userName;
+  }
   getUserRoles(): string[] {
-    const token = this.getToken(); 
+    const token = this.getToken();
     if (!token) return [];
 
-    const decoded = this.decodeToken(token); 
+    const decoded = this.decodeToken(token);
     if (!decoded) return [];
 
-    const roleMatches = decoded.role.match(/name=(\w+)/g); 
+    const roleMatches = decoded.role.match(/name=(\w+)/g);
     if (!roleMatches) return [];
-    return roleMatches.map((r: string) => r.split('=')[1]); 
+    return roleMatches.map((r: string) => r.split('=')[1]);
   }
-refresh() {
-  return this.http.get('http://localhost:8080/auth/refresh', {
-    withCredentials: true  // send refreshToken cookie
-  });
-}
+  refresh() {
+    return this.http.get('http://localhost:8080/auth/refresh', {
+      withCredentials: true  // send refreshToken cookie
+    });
+  }
 
 
   isTokenExpired(token: string): boolean {
@@ -53,7 +62,7 @@ refresh() {
     console.log(decoded)
     if (!decoded || !decoded.exp) return true;
 
-    const expiryDate = decoded.exp * 1000; 
+    const expiryDate = decoded.exp * 1000;
     return Date.now() > expiryDate;
   }
 
@@ -115,4 +124,11 @@ refresh() {
 
   }
 
+  logout() {
+    this.cookieService.delete('accessToken', '/');
+
+
+    this.cookieService.delete('refreshToken', '/');
+    this.router.navigate(['/auth']);
+  }
 }

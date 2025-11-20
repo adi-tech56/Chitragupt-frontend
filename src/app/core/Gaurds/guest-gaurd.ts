@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router } from '@angular/router';
 import { AuthService } from '../Services/auth-service.service';
+import { map } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class GuestGaurd implements CanActivate {
@@ -12,16 +13,27 @@ export class GuestGaurd implements CanActivate {
     canActivate(route: ActivatedRouteSnapshot): boolean {
         const token = this.auth.getToken();
 
-   
+
 
         if (!token) {
-            return true;
+            this.auth.refresh().pipe(
+                map(success =>{
+                    if(success)
+                    {
+                        console.log("Guest gaurd")
+                        return false;
+                    }
+                    else{
+                        return true
+                    }
+                })
+            );
         } else {
-          
-    const userRoles = this.auth.getUserRoles();
-    console.log(userRoles)
 
-  
+            const userRoles = this.auth.getUserRoles();
+            console.log(userRoles)
+
+
             if (userRoles.includes("PATIENT")) {
                 this.router.navigate(["/user"]);
                 return true;

@@ -1,19 +1,23 @@
-<!-- <div class="user-layout">
- 
-  <app-sidebar></app-sidebar>
-  <div class="content-area">
-    <p>User layout</p>
-    <router-outlet></router-outlet>
-  </div>
-</div> -->
-<!-- If patient details are incomplete, show that component -->
-<app-patient-details *ngIf="!patientDetailsComplete"
- (detailsSubmitted)="onDetailsSubmitted()"></app-patient-details>
+
+<app-patient-contact-details
+  *ngIf="!patientContactsComplete"
+  (contactSubmitted)="onContactSubmitted()">
+</app-patient-contact-details>
+
+<app-patient-details
+  *ngIf="patientContactsComplete && !patientDetailsComplete"
+  (detailsSubmitted)="onDetailsSubmitted()">
+</app-patient-details>
 
 
-<div class="user-layout" *ngIf="patientDetailsComplete">
+<div class="user-layout" *ngIf="patientContactsComplete && patientDetailsComplete">
   <app-sidebar></app-sidebar>
+
   <div class="content-area">
+    <h4>
+      {{ greetingMessage }} {{ userName }}!
+    </h4>
+
     <router-outlet></router-outlet>
   </div>
 </div>
