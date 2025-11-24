@@ -32,9 +32,9 @@ import { AuthInterceptor } from './core/Interceptors/auth-interceptor';
     ResetPasswordComponent,
     SendEmailComponent,
     MedicationPageComponent,
-   
-   
-  
+
+
+
   ],
   imports: [
     BrowserModule,
@@ -46,7 +46,8 @@ import { AuthInterceptor } from './core/Interceptors/auth-interceptor';
     CommonModule,
     FormsModule,
     UserLayoutModule,
- 
+
+
   ],
  providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }

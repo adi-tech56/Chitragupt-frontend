@@ -39,6 +39,15 @@ export class AuthService {
     const userName = decoded.userName;
     return userName;
   }
+getUserId(): number {
+  let token = this.getToken() ?? "";   // ensures token is always string
+
+  const decoded = this.decodeToken(token) ?? "";
+
+
+  return Number(decoded.userId);
+}
+
   getUserRoles(): string[] {
     const token = this.getToken();
     if (!token) return [];
@@ -51,8 +60,8 @@ export class AuthService {
     return roleMatches.map((r: string) => r.split('=')[1]);
   }
   refresh() {
-    return this.http.get('http://localhost:8080/auth/refresh', {
-      withCredentials: true  // send refreshToken cookie
+    return this.http.get('http://localhost:8089/auth/refresh', {
+      withCredentials: true
     });
   }
 

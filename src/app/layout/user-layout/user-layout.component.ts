@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/core/Services/auth-service.service';
+import { PatientContactService } from 'src/app/core/Services/patient-contact.service';
 
 @Component({
   selector: 'app-user-layout',
@@ -11,6 +12,7 @@ export class UserLayoutComponent {
 patientDetailsComplete: boolean = false;
 patientContactsComplete:boolean = false;
 private auth = inject(AuthService);
+private patientContactService = inject(PatientContactService);
 userName: any;
 greetingMessage: string = '';
 
@@ -19,13 +21,13 @@ setGreeting() {
 
   if (hour >= 12&& hour < 12) {
     this.greetingMessage = 'Good Morning';
-  } 
+  }
   else if (hour >= 12 && hour < 17) {
     this.greetingMessage = 'Good Afternoon';
-  } 
+  }
   else if (hour >= 17 && hour < 21) {
     this.greetingMessage = 'Good Evening';
-  } 
+  }
   else {
     this.greetingMessage = 'Good Night';
   }
@@ -48,6 +50,18 @@ onContactSubmitted() {
      this.setGreeting();
     this.userName = this.auth.getUserName();
     console.log(this.userName)
+     this.patientContactService.getContact().subscribe({
+    next: (res) => {
+      if (res.hasContact) {
+      this.patientContactsComplete = true;
+      } else {
+        this.patientContactsComplete = false;
+      }
+    },
+    error: (err) => {
+      console.error('Error fetching contact:', err);
+    }
+  });
 
   }
 
@@ -55,5 +69,5 @@ onContactSubmitted() {
     // this.patientDetailsComplete = this.patientService.isPatientDetailsComplete();
   }
 
-  
+
 }
