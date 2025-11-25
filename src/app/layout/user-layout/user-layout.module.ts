@@ -8,6 +8,8 @@ import { PatientDetailsComponent } from '../../common/forms/patient-details/pati
 import { ReactiveFormsModule } from '@angular/forms';
 import { HomePageComponent } from 'src/app/common/user/home-page/home-page.component';
 import { PatientContactDetailsComponent } from 'src/app/common/forms/patient-contact-details/patient-contact-details.component';
+import { AddMedicationComponent } from 'src/app/common/forms/add-medication/add-medication.component';
+import { MedicationPageComponent } from 'src/app/common/user/medication-page/medication-page.component';
 
 
 @NgModule({
@@ -16,7 +18,9 @@ import { PatientContactDetailsComponent } from 'src/app/common/forms/patient-con
     SidebarComponent,
     PatientDetailsComponent,
     PatientContactDetailsComponent,
-    HomePageComponent
+    HomePageComponent,
+    AddMedicationComponent,
+    MedicationPageComponent
   ],
   imports: [
     CommonModule,

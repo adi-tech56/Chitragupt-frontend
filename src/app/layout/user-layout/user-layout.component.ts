@@ -9,7 +9,7 @@ import { PatientContactService } from 'src/app/core/Services/patient-contact.ser
   styleUrls: ['./user-layout.component.css']
 })
 export class UserLayoutComponent {
-patientDetailsComplete: boolean = false;
+patientDetailsComplete: boolean = true;
 patientContactsComplete:boolean = false;
 private auth = inject(AuthService);
 private patientContactService = inject(PatientContactService);

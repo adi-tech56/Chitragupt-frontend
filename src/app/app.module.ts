@@ -22,6 +22,7 @@ import { MedicationPageComponent } from './common/user/medication-page/medicatio
 import { PatientContactDetailsComponent } from './common/forms/patient-contact-details/patient-contact-details.component';
 import { AuthInterceptor } from './core/Interceptors/auth-interceptor';
 
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -31,7 +32,8 @@ import { AuthInterceptor } from './core/Interceptors/auth-interceptor';
     VerificationComponent,
     ResetPasswordComponent,
     SendEmailComponent,
-    MedicationPageComponent,
+
+
 
 
 
