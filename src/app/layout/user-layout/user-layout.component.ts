@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/core/Services/auth-service.service';
 import { PatientContactService } from 'src/app/core/Services/patient-contact.service';
+import { PatientProfileService } from 'src/app/core/Services/PatientServices/patient-profile.service';
 
 @Component({
   selector: 'app-user-layout',
@@ -13,6 +14,7 @@ patientDetailsComplete: boolean = false;
 patientContactsComplete:boolean = false;
 private auth = inject(AuthService);
 private patientContactService = inject(PatientContactService);
+private patientProfileService = inject(PatientProfileService);
 userName: any;
 greetingMessage: string = '';
 
@@ -62,6 +64,18 @@ onContactSubmitted() {
       console.error('Error fetching contact:', err);
     }
   });
+    this.patientProfileService.getProfile().subscribe({
+  next: (res) => {
+    if (res.hasProfile) {
+      this.patientDetailsComplete = true;
+    } else {
+      this.patientDetailsComplete = false;
+    }
+  },
+  error: (err) => {
+    console.error("Error fetching profile:", err);
+  }
+});
 
   }
 
