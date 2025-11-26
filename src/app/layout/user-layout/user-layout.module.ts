@@ -9,6 +9,8 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { HomePageComponent } from 'src/app/common/user/home-page/home-page.component';
 import { PatientContactDetailsComponent } from 'src/app/common/forms/patient-contact-details/patient-contact-details.component';
 import { PatientAllergyComponent } from 'src/app/common/forms/patient-allergy/patient-allergy.component';
+import { HeaderComponent } from 'src/app/common/header/header.component';
+import { ProfilePageComponent } from 'src/app/common/user/profile-page/profile-page.component';
 
 @NgModule({
   declarations: [
@@ -18,6 +20,8 @@ import { PatientAllergyComponent } from 'src/app/common/forms/patient-allergy/pa
     PatientContactDetailsComponent,
     HomePageComponent,
     PatientAllergyComponent,
+    HeaderComponent,
+    ProfilePageComponent,
   ],
   imports: [CommonModule, UserLayoutRoutingModule, ReactiveFormsModule],
 })

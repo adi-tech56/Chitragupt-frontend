@@ -3,7 +3,7 @@
   border-right: 1px solid #ddd;
   padding: 1rem;
   position: fixed;
-  top: 0;
+  top: 60px;
   left: 0;
   height: 100vh;
   width: 220px;
@@ -14,7 +14,7 @@
 
 /* Sidebar links */
 .sidebar .nav-link {
- display: flex;
+  display: flex;
   align-items: center;
   gap: 10px;
   color: #0d6efd; /* blue font color */
@@ -71,5 +71,3 @@
     display: none; /* hide text on mobile */
   }
 }
-
-

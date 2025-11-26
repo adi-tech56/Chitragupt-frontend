@@ -33,10 +33,6 @@ import { PatientAllergyComponent } from './common/forms/patient-allergy/patient-
     ResetPasswordComponent,
     SendEmailComponent,
     MedicationPageComponent,
-
-
-
-
   ],
   imports: [
     BrowserModule,
@@ -48,12 +44,10 @@ import { PatientAllergyComponent } from './common/forms/patient-allergy/patient-
     CommonModule,
     FormsModule,
     UserLayoutModule,
-
-
   ],
- providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
