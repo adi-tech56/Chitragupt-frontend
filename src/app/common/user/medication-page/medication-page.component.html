@@ -1,1 +1,113 @@
-<p>medication-page works!</p>
+<div class="container mt-4">
+
+   <!-- Active / Pending / Taken -->
+<div class="card mb-4">
+  <div class="card-header bg-primary text-white">
+    <h4 class="mb-0">Today's Medications</h4>
+  </div>
+  <div class="card-body">
+    <div *ngIf="activeMeds.length === 0" class="text-muted">
+      No active medicines for today.
+    </div>
+
+    <div class="accordion" id="todayMedsAccordion">
+      <div *ngFor="let med of activeMeds; let i = index" class="accordion-item">
+        <h2 class="accordion-header" id="heading{{ i }}">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                  [attr.data-bs-target]="'#collapse' + i" aria-expanded="false"
+                  [attr.aria-controls]="'collapse' + i">
+            <strong class="me-2">{{ med.timing.timeOfDay }}</strong>
+            <span class="text-primary">{{ med.medication }}</span>
+          </button>
+        </h2>
+
+        <div [id]="'collapse' + i" class="accordion-collapse collapse"
+             [attr.aria-labelledby]="'heading' + i" data-bs-parent="#todayMedsAccordion">
+          <div class="accordion-body d-flex justify-content-between align-items-start flex-wrap">
+            <div class="med-details">
+              <p><strong>Dosage:</strong> {{ med.dosage.amount }} {{ med.dosage.amountUnitId }}</p>
+              <p><strong>Instruction:</strong> {{ med.dosage.instruction || '—' }}</p>
+              <p><strong>Condition:</strong> {{ med.conditionName }}</p>
+              <p class="m-0 text-secondary"><small>Prescribed by: {{ med.doctorName }}</small></p>
+            </div>
+
+            <div class="med-action mt-2 mt-sm-0">
+              <div *ngIf="med.status === 'PENDING'; else statusTemplate">
+                <label class="d-flex align-items-center mb-0">
+                  <input type="checkbox" class="form-check-input me-2" (change)="markTaken(med)" />
+                  Mark as Completed
+                </label>
+              </div>
+              <ng-template #statusTemplate>
+                <span *ngIf="med.status === 'TAKEN'" class="badge bg-success fs-6">Completed</span>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 
+<div class="card mb-4" *ngIf="skippedMeds.length > 0">
+  <div class="card-header bg-warning text-dark">
+    <h4 class="mb-0">Skipped Medications</h4>
+  </div>
+  <div class="card-body">
+    <div *ngFor="let med of skippedMeds" class="p-3 border rounded mb-3 shadow-sm">
+      <h5>{{ med.medication }}</h5>
+      <p><strong>Condition:</strong> {{ med.conditionName }}</p>
+      <p><strong>Doctor:</strong> {{ med.doctorName }}</p>
+      <p><strong>Dosage:</strong> {{ med.dosage.amount }} {{ med.dosage.amountUnitId }}</p>
+      <p><strong>Timing:</strong> {{ med.timing.timeOfDay }} ({{ med.timing.whenCode }})</p>
+      <p><strong>Instruction:</strong> {{ med.dosage.instruction || '—' }}</p>
+      <span class="badge bg-warning text-dark fs-6">Skipped</span>
+    </div>
+  </div>
+</div> -->
+<div class="card m-3" style="width: 18rem;">
+    <div class="card-body">
+      <h5 class="card-title">Add Medications</h5>
+      <p class="card-text">No medications found. Add medications.</p>
+      <a [routerLink]="['view-prescription']" class="btn btn-primary">Add</a>
+    </div>
+  </div>
+    <!-- <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h4 class="mb-0">All Prescriptions</h4>
+        </div>
+
+        <div class="card-body">
+            <div *ngFor="let med of allMeds" class="p-3 border rounded mb-3 shadow-sm">
+
+                <h5>{{ med.medication }}</h5>
+
+                <p><strong>Condition:</strong> {{ med.conditionName }}</p>
+                <p><strong>Doctor:</strong> {{ med.doctorName }}</p>
+
+                <p>
+                    <strong>Dosage:</strong>
+                    {{ med.dosage.amount }} {{ med.dosage.amountUnitId }}
+                </p>
+
+                <p>
+                    <strong>Timing:</strong>
+                    {{ med.timing.timeOfDay }} ({{ med.timing.whenCode }})
+                </p>
+
+                <p>
+                    <strong>Duration:</strong>
+                    {{ med.effectiveStartDate | date }} → {{ med.effectiveEndDate | date }}
+                </p>
+
+                <p>
+                    <strong>Instruction:</strong>
+                    {{ med.dosage.instruction || '—' }}
+                </p>
+
+            </div>
+        </div>
+    </div> -->
+
+</div>

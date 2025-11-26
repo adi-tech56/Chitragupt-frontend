@@ -10,6 +10,7 @@ import { HomePageComponent } from 'src/app/common/user/home-page/home-page.compo
 import { PatientContactDetailsComponent } from 'src/app/common/forms/patient-contact-details/patient-contact-details.component';
 import { AddMedicationComponent } from 'src/app/common/forms/add-medication/add-medication.component';
 import { MedicationPageComponent } from 'src/app/common/user/medication-page/medication-page.component';
+import { ViewPrescriptionComponent } from 'src/app/common/view-prescription/view-prescription.component';
 
 
 @NgModule({
@@ -20,7 +21,7 @@ import { MedicationPageComponent } from 'src/app/common/user/medication-page/med
     PatientContactDetailsComponent,
     HomePageComponent,
     AddMedicationComponent,
-    MedicationPageComponent
+    
   ],
   imports: [
     CommonModule,

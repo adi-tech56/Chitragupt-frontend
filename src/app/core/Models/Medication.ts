@@ -47,3 +47,65 @@ export interface TimingData {
   timeOfDay?: string; // "HH:mm" format
   whenCode?: string;
 }
+
+export interface PrescriptionResponse {
+  superPrescriptionId: number,
+  patientId: number;
+  doctorName: string;
+  prescriptionDate: string;
+  notes: string;
+  prescriptions: PrescriptionConditionResponse[];
+}
+export interface PrescriptionConditionResponse {
+  prescriptionId: number,
+  conditionName: string;
+  notes: string | null;
+  medications: MedicationResponse[];
+}
+export interface MedicationResponse {
+  statementId: number,
+  medication: string;          // backend gives the medication NAME, not ID
+  status: string;
+  effectiveStartDate: string;
+  effectiveEndDate: string;
+  notes: string | null;
+  dosage: DosageResponse;
+  timing: TimingResponse;
+}
+export interface DosageResponse {
+  amount: number;
+  amountUnitId: string;      // backend returns text (e.g. "Drops")
+  routeId: string;           // backend returns text (e.g. "Oral route")
+  instruction: string | null;
+}
+export interface TimingResponse {
+  frequency: number;
+  period: number;
+  periodUnit: string;
+  timeOfDay: string;         // "07:30:00"
+  whenCode: string;          // "Early Morning"
+}
+export interface MedicationNormalized extends MedicationResponse {
+  doctorName: string;
+  prescriptionId: number;
+  prescriptionConditionId: number;
+  prescriptionDate: string;
+  conditionName: string;
+  conditionNotes: string | null;
+}
+export interface MedicationWithStatus extends MedicationNormalized {
+  taken?: boolean; 
+  status: 'PENDING' | 'TAKEN' | 'SKIPPED';
+}
+
+export interface PatientMedicationLogs {
+  id: number;                    
+  patientId: number;             
+  superPrescriptionId: number;   
+  prescriptionId: number;        
+  statementId: number;          
+  taken: boolean;                
+  createdAt: string;           
+  updatedAt: string;           
+}
+

@@ -60,7 +60,7 @@ getUserId(): number {
     return roleMatches.map((r: string) => r.split('=')[1]);
   }
   refresh() {
-    return this.http.get('http://localhost:8089/auth/refresh', {
+    return this.http.get(`${this.apiUrl}/refresh`, {
       withCredentials: true
     });
   }

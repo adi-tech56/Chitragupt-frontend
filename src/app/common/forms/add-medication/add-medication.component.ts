@@ -390,9 +390,9 @@ export class AddMedicationComponent implements OnInit, OnDestroy {
           timing: {
             frequency: med.timing.frequency,
             period: med.timing.period,
-            periodUnitId: med.timing.periodUnit,
+            periodUnit: med.timing.periodUnit,
             timeOfDay: med.timing.timeOfDay,
-            whenCodeId: med.timing.whenCode
+            whenCode: med.timing.whenCode
           }
         }))
       }))
@@ -401,7 +401,9 @@ export class AddMedicationComponent implements OnInit, OnDestroy {
     console.log("FINAL PAYLOAD:", payload);
 
     this.medicationService.savePrescription(payload).subscribe({
-      next: res => console.log("Saved!", res),
+      next: res =>{
+        console.log("Saved!", res);
+      } ,
       error: err => console.error("Save failed", err)
     });
   }
