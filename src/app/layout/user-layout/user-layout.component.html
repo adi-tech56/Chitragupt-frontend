@@ -10,7 +10,13 @@
 </app-patient-details>
 
 
-<div class="user-layout" *ngIf="patientContactsComplete && patientDetailsComplete">
+<app-patient-allergy
+  *ngIf="patientContactsComplete && patientDetailsComplete && !patientAllergyComplete"
+  (allergySubmitted)="onAllergySubmitted()">
+</app-patient-allergy>
+
+
+<div class="user-layout" *ngIf="patientContactsComplete && patientDetailsComplete && patientAllergyComplete">
   <app-sidebar></app-sidebar>
 
   <div class="content-area">

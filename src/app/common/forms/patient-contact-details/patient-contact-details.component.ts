@@ -1,16 +1,22 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  OnDestroy,
+  OnInit,
+  Output,
+} from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { debounceTime, distinctUntilChanged, Subscription } from 'rxjs';
 import { AuthService } from 'src/app/core/Services/auth-service.service';
-import { LocationService } from 'src/app/core/Services/locationService.service';
-import { PatientContactService } from 'src/app/core/Services/patient-contact.service';
+import { LocationService } from 'src/app/core/Services/PatientServices/locationService.service';
+import { PatientContactService } from 'src/app/core/Services/PatientServices/patient-contact.service';
 
 @Component({
   selector: 'app-patient-contact-details',
   templateUrl: './patient-contact-details.component.html',
-  styleUrls: ['./patient-contact-details.component.css']
+  styleUrls: ['./patient-contact-details.component.css'],
 })
 export class PatientContactDetailsComponent implements OnInit, OnDestroy {
   @Output() contactSubmitted = new EventEmitter<void>();
@@ -21,7 +27,12 @@ export class PatientContactDetailsComponent implements OnInit, OnDestroy {
 
   relationshipTypes: any[] = [];
 
-  cityData: Array<{ city: string; state: string; country: string; postalCode: string }> = [];
+  cityData: Array<{
+    city: string;
+    state: string;
+    country: string;
+    postalCode: string;
+  }> = [];
   countries: string[] = [];
   statesList: string[] = [];
   citiesList: string[] = [];
@@ -55,16 +66,24 @@ export class PatientContactDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.http.get<any[]>('assets/data/relations-type.json')
-      .subscribe(data => this.relationshipTypes = data || []);
+    this.http
+      .get<any[]>('assets/data/relations-type.json')
+      .subscribe((data) => (this.relationshipTypes = data || []));
 
-    this.http.get<any[]>('assets/data/india-locations.json')
-      .subscribe(list => {
+    this.http
+      .get<any[]>('assets/data/india-locations.json')
+      .subscribe((list) => {
         this.cityData = list || [];
 
-        this.citiesList = Array.from(new Set(this.cityData.map(x => x.city))).sort();
-        this.statesList = Array.from(new Set(this.cityData.map(x => x.state))).sort();
-        this.countries = Array.from(new Set(this.cityData.map(x => x.country))).sort();
+        this.citiesList = Array.from(
+          new Set(this.cityData.map((x) => x.city))
+        ).sort();
+        this.statesList = Array.from(
+          new Set(this.cityData.map((x) => x.state))
+        ).sort();
+        this.countries = Array.from(
+          new Set(this.cityData.map((x) => x.country))
+        ).sort();
 
         this.filteredCities[0] = this.citiesList.slice(0, 200);
         this.filteredStates[0] = this.statesList.slice(0, 200);
@@ -79,7 +98,7 @@ export class PatientContactDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.subs.forEach(s => s.unsubscribe());
+    this.subs.forEach((s) => s.unsubscribe());
   }
 
   createAddressGroup(): FormGroup {
@@ -92,7 +111,7 @@ export class PatientContactDetailsComponent implements OnInit, OnDestroy {
       city: ['', Validators.required],
       state: ['', Validators.required],
       postalCode: ['', Validators.required],
-      country: ['', Validators.required]
+      country: ['', Validators.required],
     });
   }
 
@@ -100,7 +119,7 @@ export class PatientContactDetailsComponent implements OnInit, OnDestroy {
     return this.fb.group({
       system: ['Phone', Validators.required],
       useCode: ['', Validators.required],
-      value: ['', Validators.required]
+      value: ['', Validators.required],
     });
   }
 
@@ -147,11 +166,13 @@ export class PatientContactDetailsComponent implements OnInit, OnDestroy {
     if (this.telecoms.length > 1) this.telecoms.removeAt(index);
   }
 
-
   setupAddressAutocomplete(index: number) {
-    this.filteredCountries[index] = this.filteredCountries[index] || this.countries.slice(0, 200);
-    this.filteredStates[index] = this.filteredStates[index] || this.statesList.slice(0, 200);
-    this.filteredCities[index] = this.filteredCities[index] || this.citiesList.slice(0, 200);
+    this.filteredCountries[index] =
+      this.filteredCountries[index] || this.countries.slice(0, 200);
+    this.filteredStates[index] =
+      this.filteredStates[index] || this.statesList.slice(0, 200);
+    this.filteredCities[index] =
+      this.filteredCities[index] || this.citiesList.slice(0, 200);
 
     this.showCountry[index] = this.showCountry[index] ?? false;
     this.showState[index] = this.showState[index] ?? false;
@@ -159,23 +180,26 @@ export class PatientContactDetailsComponent implements OnInit, OnDestroy {
 
     const group = this.addresses.at(index) as FormGroup;
 
-    const subC = group.get('country')!.valueChanges
-      .pipe(debounceTime(200), distinctUntilChanged())
-      .subscribe(val => {
+    const subC = group
+      .get('country')!
+      .valueChanges.pipe(debounceTime(200), distinctUntilChanged())
+      .subscribe((val) => {
         this.filteredCountries[index] = this.filterOptions(this.countries, val);
       });
     this.subs.push(subC);
 
-    const subS = group.get('state')!.valueChanges
-      .pipe(debounceTime(200), distinctUntilChanged())
-      .subscribe(val => {
+    const subS = group
+      .get('state')!
+      .valueChanges.pipe(debounceTime(200), distinctUntilChanged())
+      .subscribe((val) => {
         this.filteredStates[index] = this.filterOptions(this.statesList, val);
       });
     this.subs.push(subS);
 
-    const subCity = group.get('city')!.valueChanges
-      .pipe(debounceTime(200), distinctUntilChanged())
-      .subscribe(val => {
+    const subCity = group
+      .get('city')!
+      .valueChanges.pipe(debounceTime(200), distinctUntilChanged())
+      .subscribe((val) => {
         this.filteredCities[index] = this.filterOptions(this.citiesList, val);
       });
     this.subs.push(subCity);
@@ -184,9 +208,8 @@ export class PatientContactDetailsComponent implements OnInit, OnDestroy {
   private filterOptions(list: string[], value: any): string[] {
     const q = (value || '').toString().toLowerCase().trim();
     if (!q) return list.slice(0, 200);
-    return list.filter(x => x.toLowerCase().includes(q)).slice(0, 200);
+    return list.filter((x) => x.toLowerCase().includes(q)).slice(0, 200);
   }
-
 
   selectCountry(i: number, value: string) {
     this.addresses.at(i).get('country')?.setValue(value);
@@ -198,12 +221,13 @@ export class PatientContactDetailsComponent implements OnInit, OnDestroy {
     this.showState[i] = false;
   }
 
-
   selectCity(i: number, city: string) {
     const group = this.addresses.at(i) as FormGroup;
     group.get('city')?.setValue(city);
 
-    const found = this.cityData.find(c => c.city.toLowerCase() === city.toLowerCase());
+    const found = this.cityData.find(
+      (c) => c.city.toLowerCase() === city.toLowerCase()
+    );
     if (found) {
       group.get('state')?.setValue(found.state);
       group.get('country')?.setValue(found.country);
@@ -239,19 +263,19 @@ export class PatientContactDetailsComponent implements OnInit, OnDestroy {
 
     const payload = {
       ...this.contactForm.value,
-      patientId: patientId
+      patientId: patientId,
     };
 
     this.patientContactService.saveContact(payload).subscribe({
-      next: res => {
+      next: (res) => {
         alert('Contact saved successfully!');
         localStorage.setItem('contactCompleted', 'true');
         this.contactSubmitted.emit();
       },
-      error: err => {
+      error: (err) => {
         console.error(err);
         alert('Failed to save contact');
-      }
+      },
     });
   }
 }

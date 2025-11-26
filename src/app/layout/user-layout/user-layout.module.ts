@@ -8,7 +8,7 @@ import { PatientDetailsComponent } from '../../common/forms/patient-details/pati
 import { ReactiveFormsModule } from '@angular/forms';
 import { HomePageComponent } from 'src/app/common/user/home-page/home-page.component';
 import { PatientContactDetailsComponent } from 'src/app/common/forms/patient-contact-details/patient-contact-details.component';
-
+import { PatientAllergyComponent } from 'src/app/common/forms/patient-allergy/patient-allergy.component';
 
 @NgModule({
   declarations: [
@@ -16,12 +16,9 @@ import { PatientContactDetailsComponent } from 'src/app/common/forms/patient-con
     SidebarComponent,
     PatientDetailsComponent,
     PatientContactDetailsComponent,
-    HomePageComponent
+    HomePageComponent,
+    PatientAllergyComponent,
   ],
-  imports: [
-    CommonModule,
-    UserLayoutRoutingModule,
-     ReactiveFormsModule,
-  ]
+  imports: [CommonModule, UserLayoutRoutingModule, ReactiveFormsModule],
 })
-export class UserLayoutModule { }
+export class UserLayoutModule {}
