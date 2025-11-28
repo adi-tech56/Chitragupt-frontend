@@ -1,0 +1,192 @@
+<div class="d-flex justify-content-between align-items-center my-3 px-2">
+  <h4 class="m-0">
+    {{
+      viewMode === 'TODAY' ? "Today's Medications" :
+      viewMode === 'SKIPPED' ? "Skipped Medications" :
+      "Completed Medications"
+    }}
+  </h4>
+  <div class="btn-group" role="group">
+
+    <button 
+      class="btn"
+      [ngClass]="viewMode === 'TODAY' ? 'btn-primary' : 'btn-outline-primary'"
+      (click)="setView('TODAY')">
+      <i class="fa-solid fa-list-check me-1"></i>
+      Today
+    </button>
+    <button 
+      class="btn"
+      [ngClass]="viewMode === 'SKIPPED' ? 'btn-primary' : 'btn-outline-primary'"
+      (click)="setView('SKIPPED')">
+      <i class="fa-solid fa-ban me-1"></i>
+      Skipped
+    </button>
+    <button 
+      class="btn"
+      [ngClass]="viewMode === 'COMPLETED' ? 'btn-primary' : 'btn-outline-primary'"
+      (click)="setView('COMPLETED')">
+      <i class="fa-solid fa-check-circle me-1"></i>
+      Completed
+    </button>
+
+  </div>
+
+</div>
+
+  <div *ngIf="viewMode === 'TODAY'">
+
+    <div class="card mb-4">
+
+
+      <div class="card-body">
+        <div *ngIf="activeMeds.length === 0" class="text-muted">
+          No active medicines for today.
+        </div>
+
+        <div class="accordion" id="todayMedsAccordion">
+          <div *ngFor="let med of activeMeds | slice:0:4; let i = index" class="accordion-item">
+            <h2 class="accordion-header" id="today-heading-{{ i }}">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                [attr.data-bs-target]="'#today-collapse-' + i" aria-expanded="false"
+                [attr.aria-controls]="'today-collapse-' + i">
+
+                <strong class="me-2">{{ med.doseTime | date: 'shortTime' }}</strong>
+                <span class="text-primary">{{ med.medication }}</span>
+
+              </button>
+            </h2>
+
+            <div [id]="'today-collapse-' + i" class="accordion-collapse collapse"
+              [attr.aria-labelledby]="'today-heading-' + i" data-bs-parent="#todayMedsAccordion">
+
+              <div class="accordion-body d-flex justify-content-between align-items-start flex-wrap">
+
+                <div class="med-details">
+                  <p><strong>Dosage:</strong> {{ med.dosage.amount }} {{ med.dosage.amountUnitId }}</p>
+                  <p><strong>Instruction:</strong> {{ med.dosage.instruction || '—' }}</p>
+                  <p><strong>Condition:</strong> {{ med.conditionName }}</p>
+                  <p class="m-0 text-secondary"><small>Prescribed by: {{ med.doctorName }}</small></p>
+                </div>
+
+        
+                <div class="med-action mt-2 mt-sm-0">
+                  <div *ngIf="med.status === 'PENDING' && isWithinCompletionWindow(med); else statusTemplate">
+                    <label class="d-flex align-items-center mb-0">
+                      <input type="checkbox" class="form-check-input me-2" (change)="markTaken(med)" />
+                      Mark as Completed
+                    </label>
+                  </div>
+
+                  <ng-template #statusTemplate>
+                    <span *ngIf="med.status === 'TAKEN'" class="badge bg-success fs-6">Completed</span>
+                  </ng-template>
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+<div *ngIf="viewMode === 'SKIPPED'">
+  <div class="card mb-4">
+    <div class="card-body">
+      <div *ngIf="skippedMeds.length === 0" class="text-muted">
+        No skipped medications.
+      </div>
+
+      <div class="accordion" id="skippedMedsAccordion">
+        <div *ngFor="let med of paginatedSkippedMeds; let i = index" class="accordion-item">
+          <h2 class="accordion-header" id="skipped-heading-{{ i }}">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+              [attr.data-bs-target]="'#skipped-collapse-' + i" aria-expanded="false"
+              [attr.aria-controls]="'skipped-collapse-' + i">
+              <strong class="me-2">{{ med.doseTime | date: 'shortTime' }}</strong>
+              <span class="text-danger">{{ med.medication }}</span>
+            </button>
+          </h2>
+          <div [id]="'skipped-collapse-' + i" class="accordion-collapse collapse"
+               [attr.aria-labelledby]="'skipped-heading-' + i" data-bs-parent="#skippedMedsAccordion">
+            <div class="accordion-body">
+              <p><strong>Condition:</strong> {{ med.conditionName }}</p>
+              <p><strong>Doctor:</strong> {{ med.doctorName }}</p>
+              <p><strong>Dosage:</strong> {{ med.dosage.amount }} {{ med.dosage.amountUnitId }}</p>
+              <p><strong>Timing:</strong> {{ med.timing.timeOfDay }} ({{ med.timing.whenCode }})</p>
+              <p><strong>Instruction:</strong> {{ med.dosage.instruction || '—' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination Controls -->
+      <nav *ngIf="totalSkippedPages > 1" aria-label="Skipped pagination">
+        <ul class="pagination justify-content-center mt-3">
+          <li class="page-item" [class.disabled]="skippedPagination.page === 1">
+            <a class="page-link" (click)="setSkippedPage(skippedPagination.page - 1)">Previous</a>
+          </li>
+          <li class="page-item" *ngFor="let p of [].constructor(totalSkippedPages); let idx = index"
+              [class.active]="skippedPagination.page === idx + 1">
+            <a class="page-link" (click)="setSkippedPage(idx + 1)">{{ idx + 1 }}</a>
+          </li>
+          <li class="page-item" [class.disabled]="skippedPagination.page === totalSkippedPages">
+            <a class="page-link" (click)="setSkippedPage(skippedPagination.page + 1)">Next</a>
+          </li>
+        </ul>
+      </nav>
+
+    </div>
+  </div>
+</div>
+<div *ngIf="viewMode === 'COMPLETED'">
+  <div class="card mb-4">
+    <div class="card-body">
+      <div *ngIf="completedMeds.length === 0" class="text-muted">
+        No completed medications.
+      </div>
+
+      <div class="accordion" id="completedMedsAccordion">
+        <div *ngFor="let med of paginatedCompletedMeds; let i = index" class="accordion-item">
+          <h2 class="accordion-header" id="completed-heading-{{ i }}">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+              [attr.data-bs-target]="'#completed-collapse-' + i" aria-expanded="false"
+              [attr.aria-controls]="'completed-collapse-' + i">
+              <strong class="me-2">{{ med.doseTime | date: 'shortTime' }}</strong>
+              <span class="text-primary">{{ med.medication }}</span>
+            </button>
+          </h2>
+          <div [id]="'completed-collapse-' + i" class="accordion-collapse collapse"
+               [attr.aria-labelledby]="'completed-heading-' + i" data-bs-parent="#completedMedsAccordion">
+            <div class="accordion-body">
+              <p><strong>Condition:</strong> {{ med.conditionName }}</p>
+              <p><strong>Doctor:</strong> {{ med.doctorName }}</p>
+              <p><strong>Dosage:</strong> {{ med.dosage.amount }} {{ med.dosage.amountUnitId }}</p>
+              <p><strong>Timing:</strong> {{ med.timing.timeOfDay }} ({{ med.timing.whenCode }})</p>
+              <p><strong>Instruction:</strong> {{ med.dosage.instruction || '—' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <nav *ngIf="totalCompletedPages > 1" aria-label="Completed pagination">
+        <ul class="pagination justify-content-center mt-3">
+          <li class="page-item" [class.disabled]="completedPagination.page === 1">
+            <a class="page-link" (click)="setCompletedPage(completedPagination.page - 1)">Previous</a>
+          </li>
+          <li class="page-item" *ngFor="let p of [].constructor(totalCompletedPages); let idx = index"
+              [class.active]="completedPagination.page === idx + 1">
+            <a class="page-link" (click)="setCompletedPage(idx + 1)">{{ idx + 1 }}</a>
+          </li>
+          <li class="page-item" [class.disabled]="completedPagination.page === totalCompletedPages">
+            <a class="page-link" (click)="setCompletedPage(completedPagination.page + 1)">Next</a>
+          </li>
+        </ul>
+      </nav>
+
+    </div>
+  </div>
+</div>

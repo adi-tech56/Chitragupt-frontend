@@ -5,6 +5,7 @@ import { MedicationLayoutRoutingModule } from './medication-layout-routing.modul
 import { MedicationLayoutComponent } from './medication-layout.component';
 import { MedicationPageComponent } from 'src/app/common/user/medication-page/medication-page.component';
 import { ViewPrescriptionComponent } from 'src/app/common/view-prescription/view-prescription.component';
+import { SharedModule } from "src/app/shared/shared.module";
 
 
 @NgModule({
@@ -15,7 +16,8 @@ import { ViewPrescriptionComponent } from 'src/app/common/view-prescription/view
   ],
   imports: [
     CommonModule,
-    MedicationLayoutRoutingModule
-  ]
+    MedicationLayoutRoutingModule,
+    SharedModule
+]
 })
 export class MedicationLayoutModule { }

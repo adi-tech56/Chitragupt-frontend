@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { debounceTime } from 'rxjs';
 import { UserLoginDetails } from 'src/app/core/Models/Authentication';
 import { AuthService } from 'src/app/core/Services/auth-service.service';
+import { TokenRefreshService } from 'src/app/core/Services/token-refresh.service';
 
 
 let initialEmail = '';
@@ -25,7 +26,7 @@ export class LoginComponent implements OnInit {
   @Output() passwordReset = new EventEmitter<void>();
   @Output() loginSuccess = new EventEmitter<boolean>();
   private auth = inject(AuthService);
-
+ private tokenRefresh = inject(TokenRefreshService);
   email = '';
   password = '';
   userReset: Boolean = false;
@@ -77,7 +78,7 @@ export class LoginComponent implements OnInit {
       next: (res) => {
         this.response = res;
         console.log('Post created successfully:', res);
-        
+          this.tokenRefresh.startAutoRefresh(); 
         this.loginSuccess.emit();
       },
       error: (err) => {

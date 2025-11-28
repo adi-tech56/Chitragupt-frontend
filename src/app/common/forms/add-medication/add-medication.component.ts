@@ -1,10 +1,11 @@
+import { Location } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { debounceTime, of, Subscription, switchMap } from 'rxjs';
 import { Amount, Medicine, Route, SuperPrescriptionData } from 'src/app/core/Models/Medication';
-import { AutoCompleteService } from 'src/app/core/Services/auto-complete.service';
-import { MedicationService } from 'src/app/core/Services/medication-service';
+import { AutoCompleteService } from 'src/app/core/Services/PrescriptionServices/auto-complete.service';
+import { MedicationService } from 'src/app/core/Services/PrescriptionServices/medication-service';
 
 @Component({
   selector: 'app-add-medication',
@@ -37,7 +38,8 @@ export class AddMedicationComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private medicationService: MedicationService,
     private http: HttpClient,
-    private autoComplete: AutoCompleteService
+    private autoComplete: AutoCompleteService,
+    private location:Location
   ) {
     this.superPrescription = this.fb.group({
       doctorName: ['', Validators.required],
@@ -46,7 +48,9 @@ export class AddMedicationComponent implements OnInit, OnDestroy {
       prescription: this.fb.array([this.createPrescriptionGroup()])
     });
   }
-
+  goBack() {
+  this.location.back();
+}
   ngOnInit(): void {
     this.http.get<any[]>('assets/when-code.json').subscribe(data => this.whenCode = data);
     this.http.get<any[]>('assets/period-unit.json').subscribe(data => this.periodUnit = data);
@@ -403,6 +407,7 @@ export class AddMedicationComponent implements OnInit, OnDestroy {
     this.medicationService.savePrescription(payload).subscribe({
       next: res =>{
         console.log("Saved!", res);
+        this.goBack();
       } ,
       error: err => console.error("Save failed", err)
     });

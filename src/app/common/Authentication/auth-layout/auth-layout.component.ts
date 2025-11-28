@@ -22,6 +22,7 @@ constructor(private router: Router) { }
     // } else {
       // redirect to main app/dashboard etc.
       console.log('Login complete — navigate to dashboard');
+    
       this.router.navigate(['/user'])
     // }
   }

@@ -1,4 +1,7 @@
 <div class="p-2">
+  <button (click)="goBack()" class="btn btn-outline-primary btn-sm">
+  <i class="fa-solid fa-angle-left"></i>
+</button>
   <h3 class="text-primary text-center mb-4 fw-bold">Add Your Prescription</h3>
 
   <form [formGroup]="superPrescription" (ngSubmit)="submit()">
@@ -22,7 +25,7 @@
     </div>
 
 
-    <!-- Prescription steps -->
+    
     <div formArrayName="prescription">
 
       <!-- Loop but show ONLY the current step -->
@@ -34,7 +37,7 @@
 
           <!-- Reason autocomplete -->
           <div class="dropdown-container">
-            <label>Reason</label>
+            <label>Medical Condition</label>
             <input type="text" formControlName="reason" placeholder="Search medical condition" />
             <ul *ngIf="conditions.length > 0" class="dropdown">
               <li *ngFor="let item of conditions" (click)="selectCondition(item)">

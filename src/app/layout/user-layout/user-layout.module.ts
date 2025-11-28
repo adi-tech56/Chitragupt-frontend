@@ -1,32 +1,29 @@
+// src/app/layout/user-layout/user-layout.module.ts
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { UserLayoutRoutingModule } from './user-layout-routing.module';
 import { UserLayoutComponent } from './user-layout.component';
-import { SidebarComponent } from 'src/app/common/sidebar/sidebar.component';
-import { PatientDetailsComponent } from '../../common/forms/patient-details/patient-details.component';
-import { ReactiveFormsModule } from '@angular/forms';
-import { HomePageComponent } from 'src/app/common/user/home-page/home-page.component';
-import { PatientContactDetailsComponent } from 'src/app/common/forms/patient-contact-details/patient-contact-details.component';
-import { AddMedicationComponent } from 'src/app/common/forms/add-medication/add-medication.component';
-import { MedicationPageComponent } from 'src/app/common/user/medication-page/medication-page.component';
-import { ViewPrescriptionComponent } from 'src/app/common/view-prescription/view-prescription.component';
 
+import { PatientDetailsComponent } from '../../common/forms/patient-details/patient-details.component';
+import { PatientContactDetailsComponent } from '../../common/forms/patient-contact-details/patient-contact-details.component';
+import { HomePageComponent } from '../../common/user/home-page/home-page.component';
+
+import { ReactiveFormsModule } from '@angular/forms';
+import { SharedModule } from 'src/app/shared/shared.module';  // ⬅ IMPORTANT
 
 @NgModule({
   declarations: [
     UserLayoutComponent,
-    SidebarComponent,
     PatientDetailsComponent,
     PatientContactDetailsComponent,
     HomePageComponent,
-    AddMedicationComponent,
-    
   ],
   imports: [
     CommonModule,
     UserLayoutRoutingModule,
-     ReactiveFormsModule,
+    ReactiveFormsModule,
+    SharedModule   // ✔ Sidebar, DailyMedicines, AddMedication available now
   ]
 })
 export class UserLayoutModule { }

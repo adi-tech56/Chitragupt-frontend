@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { UserLoginDetails, UserRegisterDetails } from '../Models/Authentication';
-import { map, Observable } from 'rxjs';
+import { catchError, map, Observable, of } from 'rxjs';
 import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 
@@ -19,7 +19,12 @@ export class AuthService {
 
   getToken(): string | null {
     const token = this.cookieService.get('accessToken');
-    console.log(token);
+
+    return token ? token : null;
+  }
+  getRefreshToken(): string | null {
+    const token = this.cookieService.get('refreshToken');
+
     return token ? token : null;
   }
 
@@ -59,16 +64,15 @@ getUserId(): number {
     if (!roleMatches) return [];
     return roleMatches.map((r: string) => r.split('=')[1]);
   }
-  refresh() {
-    return this.http.get(`${this.apiUrl}/refresh`, {
-      withCredentials: true
-    });
-  }
+  // refresh() {
+  //   return this.http.get(`${this.apiUrl}/refresh`, {
+  //     withCredentials: true
+  //   });
+  // }
 
 
   isTokenExpired(token: string): boolean {
     const decoded = this.decodeToken(token);
-    console.log(decoded)
     if (!decoded || !decoded.exp) return true;
 
     const expiryDate = decoded.exp * 1000;
@@ -133,10 +137,21 @@ getUserId(): number {
 
   }
 
-  logout() {
+ refresh(): Observable<boolean> {
+    return this.http.get(`${this.apiUrl}/refresh`, { withCredentials: true }).pipe(
+      map((res: any) => {
+        return true;
+      }),
+      catchError(() => {
+        this.logout();
+        return of(false);
+      })
+    );
+  }
+
+  /** Logout **/
+  logout(): void {
     this.cookieService.delete('accessToken', '/');
-
-
     this.cookieService.delete('refreshToken', '/');
     this.router.navigate(['/auth']);
   }

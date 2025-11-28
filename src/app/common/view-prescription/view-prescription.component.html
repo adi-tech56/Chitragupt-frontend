@@ -1,1 +1,97 @@
-<p>view-prescription works!</p>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+
+
+  <button (click)="goBack()" class="btn btn-outline-primary btn-sm">
+    <i class="fa-solid fa-angle-left"></i>
+  </button>
+
+  
+  <a [routerLink]="['/user/add-medication']" class="btn btn-outline-primary btn-sm">
+
+    <i class="fa-solid fa-plus"></i> Add Prescription
+  </a>
+
+</div>
+
+<div class="prescription-wrapper" *ngIf="allMeds.length > 0; else noPrescriptions">
+
+  <div class="card mb-4" *ngFor="let p of allMeds, let i = index">
+    <div class="card-header bg-primary text-white">
+      <h4 class="mb-0">Prescription {{ i+1 }}</h4>
+    </div>
+
+    <div class="card-body">
+      <p><strong>Doctor:</strong> {{ p.doctorName }}</p>
+      <p><strong>Date:</strong> {{ p.prescriptionDate | date }}</p>
+      <p><strong>Notes:</strong> {{ p.notes || '—' }}</p>
+    </div>
+
+  
+    <div class="accordion" [id]="'accordion-' + p.superPrescriptionId">
+
+      <div class="accordion-item" *ngFor="let c of p.prescriptions; let i = index">
+        <h2 class="accordion-header" [id]="'heading-' + p.superPrescriptionId + '-' + i">
+          
+          <button class="accordion-button collapsed"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  [attr.data-bs-target]="'#collapse-' + p.superPrescriptionId + '-' + i"
+                  aria-expanded="false"
+                  [attr.aria-controls]="'collapse-' + p.superPrescriptionId + '-' + i">
+            Condition: {{ c.conditionName }}
+          </button>
+
+        </h2>
+
+        <div [id]="'collapse-' + p.superPrescriptionId + '-' + i"
+             class="accordion-collapse collapse"
+             [attr.aria-labelledby]="'heading-' + p.superPrescriptionId + '-' + i"
+             [attr.data-bs-parent]="'#accordion-' + p.superPrescriptionId">
+
+          <div class="accordion-body">
+
+            <p><strong>Condition Notes:</strong> {{ c.notes || '—' }}</p>
+
+
+            <div *ngFor="let m of c.medications" class="mb-3 p-3 border rounded bg-light">
+
+              <h5 class="text-primary">{{ m.medication }}</h5>
+
+              <p><strong>Status:</strong> {{ m.status }}</p>
+              <p>
+                <strong>Effective:</strong>
+                {{ m.effectiveStartDate | date }} ➝ {{ m.effectiveEndDate | date }}
+              </p>
+              <p><strong>Medication Notes:</strong> {{ m.notes || '—' }}</p>
+
+              <h6 class="mt-3">Dosage</h6>
+              <ul>
+                <li>Amount: {{ m.dosage.amount }} {{ m.dosage.amountUnitId }}</li>
+                <li>Route: {{ m.dosage.routeId }}</li>
+                <li>Instruction: {{ m.dosage.instruction || '—' }}</li>
+              </ul>
+
+              <h6 class="mt-3">Timing</h6>
+              <ul>
+                <li>Frequency: {{ m.timing.frequency }} times</li>
+                <li>Every: {{ m.timing.period }} {{ m.timing.periodUnit }}</li>
+                <li>Time of Day: {{ m.timing.timeOfDay }}</li>
+                <li>When: {{ m.timing.whenCode }}</li>
+              </ul>
+
+            </div> 
+          </div> 
+
+        </div> 
+      </div> 
+
+    </div>
+
+  </div> 
+
+</div>
+
+<ng-template #noPrescriptions>
+  <p>No prescriptions available.</p>
+</ng-template>

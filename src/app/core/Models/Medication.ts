@@ -96,16 +96,17 @@ export interface MedicationNormalized extends MedicationResponse {
 export interface MedicationWithStatus extends MedicationNormalized {
   taken?: boolean; 
   status: 'PENDING' | 'TAKEN' | 'SKIPPED';
+  doseTime?: Date;     
+  logCreatedAt?: Date;
 }
-
 export interface PatientMedicationLogs {
   id: number;                    
   patientId: number;             
   superPrescriptionId: number;   
   prescriptionId: number;        
-  statementId: number;          
+  statementId: number;           
   taken: boolean;                
-  createdAt: string;           
-  updatedAt: string;           
+  doseTime: string;              // ISO string of the scheduled dose time
+  createdAt: string;             
+  updatedAt: string;             
 }
-
