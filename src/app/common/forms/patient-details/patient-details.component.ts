@@ -34,7 +34,7 @@ export class PatientDetailsComponent {
 
   createAddressGroup(): FormGroup {
     return this.fb.group({
-      addressUse: ['', Validators.required],
+      useCode: ['', Validators.required],
       addressType: ['', Validators.required],
       text: ['', Validators.required],
       line1: [''],

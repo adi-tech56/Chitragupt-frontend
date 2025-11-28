@@ -6,8 +6,14 @@
         <div *ngIf="currentStep === 1">
           <div class="row">
             <div class="col-md-6 mb-3">
-              <label class="form-label text-primary fw-semibold">Birth Date</label>
-              <input type="date" class="form-control" formControlName="birthDate" />
+              <label class="form-label text-primary fw-semibold"
+                >Birth Date</label
+              >
+              <input
+                type="date"
+                class="form-control"
+                formControlName="birthDate"
+              />
             </div>
             <div class="col-md-6 mb-3">
               <label class="form-label text-primary fw-semibold">Gender</label>
@@ -19,7 +25,9 @@
               </select>
             </div>
             <div class="col-md-6 mb-3">
-              <label class="form-label text-primary fw-semibold">Marital Status</label>
+              <label class="form-label text-primary fw-semibold"
+                >Marital Status</label
+              >
               <select class="form-select" formControlName="maritalStatus">
                 <option value="">Select</option>
                 <option value="unmarried">Unmarried</option>
@@ -42,16 +50,24 @@
         <div *ngIf="currentStep === 2" formArrayName="addresses">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="text-primary mb-0">Addresses</h4>
-            <button type="button" class="btn btn-outline-primary" (click)="addAddress()">
+            <button
+              type="button"
+              class="btn btn-outline-primary"
+              (click)="addAddress()"
+            >
               <i class="fa fa-plus"></i>
             </button>
           </div>
           <div class="scroll-section">
-            <div *ngFor="let address of addresses.controls; let i = index" [formGroupName]="i" class="mb-3 border rounded p-3">
+            <div
+              *ngFor="let address of addresses.controls; let i = index"
+              [formGroupName]="i"
+              class="mb-3 border rounded p-3"
+            >
               <div class="row">
                 <div class="col-md-6 mb-3">
                   <label>Address Use</label>
-                  <select class="form-select" formControlName="addressUse">
+                  <select class="form-select" formControlName="useCode">
                     <option value="">Select</option>
                     <option value="home">Home</option>
                     <option value="work">Work</option>
@@ -75,9 +91,24 @@
                 </div>
                 <div class="col-md-6 mb-3 position-relative">
                   <label>City</label>
-                  <input class="form-control" formControlName="city" (input)="onCityInput(i)" (focus)="onCityInput(i)" />
-                  <ul *ngIf="cityDropdownIndex === i" class="list-group position-absolute w-100" style="z-index: 1000; max-height:150px; overflow:auto;">
-                    <li *ngFor="let c of filteredCities" class="list-group-item list-group-item-action" (click)="selectCity(i, c)">{{ c.city }}</li>
+                  <input
+                    class="form-control"
+                    formControlName="city"
+                    (input)="onCityInput(i)"
+                    (focus)="onCityInput(i)"
+                  />
+                  <ul
+                    *ngIf="cityDropdownIndex === i"
+                    class="list-group position-absolute w-100"
+                    style="z-index: 1000; max-height: 150px; overflow: auto"
+                  >
+                    <li
+                      *ngFor="let c of filteredCities"
+                      class="list-group-item list-group-item-action"
+                      (click)="selectCity(i, c)"
+                    >
+                      {{ c.city }}
+                    </li>
                   </ul>
                 </div>
                 <div class="col-md-6 mb-3">
@@ -93,7 +124,14 @@
                   <input class="form-control" formControlName="country" />
                 </div>
               </div>
-              <button type="button" class="btn btn-outline-danger btn-sm" (click)="removeAddress(i)" *ngIf="addresses.length > 1">Remove</button>
+              <button
+                type="button"
+                class="btn btn-outline-danger btn-sm"
+                (click)="removeAddress(i)"
+                *ngIf="addresses.length > 1"
+              >
+                Remove
+              </button>
             </div>
           </div>
         </div>
@@ -101,12 +139,20 @@
         <div *ngIf="currentStep === 3" formArrayName="telecoms">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="text-primary mb-0">Telecom</h4>
-            <button type="button" class="btn btn-outline-primary" (click)="addTelecom()">
+            <button
+              type="button"
+              class="btn btn-outline-primary"
+              (click)="addTelecom()"
+            >
               <i class="fa fa-plus"></i>
             </button>
           </div>
           <div class="scroll-section">
-            <div *ngFor="let telecom of telecoms.controls; let i = index" [formGroupName]="i" class="mb-3 border rounded p-3">
+            <div
+              *ngFor="let telecom of telecoms.controls; let i = index"
+              [formGroupName]="i"
+              class="mb-3 border rounded p-3"
+            >
               <div class="row">
                 <div class="col-md-6 mb-3">
                   <label class="form-label fw-semibold">Contact Use</label>
@@ -125,16 +171,44 @@
                 </div>
               </div>
               <div class="text-end">
-                <button type="button" class="btn btn-outline-danger btn-sm" (click)="removeTelecom(i)" *ngIf="telecoms.length > 1"><i class="fa fa-trash"></i></button>
+                <button
+                  type="button"
+                  class="btn btn-outline-danger btn-sm"
+                  (click)="removeTelecom(i)"
+                  *ngIf="telecoms.length > 1"
+                >
+                  <i class="fa fa-trash"></i>
+                </button>
               </div>
             </div>
           </div>
         </div>
 
         <div class="d-flex justify-content-between mt-4">
-          <button type="button" class="btn btn-secondary" (click)="previousStep()" *ngIf="!(currentStep ===1)">Previous</button>
-          <button type="button" class="btn btn-primary" *ngIf="currentStep < maxStep" (click)="nextStep()">Next</button>
-          <button type="submit" class="btn btn-success" *ngIf="currentStep === maxStep" [disabled]="!patientForm.valid">Submit</button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="previousStep()"
+            *ngIf="!(currentStep === 1)"
+          >
+            Previous
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            *ngIf="currentStep < maxStep"
+            (click)="nextStep()"
+          >
+            Next
+          </button>
+          <button
+            type="submit"
+            class="btn btn-success"
+            *ngIf="currentStep === maxStep"
+            [disabled]="!patientForm.valid"
+          >
+            Submit
+          </button>
         </div>
       </form>
     </div>
