@@ -1,0 +1,176 @@
+<div class="p-2">
+  <button (click)="goBack()" class="btn btn-outline-primary btn-sm">
+  <i class="fa-solid fa-angle-left"></i>
+</button>
+  <h3 class="text-primary text-center mb-4 fw-bold">Add Your Prescription</h3>
+
+  <form [formGroup]="superPrescription" (ngSubmit)="submit()">
+
+    <!-- Top-level info -->
+    <div *ngIf="currentStep === 0">
+      <div>
+        <label>Doctor Name</label>
+        <input type="text" formControlName="doctorName" placeholder="Doctor Name" />
+      </div>
+
+      <div>
+        <label>Prescription Date</label>
+        <input type="date" formControlName="prescriptionDate" />
+      </div>
+
+      <div>
+        <label>Notes</label>
+        <textarea formControlName="notes" placeholder="General notes"></textarea>
+      </div>
+    </div>
+
+
+    
+    <div formArrayName="prescription">
+
+      <!-- Loop but show ONLY the current step -->
+      <div *ngFor="let pres of prescriptions.controls; let stepIndex = index">
+
+        <div *ngIf="stepIndex === currentStep" [formGroupName]="stepIndex" class="prescription-block">
+
+          <h3>Prescription {{ stepIndex + 1 }} of {{ prescriptions.length }}</h3>
+
+          <!-- Reason autocomplete -->
+          <div class="dropdown-container">
+            <label>Medical Condition</label>
+            <input type="text" formControlName="reason" placeholder="Search medical condition" />
+            <ul *ngIf="conditions.length > 0" class="dropdown">
+              <li *ngFor="let item of conditions" (click)="selectCondition(item)">
+                {{ item.name || item }}
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <label>Notes</label>
+            <textarea formControlName="notes"></textarea>
+          </div>
+
+          <!-- Medications -->
+          <div formArrayName="medications">
+            <div *ngFor="let med of getMedications(stepIndex).controls; let medIndex = index" [formGroupName]="medIndex"
+              class="medication-block">
+
+              <h4>Medication {{ medIndex + 1 }}</h4>
+              <label>Medicine</label>
+              <input type="text" [value]="currentMedicineName(stepIndex, medIndex)"
+                (input)="onMedicineInput($event, stepIndex, medIndex)" placeholder="Search medicine" />
+
+              <ul *ngIf="medicines.length > 0" class="dropdown">
+                <li *ngFor="let m of medicines" (click)="selectMedicine(m, stepIndex, medIndex)">
+                  {{ m.brandName }}
+                </li>
+              </ul>
+
+              <label>Status</label>
+              <select class="form-select" formControlName="status">
+                <option value="ACTIVE">Active</option>
+                <option value="COMPLETED">Completed</option>
+                <option value="ONHOLD">OnHold</option>
+                <option value="NOTTAKEN">NotTaken</option>
+                <option value="INTENDED">Intended</option>
+              </select>
+              <div>
+                <label> EffectiveStart Date</label>
+                <input type="date" formControlName="effectiveStartDate" />
+              </div>
+              <div>
+                <label> EffectiveEnd Date</label>
+                <input type="date" formControlName="effectiveEndDate" />
+              </div>
+              <!-- Dosage -->
+              <div formGroupName="dosage">
+                <h5>Dosage</h5>
+
+                <label>Amount</label>
+                <input type="number" formControlName="amount" />
+                <label>Amount Unit</label>
+                <input type="text" [value]="currentAmountUnitName(stepIndex, medIndex)"
+                  (input)="onAmountUnitInput($event, stepIndex, medIndex)" placeholder="Search amount unit" />
+
+                <ul *ngIf="amountUnit.length > 0" class="dropdown">
+                  <li *ngFor="let u of amountUnit" (click)="selectAmountUnit(u, stepIndex, medIndex)">
+                    {{ u.conceptName }}
+                  </li>
+                </ul>
+                <label>Route</label>
+                <input type="text" [value]="currentRouteName(stepIndex, medIndex)"
+                  (input)="onRouteInput($event, stepIndex, medIndex)" placeholder="Search route of medicine" />
+
+                <ul *ngIf="routeUnit.length > 0" class="dropdown">
+                  <li *ngFor="let u of routeUnit" (click)="selectRoute(u, stepIndex, medIndex)">
+                    {{ u.conceptName }}
+                  </li>
+                </ul>
+
+                <label>Instruction</label>
+                <input type="text" formControlName="instruction" />
+              </div>
+
+              <!-- Timing -->
+              <div formGroupName="timing">
+                <h5>Timing</h5>
+
+                <label>Frequency</label>
+                <input type="number" formControlName="frequency" />
+
+                <label>Period</label>
+                <input type="number" formControlName="period" />
+
+                <label>Period Unit</label>
+                <select class="form-select" formControlName="periodUnit">
+                  <option *ngFor="let r of periodUnit" [value]="r.value">{{ r.display }}</option>
+                </select>
+
+                <label>Time of Day</label>
+                <input type="time" formControlName="timeOfDay" step="1" />
+
+                <label>When Code</label>
+                <select class="form-select" formControlName="whenCode">
+                  <option *ngFor="let w of whenCode" [value]="w.value">{{ w.display }}</option>
+                </select>
+              </div>
+
+              <button type="button" (click)="removeMedication(stepIndex, medIndex)">
+                Remove Medication
+              </button>
+
+              <hr />
+            </div>
+          </div>
+
+          <button type="button" (click)="addMedication(stepIndex)">Add Medication</button>
+          <hr />
+
+        </div> <!-- END currentStep block -->
+      </div>
+    </div>
+
+    <!-- Step navigation -->
+    <div class="step-buttons">
+      <button type="button" (click)="prevStep()" [disabled]="currentStep === 0">Previous Prescription</button>
+
+      <button type="button" (click)="nextStep()" *ngIf="currentStep < prescriptions.length - 1">
+        Next Prescription
+      </button>
+
+      <button type="button" (click)="removePrescription(currentStep)" *ngIf="currentStep > 0">
+        Remove Prescription
+      </button>
+
+      <button type="button" (click)="addNewPrescription()" *ngIf="currentStep === prescriptions.length - 1">
+        Add Another Prescription
+      </button>
+
+      <button type="submit" *ngIf="currentStep === prescriptions.length - 1">
+        Submit All Prescriptions
+      </button>
+    </div>
+
+  </form>
+</div>

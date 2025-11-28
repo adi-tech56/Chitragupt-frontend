@@ -1,111 +1,438 @@
 [
-  { "code": "FAMMEMB", "display": "Family member" },
-  { "code": "CHILD", "display": "Child" },
-  { "code": "CHLDADOPT", "display": "Adopted child" },
-  { "code": "DAUADOPT", "display": "Adopted daughter" },
-  { "code": "SONADOPT", "display": "Adopted son" },
-  { "code": "CHLDFOST", "display": "Foster child" },
-  { "code": "DAUFOST", "display": "Foster daughter" },
-  { "code": "SONFOST", "display": "Foster son" },
-  { "code": "DAUC", "display": "Daughter" },
-  { "code": "DAU", "display": "Natural daughter" },
-  { "code": "STPDAU", "display": "Stepdaughter" },
-  { "code": "NCHILD", "display": "Natural child" },
-  { "code": "SON", "display": "Natural son" },
-  { "code": "SONC", "display": "Son" },
-  { "code": "STPSON", "display": "Stepson" },
-  { "code": "STPCHLD", "display": "Step child" },
-  { "code": "EXT", "display": "Extended family member" },
-  { "code": "AUNT", "display": "Aunt" },
-  { "code": "MAUNT", "display": "Maternal aunt" },
-  { "code": "PAUNT", "display": "Paternal aunt" },
-  { "code": "COUSN", "display": "Cousin" },
-  { "code": "MCOUSN", "display": "Maternal cousin" },
-  { "code": "PCOUSN", "display": "Paternal cousin" },
-  { "code": "GGRPRN", "display": "Great grandparent" },
-  { "code": "GGRFTH", "display": "Great grandfather" },
-  { "code": "MGGRFTH", "display": "Maternal great-grandfather" },
-  { "code": "PGGRFTH", "display": "Paternal great-grandfather" },
-  { "code": "GGRMTH", "display": "Great grandmother" },
-  { "code": "MGGRMTH", "display": "Maternal great-grandmother" },
-  { "code": "PGGRMTH", "display": "Paternal great-grandmother" },
-  { "code": "MGGRPRN", "display": "Maternal great-grandparent" },
-  { "code": "PGGRPRN", "display": "Paternal great-grandparent" },
-  { "code": "GRNDCHILD", "display": "Grandchild" },
-  { "code": "GRNDDAU", "display": "Granddaughter" },
-  { "code": "GRNDSON", "display": "Grandson" },
-  { "code": "GRPRN", "display": "Grandparent" },
-  { "code": "GRFTH", "display": "Grandfather" },
-  { "code": "MGRFTH", "display": "Maternal grandfather" },
-  { "code": "PGRFTH", "display": "Paternal grandfather" },
-  { "code": "GRMTH", "display": "Grandmother" },
-  { "code": "MGRMTH", "display": "Maternal grandmother" },
-  { "code": "PGRMTH", "display": "Paternal grandmother" },
-  { "code": "MGRPRN", "display": "Maternal grandparent" },
-  { "code": "PGRPRN", "display": "Paternal grandparent" },
-  { "code": "INLAW", "display": "In-law" },
-  { "code": "CHLDINLAW", "display": "Child-in-law" },
-  { "code": "DAUINLAW", "display": "Daughter-in-law" },
-  { "code": "SONINLAW", "display": "Son-in-law" },
-  { "code": "PRNINLAW", "display": "Parent-in-law" },
-  { "code": "FTHINLAW", "display": "Father-in-law" },
-  { "code": "MTHINLAW", "display": "Mother-in-law" },
-  { "code": "SIBINLAW", "display": "Sibling-in-law" },
-  { "code": "BROINLAW", "display": "Brother-in-law" },
-  { "code": "SISINLAW", "display": "Sister-in-law" },
-  { "code": "NIENEPH", "display": "Niece/Nephew" },
-  { "code": "NEPHEW", "display": "Nephew" },
-  { "code": "NIECE", "display": "Niece" },
-  { "code": "UNCLE", "display": "Uncle" },
-  { "code": "MUNCLE", "display": "Maternal uncle" },
-  { "code": "PUNCLE", "display": "Paternal uncle" },
-  { "code": "PRN", "display": "Parent" },
-  { "code": "ADOPTP", "display": "Adoptive parent" },
-  { "code": "ADOPTF", "display": "Adoptive father" },
-  { "code": "ADOPTM", "display": "Adoptive mother" },
-  { "code": "FTH", "display": "Father" },
-  { "code": "FTHFOST", "display": "Foster father" },
-  { "code": "NFTH", "display": "Natural father" },
-  { "code": "NFTHF", "display": "Natural father of fetus" },
-  { "code": "STPFTH", "display": "Stepfather" },
-  { "code": "MTH", "display": "Mother" },
-  { "code": "GESTM", "display": "Gestational mother" },
-  { "code": "MTHFOST", "display": "Foster mother" },
-  { "code": "NMTH", "display": "Natural mother" },
-  { "code": "NMTHF", "display": "Natural mother of fetus" },
-  { "code": "STPMTH", "display": "Stepmother" },
-  { "code": "NPRN", "display": "Natural parent" },
-  { "code": "PRNFOST", "display": "Foster parent" },
-  { "code": "STPPRN", "display": "Step parent" },
-  { "code": "SIB", "display": "Sibling" },
-  { "code": "BRO", "display": "Brother" },
-  { "code": "HBRO", "display": "Half-brother" },
-  { "code": "NBRO", "display": "Natural brother" },
-  { "code": "TWINBRO", "display": "Twin brother" },
-  { "code": "FTWINBRO", "display": "Fraternal twin brother" },
-  { "code": "ITWINBRO", "display": "Identical twin brother" },
-  { "code": "STPBRO", "display": "Stepbrother" },
-  { "code": "HSIB", "display": "Half-sibling" },
-  { "code": "HSIS", "display": "Half-sister" },
-  { "code": "NSIB", "display": "Natural sibling" },
-  { "code": "NSIS", "display": "Natural sister" },
-  { "code": "TWINSIS", "display": "Twin sister" },
-  { "code": "FTWINSIS", "display": "Fraternal twin sister" },
-  { "code": "ITWINSIS", "display": "Identical twin sister" },
-  { "code": "TWIN", "display": "Twin" },
-  { "code": "FTWIN", "display": "Fraternal twin" },
-  { "code": "ITWIN", "display": "Identical twin" },
-  { "code": "SIS", "display": "Sister" },
-  { "code": "STPSIS", "display": "Stepsister" },
-  { "code": "STPSIB", "display": "Step sibling" },
-  { "code": "SIGOTHR", "display": "Significant other" },
-  { "code": "DOMPART", "display": "Domestic partner" },
-  { "code": "FMRSPS", "display": "Former spouse" },
-  { "code": "SPS", "display": "Spouse" },
-  { "code": "HUSB", "display": "Husband" },
-  { "code": "WIFE", "display": "Wife" },
-  { "code": "FRND", "display": "Friend" },
-  { "code": "NBOR", "display": "Neighbor" },
-  { "code": "ONESELF", "display": "Self" },
-  { "code": "ROOM", "display": "Roommate" }
+  {
+    "code": "FAMMEMB",
+    "display": "Family member"
+  },
+  {
+    "code": "CHILD",
+    "display": "Child"
+  },
+  {
+    "code": "CHLDADOPT",
+    "display": "Adopted child"
+  },
+  {
+    "code": "DAUADOPT",
+    "display": "Adopted daughter"
+  },
+  {
+    "code": "SONADOPT",
+    "display": "Adopted son"
+  },
+  {
+    "code": "CHLDFOST",
+    "display": "Foster child"
+  },
+  {
+    "code": "DAUFOST",
+    "display": "Foster daughter"
+  },
+  {
+    "code": "SONFOST",
+    "display": "Foster son"
+  },
+  {
+    "code": "DAUC",
+    "display": "Daughter"
+  },
+  {
+    "code": "DAU",
+    "display": "Natural daughter"
+  },
+  {
+    "code": "STPDAU",
+    "display": "Stepdaughter"
+  },
+  {
+    "code": "NCHILD",
+    "display": "Natural child"
+  },
+  {
+    "code": "SON",
+    "display": "Natural son"
+  },
+  {
+    "code": "SONC",
+    "display": "Son"
+  },
+  {
+    "code": "STPSON",
+    "display": "Stepson"
+  },
+  {
+    "code": "STPCHLD",
+    "display": "Step child"
+  },
+  {
+    "code": "EXT",
+    "display": "Extended family member"
+  },
+  {
+    "code": "AUNT",
+    "display": "Aunt"
+  },
+  {
+    "code": "MAUNT",
+    "display": "Maternal aunt"
+  },
+  {
+    "code": "PAUNT",
+    "display": "Paternal aunt"
+  },
+  {
+    "code": "COUSN",
+    "display": "Cousin"
+  },
+  {
+    "code": "MCOUSN",
+    "display": "Maternal cousin"
+  },
+  {
+    "code": "PCOUSN",
+    "display": "Paternal cousin"
+  },
+  {
+    "code": "GGRPRN",
+    "display": "Great grandparent"
+  },
+  {
+    "code": "GGRFTH",
+    "display": "Great grandfather"
+  },
+  {
+    "code": "MGGRFTH",
+    "display": "Maternal great-grandfather"
+  },
+  {
+    "code": "PGGRFTH",
+    "display": "Paternal great-grandfather"
+  },
+  {
+    "code": "GGRMTH",
+    "display": "Great grandmother"
+  },
+  {
+    "code": "MGGRMTH",
+    "display": "Maternal great-grandmother"
+  },
+  {
+    "code": "PGGRMTH",
+    "display": "Paternal great-grandmother"
+  },
+  {
+    "code": "MGGRPRN",
+    "display": "Maternal great-grandparent"
+  },
+  {
+    "code": "PGGRPRN",
+    "display": "Paternal great-grandparent"
+  },
+  {
+    "code": "GRNDCHILD",
+    "display": "Grandchild"
+  },
+  {
+    "code": "GRNDDAU",
+    "display": "Granddaughter"
+  },
+  {
+    "code": "GRNDSON",
+    "display": "Grandson"
+  },
+  {
+    "code": "GRPRN",
+    "display": "Grandparent"
+  },
+  {
+    "code": "GRFTH",
+    "display": "Grandfather"
+  },
+  {
+    "code": "MGRFTH",
+    "display": "Maternal grandfather"
+  },
+  {
+    "code": "PGRFTH",
+    "display": "Paternal grandfather"
+  },
+  {
+    "code": "GRMTH",
+    "display": "Grandmother"
+  },
+  {
+    "code": "MGRMTH",
+    "display": "Maternal grandmother"
+  },
+  {
+    "code": "PGRMTH",
+    "display": "Paternal grandmother"
+  },
+  {
+    "code": "MGRPRN",
+    "display": "Maternal grandparent"
+  },
+  {
+    "code": "PGRPRN",
+    "display": "Paternal grandparent"
+  },
+  {
+    "code": "INLAW",
+    "display": "In-law"
+  },
+  {
+    "code": "CHLDINLAW",
+    "display": "Child-in-law"
+  },
+  {
+    "code": "DAUINLAW",
+    "display": "Daughter-in-law"
+  },
+  {
+    "code": "SONINLAW",
+    "display": "Son-in-law"
+  },
+  {
+    "code": "PRNINLAW",
+    "display": "Parent-in-law"
+  },
+  {
+    "code": "FTHINLAW",
+    "display": "Father-in-law"
+  },
+  {
+    "code": "MTHINLAW",
+    "display": "Mother-in-law"
+  },
+  {
+    "code": "SIBINLAW",
+    "display": "Sibling-in-law"
+  },
+  {
+    "code": "BROINLAW",
+    "display": "Brother-in-law"
+  },
+  {
+    "code": "SISINLAW",
+    "display": "Sister-in-law"
+  },
+  {
+    "code": "NIENEPH",
+    "display": "Niece/Nephew"
+  },
+  {
+    "code": "NEPHEW",
+    "display": "Nephew"
+  },
+  {
+    "code": "NIECE",
+    "display": "Niece"
+  },
+  {
+    "code": "UNCLE",
+    "display": "Uncle"
+  },
+  {
+    "code": "MUNCLE",
+    "display": "Maternal uncle"
+  },
+  {
+    "code": "PUNCLE",
+    "display": "Paternal uncle"
+  },
+  {
+    "code": "PRN",
+    "display": "Parent"
+  },
+  {
+    "code": "ADOPTP",
+    "display": "Adoptive parent"
+  },
+  {
+    "code": "ADOPTF",
+    "display": "Adoptive father"
+  },
+  {
+    "code": "ADOPTM",
+    "display": "Adoptive mother"
+  },
+  {
+    "code": "FTH",
+    "display": "Father"
+  },
+  {
+    "code": "FTHFOST",
+    "display": "Foster father"
+  },
+  {
+    "code": "NFTH",
+    "display": "Natural father"
+  },
+  {
+    "code": "NFTHF",
+    "display": "Natural father of fetus"
+  },
+  {
+    "code": "STPFTH",
+    "display": "Stepfather"
+  },
+  {
+    "code": "MTH",
+    "display": "Mother"
+  },
+  {
+    "code": "GESTM",
+    "display": "Gestational mother"
+  },
+  {
+    "code": "MTHFOST",
+    "display": "Foster mother"
+  },
+  {
+    "code": "NMTH",
+    "display": "Natural mother"
+  },
+  {
+    "code": "NMTHF",
+    "display": "Natural mother of fetus"
+  },
+  {
+    "code": "STPMTH",
+    "display": "Stepmother"
+  },
+  {
+    "code": "NPRN",
+    "display": "Natural parent"
+  },
+  {
+    "code": "PRNFOST",
+    "display": "Foster parent"
+  },
+  {
+    "code": "STPPRN",
+    "display": "Step parent"
+  },
+  {
+    "code": "SIB",
+    "display": "Sibling"
+  },
+  {
+    "code": "BRO",
+    "display": "Brother"
+  },
+  {
+    "code": "HBRO",
+    "display": "Half-brother"
+  },
+  {
+    "code": "NBRO",
+    "display": "Natural brother"
+  },
+  {
+    "code": "TWINBRO",
+    "display": "Twin brother"
+  },
+  {
+    "code": "FTWINBRO",
+    "display": "Fraternal twin brother"
+  },
+  {
+    "code": "ITWINBRO",
+    "display": "Identical twin brother"
+  },
+  {
+    "code": "STPBRO",
+    "display": "Stepbrother"
+  },
+  {
+    "code": "HSIB",
+    "display": "Half-sibling"
+  },
+  {
+    "code": "HSIS",
+    "display": "Half-sister"
+  },
+  {
+    "code": "NSIB",
+    "display": "Natural sibling"
+  },
+  {
+    "code": "NSIS",
+    "display": "Natural sister"
+  },
+  {
+    "code": "TWINSIS",
+    "display": "Twin sister"
+  },
+  {
+    "code": "FTWINSIS",
+    "display": "Fraternal twin sister"
+  },
+  {
+    "code": "ITWINSIS",
+    "display": "Identical twin sister"
+  },
+  {
+    "code": "TWIN",
+    "display": "Twin"
+  },
+  {
+    "code": "FTWIN",
+    "display": "Fraternal twin"
+  },
+  {
+    "code": "ITWIN",
+    "display": "Identical twin"
+  },
+  {
+    "code": "SIS",
+    "display": "Sister"
+  },
+  {
+    "code": "STPSIS",
+    "display": "Stepsister"
+  },
+  {
+    "code": "STPSIB",
+    "display": "Step sibling"
+  },
+  {
+    "code": "SIGOTHR",
+    "display": "Significant other"
+  },
+  {
+    "code": "DOMPART",
+    "display": "Domestic partner"
+  },
+  {
+    "code": "FMRSPS",
+    "display": "Former spouse"
+  },
+  {
+    "code": "SPS",
+    "display": "Spouse"
+  },
+  {
+    "code": "HUSB",
+    "display": "Husband"
+  },
+  {
+    "code": "WIFE",
+    "display": "Wife"
+  },
+  {
+    "code": "FRND",
+    "display": "Friend"
+  },
+  {
+    "code": "NBOR",
+    "display": "Neighbor"
+  },
+  {
+    "code": "ONESELF",
+    "display": "Self"
+  },
+  {
+    "code": "ROOM",
+    "display": "Roommate"
+  }
 ]

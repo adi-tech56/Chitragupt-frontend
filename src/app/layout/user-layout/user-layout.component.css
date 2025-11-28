@@ -2,16 +2,23 @@
   display: flex;
   flex-direction: row;
   overflow-x: hidden;
+  position: absolute;
+
+
 }
+
 .content-area {
   flex: 1;
   margin-left: 221px;
   padding: 2rem;
   background-color: #f8f9fa;
   min-height: 100vh;
-  min-width: calc(100vw - 221px);
+  position: relative;
+  min-width: calc(99vw - 221px);
 
   transition: all 0.3s ease-in-out;
+
+
 }
 
 @media (max-width: 768px) {
@@ -21,7 +28,8 @@
 
   .content-area {
     margin-left: 0;
-    margin-bottom: 60px; /* height of bottom sidebar */
+    margin-bottom: 60px;
+    /* height of bottom sidebar */
     padding: 1rem;
   }
 }

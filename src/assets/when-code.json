@@ -1,0 +1,110 @@
+[
+    {
+        "value": "Morning",
+        "display": "Morning"
+    },
+    {
+        "value": "Early Morning",
+        "display": "Early Morning"
+    },
+    {
+        "value": "Late Morning",
+        "display": "Late Morning"
+    },
+    {
+        "value": "Noon",
+        "display": "Noon"
+    },
+    {
+        "value": "Afternoon",
+        "display": "Afternoon"
+    },
+    {
+        "value": "Early Afternoon",
+        "display": "Early Afternoon"
+    },
+    {
+        "value": "Late Afternoon",
+        "display": "Late Afternoon"
+    },
+    {
+        "value": "Evening",
+        "display": "Evening"
+    },
+    {
+        "value": "Early Evening",
+        "display": "Early Evening"
+    },
+    {
+        "value": "Late Evening",
+        "display": "Late Evening"
+    },
+    {
+        "value": "Night",
+        "display": "Night"
+    },
+    {
+        "value": "After Sleep",
+        "display": "After Sleep"
+    },
+    {
+        "value": "Immediate",
+        "display": "Immediate"
+    },
+    {
+        "value": "HS",
+        "display": "At bedtime"
+    },
+    {
+        "value": "WAKE",
+        "display": "Upon waking"
+    },
+    {
+        "value": "C",
+        "display": "Before meals"
+    },
+    {
+        "value": "CM",
+        "display": "Before lunch"
+    },
+    {
+        "value": "CD",
+        "display": "Before dinner"
+    },
+    {
+        "value": "CV",
+        "display": "Before evening meal"
+    },
+    {
+        "value": "AC",
+        "display": "Before meals"
+    },
+    {
+        "value": "ACM",
+        "display": "Before lunch"
+    },
+    {
+        "value": "ACD",
+        "display": "Before dinner"
+    },
+    {
+        "value": "ACV",
+        "display": "Before evening meal"
+    },
+    {
+        "value": "PC",
+        "display": "After meals"
+    },
+    {
+        "value": "PCM",
+        "display": "After lunch"
+    },
+    {
+        "value": "PCD",
+        "display": "After dinner"
+    },
+    {
+        "value": "PCV",
+        "display": "After evening meal"
+    }
+]

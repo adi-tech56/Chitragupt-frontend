@@ -38,11 +38,8 @@ export class GuestGaurd implements CanActivate {
                 this.router.navigate(["/user"]);
                 return true;
             }
-            // if (userRoles.includes("ADMIN")) {
-            //     this.router.navigate(["/admin-dashboard"]);
-            // }
         }
-        // this.router.navigate(["/login"]);
+    
         return true;
     }
 

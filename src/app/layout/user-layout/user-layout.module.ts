@@ -1,8 +1,14 @@
+// src/app/layout/user-layout/user-layout.module.ts
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { UserLayoutRoutingModule } from './user-layout-routing.module';
 import { UserLayoutComponent } from './user-layout.component';
+import { PatientDetailsComponent } from '../../common/forms/patient-details/patient-details.component';
+import { PatientContactDetailsComponent } from '../../common/forms/patient-contact-details/patient-contact-details.component';
+import { HomePageComponent } from '../../common/user/home-page/home-page.component';
+import { ReactiveFormsModule } from '@angular/forms';
+import { SharedModule } from 'src/app/shared/shared.module';  // ⬅ IMPORTANT
 import { SidebarComponent } from 'src/app/common/sidebar/sidebar.component';
 import { PatientDetailsComponent } from '../../common/forms/patient-details/patient-details.component';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -15,10 +21,10 @@ import { ProfilePageComponent } from 'src/app/common/user/profile-page/profile-p
 import { ContactPageComponent } from 'src/app/common/user/contact-page/contact-page.component';
 import { AllergyFormsComponent } from 'src/app/common/user/allergy-forms/allergy-forms.component';
 
+
 @NgModule({
   declarations: [
     UserLayoutComponent,
-    SidebarComponent,
     PatientDetailsComponent,
     PatientContactDetailsComponent,
     HomePageComponent,
@@ -27,12 +33,16 @@ import { AllergyFormsComponent } from 'src/app/common/user/allergy-forms/allergy
     ProfilePageComponent,
     ContactPageComponent,
     AllergyFormsComponent,
+
   ],
   imports: [
     CommonModule,
     UserLayoutRoutingModule,
+    ReactiveFormsModule,
+    SharedModule,
     FormsModule,
     ReactiveFormsModule,
   ],
+
 })
 export class UserLayoutModule {}
