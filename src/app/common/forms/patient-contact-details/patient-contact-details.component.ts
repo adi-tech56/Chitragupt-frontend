@@ -103,10 +103,10 @@ export class PatientContactDetailsComponent implements OnInit, OnDestroy {
 
   createAddressGroup(): FormGroup {
     return this.fb.group({
-      addressUse: ['', Validators.required],
+      useCode: ['', Validators.required],
       addressType: ['', Validators.required],
-      addressText: ['', Validators.required],
-      line: [''],
+      text: ['', Validators.required],
+      line1: [''],
       line2: [''],
       city: ['', Validators.required],
       state: ['', Validators.required],

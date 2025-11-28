@@ -133,7 +133,7 @@
       </div>
 
       <!-- Address Section -->
-      <div class="section mb-4" *ngIf="addresses?.length">
+      <div class="section mb-4" *ngIf="addresses.length > 0">
         <h5 class="text-primary mb-3">Address</h5>
 
         <div
@@ -207,7 +207,7 @@
 
       <!-- Telecoms -->
 
-      <div class="section mb-4" *ngIf="telecoms?.length">
+      <div class="section mb-4" *ngIf="telecoms.length > 0">
         <h5 class="text-primary mb-3">Telecom</h5>
 
         <div
@@ -252,14 +252,13 @@
       </div>
 
       <!-- Allergies -->
-      <div class="section mb-4" *ngIf="allergies?.length">
+      <div class="section mb-4" *ngIf="allergies.length > 0">
         <h5 class="text-primary mb-3">Allergies</h5>
 
         <div
           *ngFor="let al of allergies; let i = index"
           class="item-box p-3 mb-3 position-relative"
         >
-          <!-- Delete Button (Top Right) -->
           <div class="position-absolute top-0 end-0 p-2">
             <button
               class="btn btn-sm btn-danger"
