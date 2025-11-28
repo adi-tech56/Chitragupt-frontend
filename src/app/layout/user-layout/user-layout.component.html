@@ -1,39 +1,40 @@
-
 <app-patient-contact-details
   *ngIf="!patientContactsComplete"
-  (contactSubmitted)="onContactSubmitted()">
+  (contactSubmitted)="onContactSubmitted()"
+>
 </app-patient-contact-details>
 
 <app-patient-details
   *ngIf="patientContactsComplete && !patientDetailsComplete"
-  (detailsSubmitted)="onDetailsSubmitted()">
+  (detailsSubmitted)="onDetailsSubmitted()"
+>
 </app-patient-details>
-
-
 <app-patient-allergy
-  *ngIf="patientContactsComplete && patientDetailsComplete && !patientAllergyComplete"
-  (allergySubmitted)="onAllergySubmitted()">
+  *ngIf="
+    patientContactsComplete && patientDetailsComplete && !patientAllergyComplete
+  "
+  (allergySubmitted)="onAllergySubmitted()"
+>
 </app-patient-allergy>
 
-<div class="user-layout" *ngIf="patientContactsComplete && patientDetailsComplete && patientAllergyComplete">
-
-
-  <div style="position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;">
+<div
+  class="user-layout"
+  *ngIf="
+    patientContactsComplete && patientDetailsComplete && patientAllergyComplete
+  "
+>
+  <div style="position: fixed; top: 0; left: 0; width: 100%; z-index: 1000">
     <app-header></app-header>
   </div>
 
-
-  <div style="margin-top: 60px;">  <!-- adjust height if needed -->
+  <div style="margin-top: 60px">
+    <!-- adjust height if needed -->
     <app-sidebar></app-sidebar>
 
     <div class="content-area">
-      <h4>
-        {{ greetingMessage }} {{ userName }}!
-      </h4>
+      <h4>{{ greetingMessage }} {{ userName }}!</h4>
 
       <router-outlet></router-outlet>
     </div>
   </div>
-
 </div>
-

@@ -7,7 +7,7 @@ import { PatientProfileService } from 'src/app/core/Services/PatientServices/pat
 @Component({
   selector: 'app-patient-details',
   templateUrl: './patient-details.component.html',
-  styleUrls: ['./patient-details.component.css']
+  styleUrls: ['./patient-details.component.css'],
 })
 export class PatientDetailsComponent {
   @Output() detailsSubmitted = new EventEmitter<void>();
@@ -18,28 +18,31 @@ export class PatientDetailsComponent {
   filteredCities: any[] = [];
   cityDropdownIndex: number | null = null;
 
-  constructor(private fb: FormBuilder,private auth:AuthService,private profileService:PatientProfileService) {
+  constructor(
+    private fb: FormBuilder,
+    private auth: AuthService,
+    private profileService: PatientProfileService
+  ) {
     this.patientForm = this.fb.group({
       birthDate: ['', Validators.required],
       gender: ['', Validators.required],
       maritalStatus: ['', Validators.required],
       addresses: this.fb.array([this.createAddressGroup()]),
-      telecoms: this.fb.array([this.createTelecomGroup()])
+      telecoms: this.fb.array([this.createTelecomGroup()]),
     });
-
   }
 
   createAddressGroup(): FormGroup {
     return this.fb.group({
       addressUse: ['', Validators.required],
       addressType: ['', Validators.required],
-      addressText: ['', Validators.required],
-      line: [''],
+      text: ['', Validators.required],
+      line1: [''],
       line2: [''],
       city: ['', Validators.required],
       state: ['', Validators.required],
       postalCode: ['', Validators.required],
-      country: ['', Validators.required]
+      country: ['', Validators.required],
     });
   }
 
@@ -47,7 +50,7 @@ export class PatientDetailsComponent {
     return this.fb.group({
       system: ['Phone', Validators.required],
       useCode: ['', Validators.required],
-      value: ['', Validators.required]
+      value: ['', Validators.required],
     });
   }
 
@@ -83,7 +86,9 @@ export class PatientDetailsComponent {
       this.cityDropdownIndex = null;
       return;
     }
-    this.filteredCities = this.allCities.filter(c => c.city.toLowerCase().includes(value));
+    this.filteredCities = this.allCities.filter((c) =>
+      c.city.toLowerCase().includes(value)
+    );
     this.cityDropdownIndex = index;
   }
 
@@ -92,7 +97,7 @@ export class PatientDetailsComponent {
       city: c.city,
       state: c.state,
       country: c.country,
-      postalCode: c.postalCode
+      postalCode: c.postalCode,
     });
     this.filteredCities = [];
     this.cityDropdownIndex = null;
@@ -116,19 +121,18 @@ export class PatientDetailsComponent {
 
     const payload = {
       ...this.patientForm.value,
-      patientId: patientId
+      patientId: patientId,
     };
     this.profileService.saveProfile(patientId, payload).subscribe({
-    next: (res) => {
-      console.log('Saved successfully:', res);
-      alert('Patient profile updated');
-          this.detailsSubmitted.emit();
-    },
-    error: (err) => {
-      console.error(err);
-      alert('Failed to update profile');
-    }
-  });
+      next: (res) => {
+        console.log('Saved successfully:', res);
+        alert('Patient profile updated');
+        this.detailsSubmitted.emit();
+      },
+      error: (err) => {
+        console.error(err);
+        alert('Failed to update profile');
+      },
+    });
   }
 }
-

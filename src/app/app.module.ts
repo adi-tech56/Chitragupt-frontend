@@ -21,7 +21,7 @@ import { SendEmailComponent } from './common/Authentication/send-email/send-emai
 import { MedicationPageComponent } from './common/user/medication-page/medication-page.component';
 import { PatientContactDetailsComponent } from './common/forms/patient-contact-details/patient-contact-details.component';
 import { AuthInterceptor } from './core/Interceptors/auth-interceptor';
-import { PatientAllergyComponent } from './common/forms/patient-allergy/patient-allergy.component';
+import { AllergyFormsComponent } from './common/user/allergy-forms/allergy-forms.component';
 
 @NgModule({
   declarations: [

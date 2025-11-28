@@ -1,24 +1,32 @@
-// src/app/features/patient-allergy/patient-allergy.component.ts
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import {
+  FormArray,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { debounceTime, switchMap, Observable, forkJoin, of } from 'rxjs';
+import {
+  debounceTime,
+  switchMap,
+  Observable,
+  forkJoin,
+  of,
+} from 'rxjs';
 import { PatientAllergyService } from 'src/app/core/Services/PatientServices/patient-allergy.service';
 import { AuthService } from 'src/app/core/Services/auth-service.service';
 
 @Component({
-  selector: 'app-patient-allergy',
-  templateUrl: './patient-allergy.component.html',
-  styleUrls: ['./patient-allergy.component.css'],
+  selector: 'app-allergy-forms',
+  templateUrl: './allergy-forms.component.html',
+  styleUrls: ['./allergy-forms.component.css']
 })
-export class PatientAllergyComponent implements OnInit {
+export class AllergyFormsComponent implements OnInit {
   @Output() allergySubmitted = new EventEmitter<void>();
-  private skipConditionFetch = false;
-  currentStep = 1;
-  maxStep = 2;
 
-  suggestions: any[][] = [];
   allergyForm: FormGroup;
+  suggestions: any[][] = [];
+  private skipConditionFetch = false;
 
   constructor(
     private fb: FormBuilder,
@@ -26,31 +34,25 @@ export class PatientAllergyComponent implements OnInit {
     private auth: AuthService
   ) {
     this.allergyForm = this.fb.group({
-      hasAllergy: ['', Validators.required],
       allergies: this.fb.array([]),
     });
   }
 
   ngOnInit() {
-    this.allergyService.getAllergyStatus().subscribe({
-      next: (res) => {
-        if (res.hasAnswered) {
-          // Emit to parent and stop showing the form
-          this.allergySubmitted.emit();
-        }
-      },
-      error: (err) => console.error('Status check failed:', err),
-    });
+    if (this.allergies.length === 0) {
+      this.addAllergy();
+    }
 
-    // Keep autocomplete registration
     this.allergies.valueChanges.subscribe(() => {
       this.registerAutocompleteListeners();
     });
   }
 
+
   private registerAutocompleteListeners() {
     this.allergies.controls.forEach((group, index) => {
       const control = group.get('allergyName');
+
       if (control && !(control as any)._autocompleteBound) {
         (control as any)._autocompleteBound = true;
 
@@ -94,31 +96,10 @@ export class PatientAllergyComponent implements OnInit {
     });
   }
 
-  nextStep() {
-    if (this.currentStep === 1) {
-      if (this.allergyForm.get('hasAllergy')?.invalid) {
-        this.allergyForm.get('hasAllergy')?.markAsTouched();
-        return;
-      }
-
-      if (
-        this.allergyForm.get('hasAllergy')?.value === 'yes' &&
-        this.allergies.length === 0
-      ) {
-        this.addAllergy();
-      }
-
-      this.currentStep = 2;
-    }
-  }
-
-  previousStep() {
-    if (this.currentStep > 1) this.currentStep--;
-  }
 
   addAllergy() {
     this.allergies.push(this.createAllergyGroup());
-    this.suggestions.push([]); // create suggestion array for this row
+    this.suggestions.push([]);
     this.registerAutocompleteListeners();
   }
 
@@ -127,30 +108,22 @@ export class PatientAllergyComponent implements OnInit {
       this.allergies.removeAt(index);
       this.suggestions.splice(index, 1);
     } else {
+      // Keep at least one row always
       this.allergies.clear();
       this.addAllergy();
     }
   }
 
+
   onSubmit() {
-    const has = this.allergyForm.get('hasAllergy')?.value;
-
-    if (has === 'no') {
-      this.allergyService.markNoAllergy().subscribe({
-        next: () => this.allergySubmitted.emit(),
-        error: (err) => console.error('Failed to mark no allergy:', err),
-      });
-      return;
-    }
-
     if (this.allergies.invalid) {
       this.allergies.markAllAsTouched();
       alert('Please fill all required fields.');
       return;
     }
 
-    const calls: Observable<any>[] = this.allergies.value.map((a: any) => {
-      return this.allergyService.saveAllergy({
+    const calls: Observable<any>[] = this.allergies.value.map((a: any) =>
+      this.allergyService.saveAllergy({
         allergyName: a.allergyName,
         clinicalStatus: a.clinicalStatus,
         verificationStatus: a.verificationStatus,
@@ -158,8 +131,8 @@ export class PatientAllergyComponent implements OnInit {
         category: a.category,
         criticality: a.criticality,
         onsetDate: a.onsetDate,
-      });
-    });
+      })
+    );
 
     forkJoin(calls).subscribe({
       next: () => this.allergySubmitted.emit(),
@@ -170,3 +143,4 @@ export class PatientAllergyComponent implements OnInit {
     });
   }
 }
+

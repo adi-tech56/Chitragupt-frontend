@@ -18,6 +18,8 @@ export class UserLayoutComponent {
   private patientProfileService = inject(PatientProfileService);
   userName: any;
   greetingMessage: string = '';
+  openAllergyFormFromProfile: boolean = false;
+  forceAddAllergy: boolean = false;
 
   setGreeting() {
     const hour = new Date().getHours();
