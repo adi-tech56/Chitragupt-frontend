@@ -10,11 +10,7 @@ import { HomePageComponent } from '../../common/user/home-page/home-page.compone
 import { ReactiveFormsModule } from '@angular/forms';
 import { SharedModule } from 'src/app/shared/shared.module';  // ⬅ IMPORTANT
 import { SidebarComponent } from 'src/app/common/sidebar/sidebar.component';
-import { PatientDetailsComponent } from '../../common/forms/patient-details/patient-details.component';
-import { ReactiveFormsModule } from '@angular/forms';
-import { HomePageComponent } from 'src/app/common/user/home-page/home-page.component';
 import { FormsModule } from '@angular/forms';
-import { PatientContactDetailsComponent } from 'src/app/common/forms/patient-contact-details/patient-contact-details.component';
 import { PatientAllergyComponent } from 'src/app/common/forms/patient-allergy/patient-allergy.component';
 import { HeaderComponent } from 'src/app/common/header/header.component';
 import { ProfilePageComponent } from 'src/app/common/user/profile-page/profile-page.component';

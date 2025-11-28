@@ -16,7 +16,7 @@ const routes: Routes = [
     component: UserLayoutComponent,
     children: [
       { path: "", component: HomePageComponent, canActivate: [AuthGuard, RoleGuard], data: { roles: ['PATIENT'] } },
-           { path: 'profile', component: ProfilePageComponent },
+      { path: 'profile', component: ProfilePageComponent },
       { path: 'emergencyContact', component: ContactPageComponent },
       { path: 'allergyForm', component: AllergyFormsComponent },
       { path: "add-medication", component: AddMedicationComponent, canActivate: [AuthGuard, RoleGuard], data: { roles: ['PATIENT'] } },
@@ -31,28 +31,10 @@ const routes: Routes = [
         data: { roles: ['PATIENT'] }
       }
     ],
-
-// =======
-// import { ProfilePageComponent } from 'src/app/common/user/profile-page/profile-page.component';
-// import { ContactPageComponent } from 'src/app/common/user/contact-page/contact-page.component';
-// import { AllergyFormsComponent } from 'src/app/common/user/allergy-forms/allergy-forms.component';
-
-// const routes: Routes = [
-//   {
-//     path: '',
-//     component: UserLayoutComponent,
-//     children: [
-//       { path: '', component: HomePageComponent },
-//       { path: 'profile', component: ProfilePageComponent },
-//       { path: 'emergencyContact', component: ContactPageComponent },
-//       { path: 'allergyForm', component: AllergyFormsComponent },
-//     ],
-// >>>>>>> src/app/layout/user-layout/user-layout-routing.module.ts
-//   },
-// ];
+  }]
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class UserLayoutRoutingModule {}
+export class UserLayoutRoutingModule { }
