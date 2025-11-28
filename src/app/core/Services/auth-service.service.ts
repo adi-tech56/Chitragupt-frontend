@@ -6,14 +6,14 @@ import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
-  constructor(private router: Router) { }
-  verifyOtp(payload: { email: any; otp: any; }) {
+  constructor(private router: Router) {}
+  verifyOtp(payload: { email: any; otp: any }) {
     throw new Error('Method not implemented.');
   }
-  private apiUrl = "http://localhost:8089/auth";
+  private apiUrl = 'http://localhost:8089/auth';
   private http = inject(HttpClient);
   private cookieService = inject(CookieService);
 
@@ -44,14 +44,13 @@ export class AuthService {
     const userName = decoded.userName;
     return userName;
   }
-getUserId(): number {
-  let token = this.getToken() ?? "";   // ensures token is always string
+  getUserId(): number {
+    let token = this.getToken() ?? ''; // ensures token is always string
 
-  const decoded = this.decodeToken(token) ?? "";
+    const decoded = this.decodeToken(token) ?? '';
 
-
-  return Number(decoded.userId);
-}
+    return Number(decoded.userId);
+  }
 
   getUserRoles(): string[] {
     const token = this.getToken();
@@ -70,7 +69,6 @@ getUserId(): number {
   //   });
   // }
 
-
   isTokenExpired(token: string): boolean {
     const decoded = this.decodeToken(token);
     if (!decoded || !decoded.exp) return true;
@@ -85,22 +83,23 @@ getUserId(): number {
   }
   login(userLogin: UserLoginDetails): Observable<any> {
     console.log(userLogin);
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' })
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
-    return this.http.post(`${this.apiUrl}/login`,
+    return this.http.post(
+      `${this.apiUrl}/login`,
       {
         email: userLogin.userEmail,
         password: userLogin.passWord,
-
       },
       { withCredentials: true, headers }
     );
   }
   signup(userRegister: UserRegisterDetails): Observable<any> {
     console.log(userRegister);
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' })
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
-    return this.http.post(`${this.apiUrl}/signup`,
+    return this.http.post(
+      `${this.apiUrl}/signup`,
       {
         firstName: userRegister.firstName,
         middleName: userRegister.middleName,
@@ -108,33 +107,35 @@ getUserId(): number {
         contactNumber: userRegister.contactNo,
         email: userRegister.email,
         password: userRegister.passWord,
-        confirmPassword: userRegister.passWord
-
+        confirmPassword: userRegister.passWord,
       },
       { headers }
     );
   }
   verifyOTP(data: { email: string; otp: string }): Observable<any> {
     console.log(data);
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' })
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
     return this.http.post(`${this.apiUrl}/verify-otp`, data, { headers });
-
   }
 
   resetPassword(data: string): Observable<any> {
     console.log(data);
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' })
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
-    return this.http.post(`${this.apiUrl}/send-password-link`, data, { headers });
-
+    return this.http.post(`${this.apiUrl}/send-password-link`, data, {
+      headers,
+    });
   }
-  updatePassword(data: { password: string; confirmPassword: string, token: string }): Observable<any> {
+  updatePassword(data: {
+    password: string;
+    confirmPassword: string;
+    token: string;
+  }): Observable<any> {
     console.log(data);
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' })
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
     return this.http.post(`${this.apiUrl}/update-password`, data, { headers });
-
   }
 
  refresh(): Observable<boolean> {
@@ -153,6 +154,12 @@ getUserId(): number {
   logout(): void {
     this.cookieService.delete('accessToken', '/');
     this.cookieService.delete('refreshToken', '/');
+
+    // Optional: Clear all local data
+    localStorage.clear();
+    sessionStorage.clear();
+
+    // Navigate to login/auth page
     this.router.navigate(['/auth']);
   }
 }

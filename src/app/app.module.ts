@@ -18,6 +18,7 @@ import { HomeLayoutModule } from './layout/home-layout/home-layout.module';
 import { UserLayoutModule } from './layout/user-layout/user-layout.module';
 
 import { AuthInterceptor } from './core/Interceptors/auth-interceptor';
+import { AllergyFormsComponent } from './common/user/allergy-forms/allergy-forms.component';
 
 @NgModule({
   declarations: [
@@ -41,6 +42,6 @@ import { AuthInterceptor } from './core/Interceptors/auth-interceptor';
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

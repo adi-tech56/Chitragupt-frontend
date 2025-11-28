@@ -1,0 +1,722 @@
+[
+  {
+    "city": "Mumbai",
+    "state": "Maharashtra",
+    "country": "India",
+    "postalCode": "400001"
+  },
+  {
+    "city": "Delhi",
+    "state": "Delhi",
+    "country": "India",
+    "postalCode": "110001"
+  },
+  {
+    "city": "Bengaluru",
+    "state": "Karnataka",
+    "country": "India",
+    "postalCode": "560001"
+  },
+  {
+    "city": "Hyderabad",
+    "state": "Telangana",
+    "country": "India",
+    "postalCode": "500001"
+  },
+  {
+    "city": "Ahmedabad",
+    "state": "Gujarat",
+    "country": "India",
+    "postalCode": "380001"
+  },
+  {
+    "city": "Chennai",
+    "state": "Tamil Nadu",
+    "country": "India",
+    "postalCode": "600001"
+  },
+  {
+    "city": "Kolkata",
+    "state": "West Bengal",
+    "country": "India",
+    "postalCode": "700001"
+  },
+  {
+    "city": "Pune",
+    "state": "Maharashtra",
+    "country": "India",
+    "postalCode": "411001"
+  },
+  {
+    "city": "Surat",
+    "state": "Gujarat",
+    "country": "India",
+    "postalCode": "395003"
+  },
+  {
+    "city": "Jaipur",
+    "state": "Rajasthan",
+    "country": "India",
+    "postalCode": "302001"
+  },
+  {
+    "city": "Lucknow",
+    "state": "Uttar Pradesh",
+    "country": "India",
+    "postalCode": "226001"
+  },
+  {
+    "city": "Kanpur",
+    "state": "Uttar Pradesh",
+    "country": "India",
+    "postalCode": "208001"
+  },
+  {
+    "city": "Nagpur",
+    "state": "Maharashtra",
+    "country": "India",
+    "postalCode": "440001"
+  },
+  {
+    "city": "Indore",
+    "state": "Madhya Pradesh",
+    "country": "India",
+    "postalCode": "452001"
+  },
+  {
+    "city": "Thane",
+    "state": "Maharashtra",
+    "country": "India",
+    "postalCode": "400601"
+  },
+  {
+    "city": "Bhopal",
+    "state": "Madhya Pradesh",
+    "country": "India",
+    "postalCode": "462001"
+  },
+  {
+    "city": "Visakhapatnam",
+    "state": "Andhra Pradesh",
+    "country": "India",
+    "postalCode": "530001"
+  },
+  {
+    "city": "Patna",
+    "state": "Bihar",
+    "country": "India",
+    "postalCode": "800001"
+  },
+  {
+    "city": "Vadodara",
+    "state": "Gujarat",
+    "country": "India",
+    "postalCode": "390001"
+  },
+  {
+    "city": "Ghaziabad",
+    "state": "Uttar Pradesh",
+    "country": "India",
+    "postalCode": "201001"
+  },
+  {
+    "city": "Ludhiana",
+    "state": "Punjab",
+    "country": "India",
+    "postalCode": "141001"
+  },
+  {
+    "city": "Agra",
+    "state": "Uttar Pradesh",
+    "country": "India",
+    "postalCode": "282001"
+  },
+  {
+    "city": "Nashik",
+    "state": "Maharashtra",
+    "country": "India",
+    "postalCode": "422001"
+  },
+  {
+    "city": "Faridabad",
+    "state": "Haryana",
+    "country": "India",
+    "postalCode": "121001"
+  },
+  {
+    "city": "Meerut",
+    "state": "Uttar Pradesh",
+    "country": "India",
+    "postalCode": "250001"
+  },
+  {
+    "city": "Rajkot",
+    "state": "Gujarat",
+    "country": "India",
+    "postalCode": "360001"
+  },
+  {
+    "city": "Varanasi",
+    "state": "Uttar Pradesh",
+    "country": "India",
+    "postalCode": "221001"
+  },
+  {
+    "city": "Srinagar",
+    "state": "Jammu & Kashmir",
+    "country": "India",
+    "postalCode": "190001"
+  },
+  {
+    "city": "Aurangabad",
+    "state": "Maharashtra",
+    "country": "India",
+    "postalCode": "431001"
+  },
+  {
+    "city": "Dhanbad",
+    "state": "Jharkhand",
+    "country": "India",
+    "postalCode": "826001"
+  },
+  {
+    "city": "Amritsar",
+    "state": "Punjab",
+    "country": "India",
+    "postalCode": "143001"
+  },
+  {
+    "city": "Allahabad",
+    "state": "Uttar Pradesh",
+    "country": "India",
+    "postalCode": "211001"
+  },
+  {
+    "city": "Ranchi",
+    "state": "Jharkhand",
+    "country": "India",
+    "postalCode": "834001"
+  },
+  {
+    "city": "Coimbatore",
+    "state": "Tamil Nadu",
+    "country": "India",
+    "postalCode": "641001"
+  },
+  {
+    "city": "Jabalpur",
+    "state": "Madhya Pradesh",
+    "country": "India",
+    "postalCode": "482001"
+  },
+  {
+    "city": "Gwalior",
+    "state": "Madhya Pradesh",
+    "country": "India",
+    "postalCode": "474001"
+  },
+  {
+    "city": "Vijayawada",
+    "state": "Andhra Pradesh",
+    "country": "India",
+    "postalCode": "520001"
+  },
+  {
+    "city": "Jodhpur",
+    "state": "Rajasthan",
+    "country": "India",
+    "postalCode": "342001"
+  },
+  {
+    "city": "Madurai",
+    "state": "Tamil Nadu",
+    "country": "India",
+    "postalCode": "625001"
+  },
+  {
+    "city": "Raipur",
+    "state": "Chhattisgarh",
+    "country": "India",
+    "postalCode": "492001"
+  },
+  {
+    "city": "Kota",
+    "state": "Rajasthan",
+    "country": "India",
+    "postalCode": "324001"
+  },
+  {
+    "city": "Chandigarh",
+    "state": "Chandigarh",
+    "country": "India",
+    "postalCode": "160017"
+  },
+  {
+    "city": "Guwahati",
+    "state": "Assam",
+    "country": "India",
+    "postalCode": "781001"
+  },
+  {
+    "city": "Solapur",
+    "state": "Maharashtra",
+    "country": "India",
+    "postalCode": "413001"
+  },
+  {
+    "city": "Hubli",
+    "state": "Karnataka",
+    "country": "India",
+    "postalCode": "580020"
+  },
+  {
+    "city": "Mysuru",
+    "state": "Karnataka",
+    "country": "India",
+    "postalCode": "570001"
+  },
+  {
+    "city": "Tiruchirappalli",
+    "state": "Tamil Nadu",
+    "country": "India",
+    "postalCode": "620001"
+  },
+  {
+    "city": "Bareilly",
+    "state": "Uttar Pradesh",
+    "country": "India",
+    "postalCode": "243001"
+  },
+  {
+    "city": "Aligarh",
+    "state": "Uttar Pradesh",
+    "country": "India",
+    "postalCode": "202001"
+  },
+  {
+    "city": "Tiruppur",
+    "state": "Tamil Nadu",
+    "country": "India",
+    "postalCode": "641601"
+  },
+  {
+    "city": "Gurgaon",
+    "state": "Haryana",
+    "country": "India",
+    "postalCode": "122001"
+  },
+  {
+    "city": "Moradabad",
+    "state": "Uttar Pradesh",
+    "country": "India",
+    "postalCode": "244001"
+  },
+  {
+    "city": "Jalandhar",
+    "state": "Punjab",
+    "country": "India",
+    "postalCode": "144001"
+  },
+  {
+    "city": "Bhubaneswar",
+    "state": "Odisha",
+    "country": "India",
+    "postalCode": "751001"
+  },
+  {
+    "city": "Salem",
+    "state": "Tamil Nadu",
+    "country": "India",
+    "postalCode": "636001"
+  },
+  {
+    "city": "Warangal",
+    "state": "Telangana",
+    "country": "India",
+    "postalCode": "506001"
+  },
+  {
+    "city": "Bhiwandi",
+    "state": "Maharashtra",
+    "country": "India",
+    "postalCode": "421308"
+  },
+  {
+    "city": "Saharanpur",
+    "state": "Uttar Pradesh",
+    "country": "India",
+    "postalCode": "247001"
+  },
+  {
+    "city": "Guntur",
+    "state": "Andhra Pradesh",
+    "country": "India",
+    "postalCode": "522001"
+  },
+  {
+    "city": "Amravati",
+    "state": "Maharashtra",
+    "country": "India",
+    "postalCode": "444601"
+  },
+  {
+    "city": "Noida",
+    "state": "Uttar Pradesh",
+    "country": "India",
+    "postalCode": "201301"
+  },
+  {
+    "city": "Udaipur",
+    "state": "Rajasthan",
+    "country": "India",
+    "postalCode": "313001"
+  },
+  {
+    "city": "Rohtak",
+    "state": "Haryana",
+    "country": "India",
+    "postalCode": "124001"
+  },
+  {
+    "city": "Shimla",
+    "state": "Himachal Pradesh",
+    "country": "India",
+    "postalCode": "171001"
+  },
+  {
+    "city": "Dehradun",
+    "state": "Uttarakhand",
+    "country": "India",
+    "postalCode": "248001"
+  },
+  {
+    "city": "Haridwar",
+    "state": "Uttarakhand",
+    "country": "India",
+    "postalCode": "249401"
+  },
+  {
+    "city": "Siliguri",
+    "state": "West Bengal",
+    "country": "India",
+    "postalCode": "734001"
+  },
+  {
+    "city": "Jammu",
+    "state": "Jammu & Kashmir",
+    "country": "India",
+    "postalCode": "180001"
+  },
+  {
+    "city": "Mangalore",
+    "state": "Karnataka",
+    "country": "India",
+    "postalCode": "575001"
+  },
+  {
+    "city": "Belagavi",
+    "state": "Karnataka",
+    "country": "India",
+    "postalCode": "590001"
+  },
+  {
+    "city": "Bhavnagar",
+    "state": "Gujarat",
+    "country": "India",
+    "postalCode": "364001"
+  },
+  {
+    "city": "Jamnagar",
+    "state": "Gujarat",
+    "country": "India",
+    "postalCode": "361001"
+  },
+  {
+    "city": "Kolhapur",
+    "state": "Maharashtra",
+    "country": "India",
+    "postalCode": "416001"
+  },
+  {
+    "city": "Nanded",
+    "state": "Maharashtra",
+    "country": "India",
+    "postalCode": "431601"
+  },
+  {
+    "city": "Akola",
+    "state": "Maharashtra",
+    "country": "India",
+    "postalCode": "444001"
+  },
+  {
+    "city": "Latur",
+    "state": "Maharashtra",
+    "country": "India",
+    "postalCode": "413512"
+  },
+  {
+    "city": "Nellore",
+    "state": "Andhra Pradesh",
+    "country": "India",
+    "postalCode": "524001"
+  },
+  {
+    "city": "Kakinada",
+    "state": "Andhra Pradesh",
+    "country": "India",
+    "postalCode": "533001"
+  },
+  {
+    "city": "Karimnagar",
+    "state": "Telangana",
+    "country": "India",
+    "postalCode": "505001"
+  },
+  {
+    "city": "Kollam",
+    "state": "Kerala",
+    "country": "India",
+    "postalCode": "691001"
+  },
+  {
+    "city": "Kozhikode",
+    "state": "Kerala",
+    "country": "India",
+    "postalCode": "673001"
+  },
+  {
+    "city": "Thrissur",
+    "state": "Kerala",
+    "country": "India",
+    "postalCode": "680001"
+  },
+  {
+    "city": "Kurnool",
+    "state": "Andhra Pradesh",
+    "country": "India",
+    "postalCode": "518001"
+  },
+  {
+    "city": "Gorakhpur",
+    "state": "Uttar Pradesh",
+    "country": "India",
+    "postalCode": "273001"
+  },
+  {
+    "city": "Jhansi",
+    "state": "Uttar Pradesh",
+    "country": "India",
+    "postalCode": "284001"
+  },
+  {
+    "city": "Muzaffarpur",
+    "state": "Bihar",
+    "country": "India",
+    "postalCode": "842001"
+  },
+  {
+    "city": "Gaya",
+    "state": "Bihar",
+    "country": "India",
+    "postalCode": "823001"
+  },
+  {
+    "city": "Bhagalpur",
+    "state": "Bihar",
+    "country": "India",
+    "postalCode": "812001"
+  },
+  {
+    "city": "Bikaner",
+    "state": "Rajasthan",
+    "country": "India",
+    "postalCode": "334001"
+  },
+  {
+    "city": "Ajmer",
+    "state": "Rajasthan",
+    "country": "India",
+    "postalCode": "305001"
+  },
+  {
+    "city": "Alwar",
+    "state": "Rajasthan",
+    "country": "India",
+    "postalCode": "301001"
+  },
+  {
+    "city": "Sikar",
+    "state": "Rajasthan",
+    "country": "India",
+    "postalCode": "332001"
+  },
+  {
+    "city": "Hisar",
+    "state": "Haryana",
+    "country": "India",
+    "postalCode": "125001"
+  },
+  {
+    "city": "Panipat",
+    "state": "Haryana",
+    "country": "India",
+    "postalCode": "132103"
+  },
+  {
+    "city": "Kurukshetra",
+    "state": "Haryana",
+    "country": "India",
+    "postalCode": "136118"
+  },
+  {
+    "city": "Ambala",
+    "state": "Haryana",
+    "country": "India",
+    "postalCode": "134003"
+  },
+  {
+    "city": "Rewari",
+    "state": "Haryana",
+    "country": "India",
+    "postalCode": "123401"
+  },
+  {
+    "city": "Satara",
+    "state": "Maharashtra",
+    "country": "India",
+    "postalCode": "415001"
+  },
+  {
+    "city": "Sangli",
+    "state": "Maharashtra",
+    "country": "India",
+    "postalCode": "416416"
+  },
+  {
+    "city": "Ratnagiri",
+    "state": "Maharashtra",
+    "country": "India",
+    "postalCode": "415612"
+  },
+  {
+    "city": "Chandrapur",
+    "state": "Maharashtra",
+    "country": "India",
+    "postalCode": "442401"
+  },
+  {
+    "city": "Raigad",
+    "state": "Maharashtra",
+    "country": "India",
+    "postalCode": "402201"
+  },
+  {
+    "city": "Bilaspur",
+    "state": "Chhattisgarh",
+    "country": "India",
+    "postalCode": "495001"
+  },
+  {
+    "city": "Korba",
+    "state": "Chhattisgarh",
+    "country": "India",
+    "postalCode": "495677"
+  },
+  {
+    "city": "Durg",
+    "state": "Chhattisgarh",
+    "country": "India",
+    "postalCode": "491001"
+  },
+  {
+    "city": "Rourkela",
+    "state": "Odisha",
+    "country": "India",
+    "postalCode": "769001"
+  },
+  {
+    "city": "Cuttack",
+    "state": "Odisha",
+    "country": "India",
+    "postalCode": "753001"
+  },
+  {
+    "city": "Berhampur",
+    "state": "Odisha",
+    "country": "India",
+    "postalCode": "760001"
+  },
+  {
+    "city": "Jeypore",
+    "state": "Odisha",
+    "country": "India",
+    "postalCode": "764001"
+  },
+  {
+    "city": "Jorhat",
+    "state": "Assam",
+    "country": "India",
+    "postalCode": "785001"
+  },
+  {
+    "city": "Dibrugarh",
+    "state": "Assam",
+    "country": "India",
+    "postalCode": "786001"
+  },
+  {
+    "city": "Silchar",
+    "state": "Assam",
+    "country": "India",
+    "postalCode": "788001"
+  },
+  {
+    "city": "Aizawl",
+    "state": "Mizoram",
+    "country": "India",
+    "postalCode": "796001"
+  },
+  {
+    "city": "Shillong",
+    "state": "Meghalaya",
+    "country": "India",
+    "postalCode": "793001"
+  },
+  {
+    "city": "Agartala",
+    "state": "Tripura",
+    "country": "India",
+    "postalCode": "799001"
+  },
+  {
+    "city": "Kohima",
+    "state": "Nagaland",
+    "country": "India",
+    "postalCode": "797001"
+  },
+  {
+    "city": "Imphal",
+    "state": "Manipur",
+    "country": "India",
+    "postalCode": "795001"
+  },
+  {
+    "city": "Itanagar",
+    "state": "Arunachal Pradesh",
+    "country": "India",
+    "postalCode": "791111"
+  },
+  {
+    "city": "Port Blair",
+    "state": "Andaman & Nicobar",
+    "country": "India",
+    "postalCode": "744101"
+  },
+  {
+    "city": "Gandhinagar",
+    "state": "Gujarat",
+    "country": "India",
+    "postalCode": "382016"
+  }
+]

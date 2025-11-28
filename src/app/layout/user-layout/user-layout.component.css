@@ -21,7 +21,6 @@
 
 }
 
-/* Responsive: when sidebar moves to bottom */
 @media (max-width: 768px) {
   .user-layout {
     flex-direction: column;

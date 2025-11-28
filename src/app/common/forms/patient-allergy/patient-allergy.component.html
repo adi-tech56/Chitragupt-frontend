@@ -1,0 +1,196 @@
+<div class="display-root">
+  <div class="display-card shadow-lg">
+    <div class="p-2">
+      <form [formGroup]="allergyForm" (ngSubmit)="onSubmit()" class="m-4">
+        <h3 class="text-primary text-center mb-4 fw-bold">Patient Allergy</h3>
+
+        <!-- STEP 1 -->
+        <div *ngIf="currentStep === 1">
+          <div class="row">
+            <div class="col-md-12 mb-3">
+              <label class="form-label text-primary fw-semibold">
+                Do you have any allergies?
+              </label>
+            </div>
+
+            <div class="col-md-6 mb-3 d-flex align-items-center">
+              <div class="form-check me-3">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  id="allergyYes"
+                  formControlName="hasAllergy"
+                  value="yes"
+                />
+                <label class="form-check-label" for="allergyYes">Yes</label>
+              </div>
+
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  id="allergyNo"
+                  formControlName="hasAllergy"
+                  value="no"
+                />
+                <label class="form-check-label" for="allergyNo">No</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between mt-4">
+            <div></div>
+            <button
+              type="button"
+              class="btn btn-primary"
+              (click)="nextStep()"
+              [disabled]="allergyForm.get('hasAllergy')?.invalid"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+
+        <!-- STEP 2: YES -->
+        <div
+          *ngIf="currentStep === 2 && allergyForm.get('hasAllergy')?.value === 'yes'"
+          formArrayName="allergies"
+        >
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="text-primary mb-0">Allergy Details</h4>
+
+            <button type="button" class="btn btn-outline-primary" (click)="addAllergy()">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
+
+          <div class="scroll-section">
+            <div
+              *ngFor="let grp of allergies.controls; let i = index"
+              [formGroupName]="i"
+              class="mb-3 border rounded p-3"
+            >
+              <div class="row">
+
+
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Allergy Name</label>
+
+                  <div class="autocomplete-container position-relative">
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="allergyName"
+                      placeholder="Search allergy name"
+                    />
+
+                    <ul
+                      class="dropdown-menu show"
+                      *ngIf="suggestions[i]?.length"
+                      style="width: 100%; max-height: 200px; overflow-y: auto;"
+                    >
+                      <li
+                        class="dropdown-item"
+                        *ngFor="let item of suggestions[i]"
+                        (click)="selectAllergy(item, i)"
+                      >
+                        {{ item }}
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Clinical Status</label>
+                  <select class="form-select" formControlName="clinicalStatus">
+                    <option value="">Select</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                    <option value="resolved">Resolved</option>
+                  </select>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Verification Status</label>
+                  <select class="form-select" formControlName="verificationStatus">
+                    <option value="">Select</option>
+                    <option value="unconfirmed">Unconfirmed</option>
+                    <option value="presumed">Presumed</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="refuted">Refuted</option>
+                    <option value="entered-in-error">Entered in Error</option>
+                  </select>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Allergy Type</label>
+                  <select class="form-select" formControlName="allergyType">
+                    <option value="">Select</option>
+                    <option value="allergy">Allergy</option>
+                    <option value="intolerance">Intolerance</option>
+                  </select>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Category</label>
+                  <select class="form-select" formControlName="category">
+                    <option value="">Select</option>
+                    <option value="food">Food</option>
+                    <option value="medication">Medication</option>
+                    <option value="environment">Environment</option>
+                    <option value="biologic">Biologic</option>
+                  </select>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Criticality</label>
+                  <select class="form-select" formControlName="criticality">
+                    <option value="">Select</option>
+                    <option value="low">Low</option>
+                    <option value="high">High</option>
+                    <option value="unable-to-assess">Unable to assess</option>
+                  </select>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Onset Date</label>
+                  <input type="date" class="form-control" formControlName="onsetDate" />
+                </div>
+              </div>
+
+              <div class="text-end">
+                <button
+                  type="button"
+                  class="btn btn-outline-danger btn-sm"
+                  (click)="removeAllergy(i)"
+                  *ngIf="allergies.length > 1"
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between mt-4">
+            <button type="button" class="btn btn-secondary" (click)="previousStep()">Previous</button>
+            <button type="submit" class="btn btn-success" [disabled]="allergyForm.invalid">
+              Submit
+            </button>
+          </div>
+        </div>
+
+        <!-- STEP 2: NO -->
+        <div *ngIf="currentStep === 2 && allergyForm.get('hasAllergy')?.value === 'no'">
+          <h5 class="text-center">No allergies reported.</h5>
+
+          <div class="d-flex justify-content-between mt-4">
+            <button type="button" class="btn btn-secondary" (click)="previousStep()">Previous</button>
+
+            <button type="button" class="btn btn-success" (click)="onSubmit()">Submit</button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
