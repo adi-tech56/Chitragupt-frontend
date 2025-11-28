@@ -21,6 +21,7 @@ import { SendEmailComponent } from './common/Authentication/send-email/send-emai
 import { MedicationPageComponent } from './common/user/medication-page/medication-page.component';
 import { PatientContactDetailsComponent } from './common/forms/patient-contact-details/patient-contact-details.component';
 import { AuthInterceptor } from './core/Interceptors/auth-interceptor';
+import { AllergyFormsComponent } from './common/user/allergy-forms/allergy-forms.component';
 
 @NgModule({
   declarations: [
@@ -32,9 +33,6 @@ import { AuthInterceptor } from './core/Interceptors/auth-interceptor';
     ResetPasswordComponent,
     SendEmailComponent,
     MedicationPageComponent,
-
-
-
   ],
   imports: [
     BrowserModule,
@@ -46,12 +44,10 @@ import { AuthInterceptor } from './core/Interceptors/auth-interceptor';
     CommonModule,
     FormsModule,
     UserLayoutModule,
-
-
   ],
- providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
