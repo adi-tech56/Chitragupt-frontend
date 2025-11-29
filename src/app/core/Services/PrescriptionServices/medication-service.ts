@@ -1,36 +1,55 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
-import { MedicationNormalized, PatientMedicationLogs, PrescriptionData, PrescriptionResponse, SuperPrescriptionData } from '../../Models/Medication';
+import {
+  MedicationNormalized,
+  PatientMedicationLogs,
+  PrescriptionData,
+  PrescriptionResponse,
+  SuperPrescriptionData,
+} from '../../Models/Medication';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class MedicationService {
-
   private baseUrl = 'http://localhost:8089/patient/prescriptions'; // Backend endpoint
   private logUrl = 'http://localhost:8089/patient/medication-logs';
-  constructor(private http: HttpClient) { }
+  private reminderUrl =
+    'http://localhost:8089/patient/medication/send-reminder';
+
+  constructor(private http: HttpClient) {}
+
+  sendReminder(reminderData: any): Observable<any> {
+    console.log(reminderData);
+    return this.http.post(`${this.reminderUrl}`, reminderData);
+  }
 
   savePrescription(prescriptionData: SuperPrescriptionData): Observable<any> {
-    return this.http.post(`${this.baseUrl}/add-prescriptions`, prescriptionData, { withCredentials: true });
+    return this.http.post(
+      `${this.baseUrl}/add-prescriptions`,
+      prescriptionData,
+      { withCredentials: true }
+    );
   }
 
   getPrescriptions(): Observable<PrescriptionResponse[]> {
-    return this.http.get<PrescriptionResponse[]>(`${this.baseUrl}/prescription`);
+    return this.http.get<PrescriptionResponse[]>(
+      `${this.baseUrl}/prescription`
+    );
   }
   getMedications(): Observable<MedicationNormalized[]> {
-    return this.http.get<PrescriptionResponse[]>(`${this.baseUrl}/prescription`).pipe(
-      map(data => this.normalize(data))
-    );
+    return this.http
+      .get<PrescriptionResponse[]>(`${this.baseUrl}/prescription`)
+      .pipe(map((data) => this.normalize(data)));
   }
 
   private normalize(data: PrescriptionResponse[]): MedicationNormalized[] {
     const meds: MedicationNormalized[] = [];
 
-    data.forEach(entry => {
-      entry.prescriptions.forEach(condition => {
-        condition.medications.forEach(med => {
+    data.forEach((entry) => {
+      entry.prescriptions.forEach((condition) => {
+        condition.medications.forEach((med) => {
           meds.push({
             doctorName: entry.doctorName,
             prescriptionDate: entry.prescriptionDate,
@@ -38,7 +57,7 @@ export class MedicationService {
             conditionNotes: condition.notes,
             prescriptionId: entry.superPrescriptionId,
             prescriptionConditionId: condition.prescriptionId,
-            ...med
+            ...med,
           });
         });
       });
@@ -47,10 +66,9 @@ export class MedicationService {
     return meds;
   }
   getTodaysLogs(): Observable<PatientMedicationLogs[]> {
-    return this.http.get<PatientMedicationLogs[]>(
-      `${this.logUrl}/today`,
-      { withCredentials: true }
-    );
+    return this.http.get<PatientMedicationLogs[]>(`${this.logUrl}/today`, {
+      withCredentials: true,
+    });
   }
   markMedication(
     superPrescriptionId: number,
@@ -59,13 +77,12 @@ export class MedicationService {
     taken: boolean,
     doseTime: string // ISO string sent from frontend
   ): Observable<PatientMedicationLogs> {
-
     const body = {
       superPrescriptionId,
       prescriptionId,
       statementId,
       taken,
-      doseTime
+      doseTime,
     };
 
     return this.http.post<PatientMedicationLogs>(
@@ -75,11 +92,10 @@ export class MedicationService {
     );
   }
 
-
   //Check prescription exist
   checkPrescriptionExists(): Observable<boolean> {
-    return this.http.get<{ exists: boolean }>(`${this.baseUrl}/exists`)
-      .pipe(map(res => res.exists));
+    return this.http
+      .get<{ exists: boolean }>(`${this.baseUrl}/exists`)
+      .pipe(map((res) => res.exists));
   }
-
 }
