@@ -25,7 +25,7 @@
     </div>
 
 
-    
+    <!-- Prescription steps -->
     <div formArrayName="prescription">
 
       <!-- Loop but show ONLY the current step -->
@@ -37,7 +37,7 @@
 
           <!-- Reason autocomplete -->
           <div class="dropdown-container">
-            <label>Medical Condition</label>
+            <label>Reason</label>
             <input type="text" formControlName="reason" placeholder="Search medical condition" />
             <ul *ngIf="conditions.length > 0" class="dropdown">
               <li *ngFor="let item of conditions" (click)="selectCondition(item)">
