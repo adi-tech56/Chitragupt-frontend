@@ -1,0 +1,71 @@
+
+/* Ensure parent div wraps relative for dropdown positioning */
+.dropdown-container {
+  position: relative;
+}
+
+/* Common dropdown style for all selects and suggestion lists */
+ul.dropdown,
+select.dropdown-select {
+  position: absolute;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.section {
+  margin-bottom: 30px;
+  padding: 20px;
+  border: 1px solid #d0d7de;
+  border-radius: 10px;
+  background: #f8fbff;
+}
+/* Chevron */
+.transition {
+  transition: transform 0.3s ease;
+}
+
+.rotate-icon {
+  transform: rotate(180deg);
+}
+
+/* Items in the dropdown */
+ul.dropdown li,
+select.dropdown-select option {
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+/* Hover effect */
+ul.dropdown li:hover,
+select.dropdown-select option:hover {
+  background-color: #f0f0f0;
+}
+
+/* Active/focused item style */
+ul.dropdown li.active,
+select.dropdown-select option:checked {
+  background-color: #e0e0ff;
+}
+
+/* Input fields */
+input, select, textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  margin-bottom: 8px;
+}
+.notes-textarea {
+  height: 40px; /* adjust this to match your dropdown height */
+  resize: none; /* optional: prevent manual resizing */
+}

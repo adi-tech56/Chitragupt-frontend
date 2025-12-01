@@ -3,6 +3,7 @@ import { MedicationNormalized, MedicationWithStatus, PrescriptionResponse } from
 import { MedicationService } from 'src/app/core/Services/PrescriptionServices/medication-service';
 import { Location } from '@angular/common';
 import { DownloadPrescriptionService } from 'src/app/core/Services/PrescriptionServices/download-prescription.service';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-view-prescription',
   templateUrl: './view-prescription.component.html',
@@ -11,14 +12,32 @@ import { DownloadPrescriptionService } from 'src/app/core/Services/PrescriptionS
 export class ViewPrescriptionComponent implements OnInit {
 
   allMeds:PrescriptionResponse[] = [];
-  constructor(private medicationService: MedicationService,private location:Location,private download:DownloadPrescriptionService) { }
+  constructor(private medicationService: MedicationService,private router:Router ,private location:Location,private download:DownloadPrescriptionService) { }
   goBack() {
   this.location.back();
+}
+goToUpdatePage(med: any) {
+  // Store medication in sessionStorage
+  sessionStorage.setItem('medication', JSON.stringify(med));
+
+
+  this.router.navigate(['/user/update-medication']);
+}
+
+openIndex: number | null = null;
+
+toggleAccordion(index: number) {
+  if (this.openIndex === index) {
+    this.openIndex = null;
+  } else {
+    this.openIndex = index;
+  }
 }
 
   ngOnInit() {
     this.medicationService.getPrescriptions().subscribe(meds => {
       this.allMeds = meds;
+      console.log(meds)
     });
   }
 downloadPdf(superPrescriptionId:number) {

@@ -10,6 +10,7 @@ import { ViewPrescriptionComponent } from 'src/app/common/view-prescription/view
 import { ProfilePageComponent } from 'src/app/common/user/profile-page/profile-page.component';
 import { ContactPageComponent } from 'src/app/common/user/contact-page/contact-page.component';
 import { AllergyFormsComponent } from 'src/app/common/user/allergy-forms/allergy-forms.component';
+import { UpdatePrescriptionComponent } from 'src/app/common/forms/update-prescription/update-prescription.component';
 const routes: Routes = [
   {
     path: "",
@@ -20,6 +21,7 @@ const routes: Routes = [
       { path: 'emergencyContact', component: ContactPageComponent },
       { path: 'allergyForm', component: AllergyFormsComponent },
       { path: "add-medication", component: AddMedicationComponent, canActivate: [AuthGuard, RoleGuard], data: { roles: ['PATIENT'] } },
+       { path: "update-medication", component: UpdatePrescriptionComponent, canActivate: [AuthGuard, RoleGuard], data: { roles: ['PATIENT'] } },
       // { path: "medications", component: MedicationPageComponent, canActivate: [AuthGuard, RoleGuard], data: { roles: ['PATIENT'] } },
       // { path: "view-prescription", component: ViewPrescriptionComponent, canActivate: [AuthGuard, RoleGuard], data: { roles: ['PATIENT'] } }
       {
