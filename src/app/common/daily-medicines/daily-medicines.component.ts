@@ -20,6 +20,15 @@ export class DailyMedicinesComponent {
   completedPagination: PaginationState = { page: 1, pageSize: 4 };
 
   constructor(private state: DailyMedicationService) {}
+openIndex: number | null = null;
+
+toggleAccordion(index: number) {
+  if (this.openIndex === index) {
+    this.openIndex = null;
+  } else {
+    this.openIndex = index;
+  }
+}
 
   ngOnInit() {
     this.state.todaysMeds$.subscribe(meds => {

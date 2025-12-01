@@ -18,7 +18,7 @@ import { HomeLayoutModule } from './layout/home-layout/home-layout.module';
 import { UserLayoutModule } from './layout/user-layout/user-layout.module';
 
 import { AuthInterceptor } from './core/Interceptors/auth-interceptor';
-import { AllergyFormsComponent } from './common/user/allergy-forms/allergy-forms.component';
+
 
 @NgModule({
   declarations: [
@@ -29,6 +29,7 @@ import { AllergyFormsComponent } from './common/user/allergy-forms/allergy-forms
     VerificationComponent,
     ResetPasswordComponent,
     SendEmailComponent,
+
   ],
   imports: [
     BrowserModule,

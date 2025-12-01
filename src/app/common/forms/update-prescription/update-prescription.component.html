@@ -1,0 +1,289 @@
+<div class="container bg-white mt-3">
+    <div class="d-flex align-items-center my-3 position-relative">
+        <button (click)="goBack()" class="btn btn-outline-primary mb-2">
+            <i class="fa-solid fa-angle-left"></i> Back
+        </button>
+        <h3 class="text-primary fw-bold mb-0 position-absolute start-50 translate-middle-x text-center">
+            Update Prescription
+        </h3>
+    </div>
+
+
+    <form [formGroup]="superPrescription" (ngSubmit)="submit()">
+
+        <!-- STEP 0 — MAIN INFO -->
+        <div *ngIf="currentStep === 0">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label  fw-semibold">Doctor Name</label>
+                    <input class="form-control" type="text" formControlName="doctorName">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label  fw-semibold">Prescription Date</label>
+                    <input class="form-control" type="date" formControlName="prescriptionDate">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label  fw-semibold">Notes</label>
+                <textarea class="form-control notes-textarea" formControlName="notes"></textarea>
+            </div>
+        </div>
+
+        <!-- PRESCRIPTIONS -->
+        <div formArrayName="prescription">
+
+            <div *ngFor="let pres of prescriptions.controls; let pIndex = index;">
+
+                <div *ngIf="currentStep === pIndex" [formGroupName]="pIndex">
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="fw-semibold text-primary mb-0">
+                            Medication Course <span class="fw-bold">{{ pIndex + 1 }}</span> / {{ prescriptions.length }}
+                        </h4>
+
+                        <button type="button" class="btn btn-danger btn-sm" (click)="removePrescription(currentStep)"
+                            *ngIf="currentStep > 0">
+                            Remove  Medication Course
+                        </button>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="dropdown-container">
+                                <label class="form-label  fw-semibold">Reason</label>
+                                <input type="text" formControlName="reason" placeholder="Search medical condition" />
+                                <ul *ngIf="conditions.length > 0" class="dropdown">
+                                    <li *ngFor="let item of conditions" (click)="selectCondition(item)">
+                                        {{ item.name || item }}
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label class="form-label  fw-semibold">Notes</label>
+                                <textarea class="form-control notes-textarea" formControlName="notes"></textarea>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- MEDICATIONS ARRAY -->
+                    <div formArrayName="medications">
+                        <div class="d-flex justify-content-end mb-2">
+                            <button class="btn btn-outline-primary btn-sm" type="button"
+                                (click)="addMedication(pIndex)">
+                                <i class="fa-solid fa-plus"></i> Add Medication
+                            </button>
+                        </div>
+
+                        <div *ngFor="let med of getMedications(pIndex).controls; let mIndex = index;"
+                            [formGroupName]="mIndex" class="rounded border bg p-2 mt-3">
+
+                            <!-- HEADER -->
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+
+                                <!-- Accordion Header Button -->
+                                <button class="accordion-button px-2 py-1" type="button"
+                                    style="background: none; box-shadow: none;">
+                                    <h5 class="small text-primary fw-semibold mb-0">
+                                        Medication {{ mIndex + 1 }}
+                                    </h5>
+                                </button>
+
+                                <!-- Existing Medication: show chevron -->
+                                <ng-container
+                                    *ngIf="getMedications(pIndex).at(mIndex).get('isExisting')?.value; else removeBtn">
+                                    <i class="fa-solid fa-chevron-down ms-2 transition"
+                                        [ngClass]="{ 'rotate-icon': openIndex === mIndex, 'collapsed': openIndex !== mIndex }"
+                                        (click)="toggleAccordion(mIndex)" style="cursor: pointer; font-size: 14px;"></i>
+                                </ng-container>
+
+                                <!-- New Medication: show remove button -->
+                                <ng-template #removeBtn>
+                                    <i class="fa-solid fa-chevron-down ms-2 transition"
+                                        [ngClass]="{ 'rotate-icon': openIndex === mIndex, 'show': openIndex === mIndex }"
+                                        (click)="toggleAccordion(mIndex)" style="cursor: pointer; font-size: 14px;"></i>
+                                </ng-template>
+
+                            </div>
+
+                            <!-- COLLAPSIBLE BODY -->
+                            <div [ngClass]="{ 'show': openIndex === mIndex }" class="accordion-collapse collapse">
+
+                                <div class="accordion-body px-1">
+                                    <div *ngIf="!getMedications(pIndex).at(mIndex).get('isExisting')?.value"
+                                        class="d-flex justify-content-end mt-3">
+                                        <button type="button" class="btn btn-danger btn-sm"
+                                            (click)="removeMedication(pIndex, mIndex)">
+                                            <i class="fa-solid fa-trash me-1"></i> Remove Medication
+                                        </button>
+                                    </div>
+
+                                    <!-- MEDICINE AUTOCOMPLETE -->
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <div class="form-group position-relative">
+                                                <label class="form-label fw-semibold">Medicine</label>
+                                                <input type="text" class="form-control" formControlName="medicationName"
+                                                    placeholder="Search medicine">
+
+                                                <ul class="dropdown-menu show w-100" *ngIf="medicines.length > 0">
+                                                    <li *ngFor="let m of medicines" class="dropdown-item"
+                                                        (click)="selectMedicine(m, pIndex, mIndex)">
+                                                        {{ m.brandName }}
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label fw-semibold">Status</label>
+                                            <select class="form-control" formControlName="status">
+                                                <option value="ACTIVE">Active</option>
+                                                <option value="COMPLETED">Completed</option>
+                                                <option value="ONHOLD">On Hold</option>
+                                                <option value="NOTTAKEN">Not Taken</option>
+                                                <option value="INTENDED">Intended</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- DATES -->
+                                    <div class="row">
+                                        <div class="col">
+                                            <label class="form-label fw-semibold">Start Date</label>
+                                            <input type="date" class="form-control"
+                                                formControlName="effectiveStartDate">
+                                        </div>
+                                        <div class="col">
+                                            <label class="form-label fw-semibold">End Date</label>
+                                            <input type="date" class="form-control" formControlName="effectiveEndDate">
+                                        </div>
+                                    </div>
+
+                                    <hr>
+
+                                    <!-- DOSAGE -->
+                                    <div formGroupName="dosage">
+                                        <h6 class="fw-bold">Dosage</h6>
+
+                                        <div class="row">
+                                            <div class="col">
+                                                <label>Amount</label>
+                                                <input type="number" class="form-control" formControlName="amount">
+                                            </div>
+
+                                            <div class="col position-relative">
+                                                <label>Unit</label>
+                                                <input type="text" class="form-control"
+                                                    formControlName="amountUnitName">
+
+                                                <ul class="dropdown-menu show w-100" *ngIf="amountUnit.length > 0">
+                                                    <li class="dropdown-item" *ngFor="let u of amountUnit"
+                                                        (click)="selectAmountUnit(u, pIndex, mIndex)">
+                                                        {{ u.conceptName }}
+                                                    </li>
+                                                </ul>
+                                            </div>
+
+                                            <div class="col position-relative">
+                                                <label>Route</label>
+                                                <input type="text" class="form-control" formControlName="routeName">
+
+                                                <ul class="dropdown-menu show w-100" *ngIf="routeUnit.length > 0">
+                                                    <li class="dropdown-item" *ngFor="let r of routeUnit"
+                                                        (click)="selectRoute(r, pIndex, mIndex)">
+                                                        {{ r.conceptName }}
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-2">
+                                            <label>Instruction</label>
+                                            <input type="text" class="form-control" formControlName="instruction">
+                                        </div>
+                                    </div>
+
+                                    <hr>
+
+                                    <!-- TIMING -->
+                                    <div formGroupName="timing">
+                                        <h6 class="fw-bold">Timing</h6>
+
+                                        <div class="row">
+                                            <div class="col">
+                                                <label>Frequency</label>
+                                                <input type="number" class="form-control" formControlName="frequency">
+                                            </div>
+                                            <div class="col">
+                                                <label>Period</label>
+                                                <input type="number" class="form-control" formControlName="period">
+                                            </div>
+                                            <div class="col">
+                                                <label>Unit</label>
+                                                <select class="form-control" formControlName="periodUnit">
+                                                    <option *ngFor="let p of periodUnit" [value]="p.value">{{ p.display
+                                                        }}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mt-2">
+                                            <div class="col">
+                                                <label>Time of Day</label>
+                                                <input type="time" class="form-control" formControlName="timeOfDay">
+                                            </div>
+                                            <div class="col">
+                                                <label>When Code</label>
+                                                <select class="form-control" formControlName="whenCode">
+                                                    <option *ngFor="let w of whenCode" [value]="w.value">{{ w.display }}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+
+                </div>
+            </div>
+        </div>
+
+        <!-- NAVIGATION -->
+        <div class="mt-4 d-flex justify-content-between">
+
+            <button type="button" class="btn btn-outline-primary" (click)="prevStep()" [disabled]="currentStep === 0">
+                Previous
+            </button>
+
+            <!-- Between prescriptions -->
+            <button type="button" class="btn btn-outline-primary" *ngIf="currentStep < prescriptions.length - 1"
+                (click)="nextStep()">
+                Next
+            </button>
+
+            <!-- Add new prescription only on last step -->
+            <button type="button" class="btn btn-secondary" *ngIf="currentStep === prescriptions.length - 1"
+                (click)="addNewPrescription()">
+                + Add Medication Course
+            </button>
+            <!-- <button type="button" (click)="removePrescription(currentStep)" *ngIf="currentStep > 0">
+                Remove Prescription
+            </button> -->
+
+            <!-- Final Save -->
+            <button type="submit" class="btn btn-primary" *ngIf="currentStep === prescriptions.length - 1">
+                Update Prescription
+            </button>
+        </div>
+
+    </form>
+</div>

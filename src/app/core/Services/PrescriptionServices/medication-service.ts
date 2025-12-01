@@ -24,7 +24,16 @@ export class MedicationService {
       map(data => this.normalize(data))
     );
   }
+  updatePrescriptions(
+    superPrescriptionId: number,
+    prescription:PrescriptionResponse
+  ): Observable<{ message: string }> {
 
+    return this.http.put<{ message: string }>(
+      `${this.baseUrl}/update-prescriptions/${superPrescriptionId}`,
+      prescription
+    );
+  }
   private normalize(data: PrescriptionResponse[]): MedicationNormalized[] {
     const meds: MedicationNormalized[] = [];
 
