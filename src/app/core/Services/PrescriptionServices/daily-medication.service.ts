@@ -73,58 +73,142 @@ export class DailyMedicationService implements OnDestroy {
       (a.doseTime?.getTime() ?? 0) - (b.doseTime?.getTime() ?? 0)
     );
   }
-
-  // ----------------------------------------------
-  // SAME generateDosesForToday FROM YOUR COMPONENT
-  // ----------------------------------------------
   private generateDosesForToday(med: MedicationWithStatus): MedicationWithStatus[] {
-    if (!med.timing?.timeOfDay || !med.timing.frequency) return [];
+    if (!med.timing?.frequency || !med.timing.period || !med.timing.periodUnit) return [];
 
     const doses: MedicationWithStatus[] = [];
-    const [hours, minutes, seconds] = med.timing.timeOfDay.split(':').map(Number);
 
-    const now = new Date();
-    const todayStart = new Date(now.setHours(0, 0, 0, 0));
-    const todayEnd = new Date(new Date().setHours(23, 59, 59, 999));
-
-    let start = new Date(med.effectiveStartDate);
-    let end = new Date(med.effectiveEndDate);
-
-    if (start.toDateString() === end.toDateString()) {
-      start.setHours(0, 0, 0, 0);
-      end.setHours(23, 59, 59, 999);
-    }
-
-    let intervalMs = 0;
+    const frequency = med.timing.frequency;
+    const period = med.timing.period;
     const unit = med.timing.periodUnit.toLowerCase();
 
-    if (unit === 'day') intervalMs = med.timing.period * 86400000;
-    else if (unit === 'hour') intervalMs = med.timing.period * 3600000;
-    else if (unit === 'minute') intervalMs = med.timing.period * 60000;
-    else intervalMs = med.timing.period * 3600000;
+    // Today window boundaries
+    const now = new Date();
+    const todayStart = new Date(now.setHours(0, 0, 0, 0));
+    const todayEnd = new Date(now.setHours(23, 59, 59, 999));
+    const startDate = new Date(med.effectiveStartDate);
+    const endDate = new Date(med.effectiveEndDate);
 
-    let firstDose = new Date();
-    firstDose.setHours(hours, minutes, seconds || 0, 0);
-
-    if (firstDose < start) {
-      firstDose = new Date(start);
-      firstDose.setHours(hours, minutes, seconds || 0, 0);
+    // If both dates are same day → expand to full day
+    if (startDate.toDateString() === endDate.toDateString()) {
+      startDate.setHours(0, 0, 0, 0);
+      endDate.setHours(23, 59, 59, 999);
     }
 
-    for (let i = 0; i < med.timing.frequency; i++) {
-      const doseTime = new Date(firstDose.getTime() + i * intervalMs);
+    // Convert period window → milliseconds
+    let periodMs = 0;
 
-      if (doseTime >= todayStart && doseTime <= todayEnd && doseTime >= start && doseTime <= end) {
+    switch (unit) {
+      case 'second': periodMs = period * 1000; break;
+      case 'minute': periodMs = period * 60 * 1000; break;
+      case 'hour': periodMs = period * 60 * 60 * 1000; break;
+      case 'day': periodMs = period * 24 * 60 * 60 * 1000; break;
+      case 'week': periodMs = period * 7 * 24 * 60 * 60 * 1000; break;
+      case 'month': periodMs = period * 30 * 24 * 60 * 60 * 1000; break; // approx
+      case 'year': periodMs = period * 365 * 24 * 60 * 60 * 1000; break;
+      default: periodMs = period * 24 * 60 * 60 * 1000;
+    }
+
+    // Interval = window / frequency
+    const intervalMs = frequency > 1 ? periodMs / (frequency - 1) : 0;
+
+
+    // Extract base time (timeOfDay)
+    let hours = 0, minutes = 0, seconds = 0;
+    if (med.timing.timeOfDay) {
+      [hours, minutes, seconds] = med.timing.timeOfDay.split(':').map(Number);
+    }
+
+    // FIRST DOSE = start date + timeOfDay
+    let doseTime = new Date(startDate);
+    doseTime.setHours(hours, minutes, seconds || 0, 0);
+
+    // Move doseTime backwards if startDate > today
+    if (doseTime > todayEnd) return [];
+
+    while (doseTime.getTime() < todayStart.getTime() - periodMs) {
+      doseTime = new Date(doseTime.getTime() + intervalMs);
+    }
+
+
+    // Generate doses until beyond today
+    while (doseTime <= todayEnd && doseTime <= endDate) {
+      if (doseTime >= todayStart) {
         doses.push({
           ...med,
-          doseTime,
+          doseTime: new Date(doseTime),
           status: 'PENDING',
           taken: false
         });
       }
+      doseTime = new Date(doseTime.getTime() + intervalMs);
     }
-    return doses;
+console.log(doses)
+   return doses.sort((a, b) => (a.doseTime?.getTime() ?? 0) - (b.doseTime?.getTime() ?? 0));
   }
+
+  // private generateDosesForToday(med: MedicationWithStatus): MedicationWithStatus[] {
+  //   if (!med.timing?.frequency || !med.timing.period || !med.timing.periodUnit) return [];
+
+  //   const doses: MedicationWithStatus[] = [];
+  //   const now = new Date();
+  //   const todayStart = new Date(now.setHours(0, 0, 0, 0));
+  //   const todayEnd = new Date(now.setHours(23, 59, 59, 999));
+
+  //   const startDate = new Date(med.effectiveStartDate);
+  //   const endDate = new Date(med.effectiveEndDate);
+
+  //   const frequency = med.timing.frequency;
+  //   const period = med.timing.period;
+  //   const unit = med.timing.periodUnit.toLowerCase();
+
+  //   // Convert period & unit to interval in milliseconds
+  //   let intervalMs: number;
+  //   switch (unit) {
+  //     case 'day':
+  //       intervalMs = period * 24 * 60 * 60 * 1000 / frequency; // divide day evenly
+  //       break;
+  //     case 'hour':
+  //       intervalMs = period * 60 * 60 * 1000;
+  //       break;
+  //     case 'minute':
+  //       intervalMs = period * 60 * 1000;
+  //       break;
+  //     case 'second':
+  //       intervalMs = period * 1000;
+  //       break;
+  //     default:
+  //       intervalMs = period * 60 * 60 * 1000;
+  //   }
+
+  //   // Set first dose time
+  //   let hours = 0, minutes = 0, seconds = 0;
+  //   if (med.timing.timeOfDay) {
+  //     [hours, minutes, seconds] = med.timing.timeOfDay.split(':').map(Number);
+  //   }
+
+  //   let firstDose = new Date(todayStart);
+  //   firstDose.setHours(hours, minutes, seconds || 0, 0);
+
+  //   // Generate all doses for today
+  //   for (let i = 0; i < frequency; i++) {
+  //     const doseTime = new Date(firstDose.getTime() + i * intervalMs);
+
+  //     // Only include doses that fall within today AND prescription period
+  //     if (doseTime >= todayStart && doseTime <= todayEnd &&
+  //         doseTime >= startDate && doseTime <= endDate) {
+  //       doses.push({
+  //         ...med,
+  //         doseTime,
+  //         status: 'PENDING',
+  //         taken: false
+  //       });
+  //     }
+  //   }
+  // console.log(doses)
+  //   return doses.sort((a, b) => (a.doseTime?.getTime() ?? 0) - (b.doseTime?.getTime() ?? 0));
+  // }
+
 
   // ----------------------------------------------
   // MARK TAKEN
