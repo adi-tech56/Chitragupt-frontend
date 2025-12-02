@@ -14,13 +14,13 @@ import { UpdatePrescriptionComponent } from "../common/forms/update-prescription
     SidebarComponent,
     AddMedicationComponent,
     DailyMedicinesComponent,
-    UpdatePrescriptionComponent
+    UpdatePrescriptionComponent,
   ],
   imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-      RouterModule  
+      RouterModule
   ],
   exports: [
     SidebarComponent,
@@ -29,7 +29,7 @@ import { UpdatePrescriptionComponent } from "../common/forms/update-prescription
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-      RouterModule  
+      RouterModule
   ]
 })
 export class SharedModule { }

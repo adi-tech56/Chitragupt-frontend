@@ -156,9 +156,9 @@ export class DailyMedicationService implements OnDestroy {
     if (!med.timing?.timeOfDay || !med.timing.frequency) return [];
 
     const doses: MedicationWithStatus[] = [];
-    const [hours, minutes, seconds] = med.timing.timeOfDay
-      .split(':')
-      .map(Number);
+    // const [hours, minutes, seconds] = med.timing.timeOfDay
+    //   .split(':')
+    //   .map(Number);
 
     const frequency = med.timing.frequency;
     const period = med.timing.period;
@@ -181,22 +181,38 @@ export class DailyMedicationService implements OnDestroy {
     let periodMs = 0;
 
     switch (unit) {
-      case 'second': periodMs = period * 1000; break;
-      case 'minute': periodMs = period * 60 * 1000; break;
-      case 'hour': periodMs = period * 60 * 60 * 1000; break;
-      case 'day': periodMs = period * 24 * 60 * 60 * 1000; break;
-      case 'week': periodMs = period * 7 * 24 * 60 * 60 * 1000; break;
-      case 'month': periodMs = period * 30 * 24 * 60 * 60 * 1000; break; // approx
-      case 'year': periodMs = period * 365 * 24 * 60 * 60 * 1000; break;
-      default: periodMs = period * 24 * 60 * 60 * 1000;
+      case 'second':
+        periodMs = period * 1000;
+        break;
+      case 'minute':
+        periodMs = period * 60 * 1000;
+        break;
+      case 'hour':
+        periodMs = period * 60 * 60 * 1000;
+        break;
+      case 'day':
+        periodMs = period * 24 * 60 * 60 * 1000;
+        break;
+      case 'week':
+        periodMs = period * 7 * 24 * 60 * 60 * 1000;
+        break;
+      case 'month':
+        periodMs = period * 30 * 24 * 60 * 60 * 1000;
+        break; // approx
+      case 'year':
+        periodMs = period * 365 * 24 * 60 * 60 * 1000;
+        break;
+      default:
+        periodMs = period * 24 * 60 * 60 * 1000;
     }
 
     // Interval = window / frequency
     const intervalMs = frequency > 1 ? periodMs / (frequency - 1) : 0;
 
-
     // Extract base time (timeOfDay)
-    let hours = 0, minutes = 0, seconds = 0;
+    let hours = 0,
+      minutes = 0,
+      seconds = 0;
     if (med.timing.timeOfDay) {
       [hours, minutes, seconds] = med.timing.timeOfDay.split(':').map(Number);
     }
@@ -212,7 +228,6 @@ export class DailyMedicationService implements OnDestroy {
       doseTime = new Date(doseTime.getTime() + intervalMs);
     }
 
-
     // Generate doses until beyond today
     while (doseTime <= todayEnd && doseTime <= endDate) {
       if (doseTime >= todayStart) {
@@ -225,8 +240,10 @@ export class DailyMedicationService implements OnDestroy {
       }
       doseTime = new Date(doseTime.getTime() + intervalMs);
     }
-console.log(doses)
-   return doses.sort((a, b) => (a.doseTime?.getTime() ?? 0) - (b.doseTime?.getTime() ?? 0));
+    console.log(doses);
+    return doses.sort(
+      (a, b) => (a.doseTime?.getTime() ?? 0) - (b.doseTime?.getTime() ?? 0)
+    );
   }
 
   // private generateDosesForToday(med: MedicationWithStatus): MedicationWithStatus[] {
@@ -290,7 +307,6 @@ console.log(doses)
   // console.log(doses)
   //   return doses.sort((a, b) => (a.doseTime?.getTime() ?? 0) - (b.doseTime?.getTime() ?? 0));
   // }
-
 
   // ----------------------------------------------
   // MARK TAKEN
