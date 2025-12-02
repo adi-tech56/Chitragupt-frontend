@@ -5,6 +5,7 @@ import { MedicationPageComponent } from 'src/app/common/user/medication-page/med
 import { AuthGuard } from 'src/app/core/Gaurds/auth.guard';
 import { RoleGuard } from 'src/app/core/Gaurds/role.guard';
 import { ViewPrescriptionComponent } from 'src/app/common/view-prescription/view-prescription.component';
+import { ExportFhirDataComponent } from 'src/app/common/export-fhir-data/export-fhir-data.component';
 
 
 
@@ -15,7 +16,8 @@ const routes: Routes = [
     children: [
       { path: "", component: MedicationPageComponent, canActivate: [AuthGuard, RoleGuard], data: { roles: ['PATIENT'] } },
       
-      { path: "view-prescription", component: ViewPrescriptionComponent, canActivate: [AuthGuard, RoleGuard], data: { roles: ['PATIENT'] } }
+      { path: "view-prescription", component: ViewPrescriptionComponent, canActivate: [AuthGuard, RoleGuard], data: { roles: ['PATIENT'] } },
+        { path: "export-fhir", component: ExportFhirDataComponent, canActivate: [AuthGuard, RoleGuard], data: { roles: ['PATIENT'] } }
      
     ],
 

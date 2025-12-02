@@ -67,48 +67,54 @@ export class UpdatePrescriptionComponent implements OnInit, OnDestroy {
   goBack() {
     this.location.back();
   }
-// openIndex: number | null = null;
+  // openIndex: number | null = null;
 
-// toggleAccordion(index: number) {
-//   if (this.openIndex === index) {
-//     this.openIndex = null;
-//   } else {
-//     this.openIndex = index;
-//   }
-// }
-openIndex: number | null = null;
+  // toggleAccordion(index: number) {
+  //   if (this.openIndex === index) {
+  //     this.openIndex = null;
+  //   } else {
+  //     this.openIndex = index;
+  //   }
+  // }
+  openIndex: number | null = null;
 
-// Toggle function for existing accordions
-toggleAccordion(index: number) {
-  this.openIndex = this.openIndex === index ? null : index;
-}
+  // Toggle function for existing accordions
+  toggleAccordion(index: number) {
+    this.openIndex = this.openIndex === index ? null : index;
+  }
 
   ngOnInit(): void {
     // Load JSON files
     this.http.get<any[]>('assets/when-code.json').subscribe(data => this.whenCode = data);
     this.http.get<any[]>('assets/period-unit.json').subscribe(data => this.periodUnit = data);
+    // this.subscribeReasonValueChanges(0);
+    // this.subscribeMedicineValueChanges(0);
+    // this.subscribeRouteValueChanges(0);
+    // this.subscribeAmountValueChanges(0);
+    const medData = sessionStorage.getItem('medication');
 
-     const medData = sessionStorage.getItem('medication');
+    if (medData) {
+      this.receivedData = JSON.parse(medData);
+      console.log("Received medication:", this.receivedData);
 
-  if (medData) {
-    this.receivedData = JSON.parse(medData);
-    console.log("Received medication:", this.receivedData);
+      // Clear it so it doesn't persist unnecessarily
+      sessionStorage.removeItem('medication');
+    } else {
+      console.warn("No medication data received. Possibly a direct reload.");
+    }
 
-    // Clear it so it doesn't persist unnecessarily
-    sessionStorage.removeItem('medication');
-  } else {
-    console.warn("No medication data received. Possibly a direct reload.");
-  }
-  
     // Auto-fill the form if data exists
     if (this.receivedData) {
       this.patchFormWithReceivedData();
     }
+  
   }
 
   ngOnDestroy(): void {
     this.reasonSubscriptions.forEach(s => s.unsubscribe());
     this.medicineSubscriptions.forEach(s => s.unsubscribe());
+    this.amountSubscriptions.forEach(s => s.unsubscribe());
+    
   }
 
   // ---------------- FORM GROUP BUILDERS ----------------
@@ -263,6 +269,11 @@ toggleAccordion(index: number) {
   addNewPrescription() {
     this.prescriptions.push(this.createPrescriptionGroup());
     this.currentStep = this.prescriptions.length - 1;
+    this.subscribeReasonValueChanges(this.currentStep);
+    this.subscribeMedicineValueChanges(this.currentStep);
+    this.subscribeAmountValueChanges(this.currentStep);
+    this.subscribeRouteValueChanges(this.currentStep);
+    
   }
 
   removePrescription(index: number) {
@@ -271,20 +282,32 @@ toggleAccordion(index: number) {
     if (this.currentStep >= this.prescriptions.length) {
       this.currentStep = this.prescriptions.length - 1;
     }
+    if (this.prescriptions.length > 0) {
+      this.subscribeReasonValueChanges(this.currentStep);
+      this.subscribeMedicineValueChanges(this.currentStep);
+      this.subscribeAmountValueChanges(this.currentStep);
+       this.subscribeRouteValueChanges(this.currentStep);
+    }
   }
 
   // addMedication(presIndex: number) {
   //   this.getMedications(presIndex).push(this.createMedicationGroup());
   // }
-addMedication(presIndex: number) {
-  const medsArray = this.getMedications(presIndex);
-  medsArray.push(this.createMedicationGroup());
+  addMedication(presIndex: number) {
+    const medsArray = this.getMedications(presIndex);
+    medsArray.push(this.createMedicationGroup());
 
-  // Open the newly added medication accordion
-  this.openIndex = medsArray.length - 1;
-}
+    // Open the newly added medication accordion
+    this.openIndex = medsArray.length - 1;
+    this.subscribeMedicineValueChanges(presIndex);
+    this.subscribeAmountValueChanges(presIndex);
+     this.subscribeRouteValueChanges(presIndex);
+  }
   removeMedication(presIndex: number, medIndex: number) {
     this.getMedications(presIndex).removeAt(medIndex);
+    this.subscribeMedicineValueChanges(presIndex);
+    this.subscribeAmountValueChanges(presIndex);
+         this.subscribeRouteValueChanges(presIndex);
   }
 
   // ---------------- SUBSCRIPTION METHODS ----------------

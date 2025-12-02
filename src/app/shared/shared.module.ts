@@ -8,13 +8,15 @@ import { AddMedicationComponent } from "../common/forms/add-medication/add-medic
 import { DailyMedicinesComponent } from "../common/daily-medicines/daily-medicines.component";
 import { RouterModule } from "@angular/router";
 import { UpdatePrescriptionComponent } from "../common/forms/update-prescription/update-prescription.component";
+import { ExportFhirDataComponent } from "../common/export-fhir-data/export-fhir-data.component";
 
 @NgModule({
   declarations: [
     SidebarComponent,
     AddMedicationComponent,
     DailyMedicinesComponent,
-    UpdatePrescriptionComponent
+    UpdatePrescriptionComponent,
+    ExportFhirDataComponent
   ],
   imports: [
     CommonModule,

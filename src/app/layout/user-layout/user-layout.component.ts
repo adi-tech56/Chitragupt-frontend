@@ -13,6 +13,7 @@ export class UserLayoutComponent {
   patientDetailsComplete: boolean = false;
   patientContactsComplete: boolean = false;
   patientAllergyComplete: boolean = false;
+    loading: boolean = true;
   private auth = inject(AuthService);
   private patientContactService = inject(PatientContactService);
   private patientProfileService = inject(PatientProfileService);
@@ -54,30 +55,45 @@ export class UserLayoutComponent {
     this.setGreeting();
     this.userName = this.auth.getUserName();
     console.log(this.userName);
-    this.patientContactService.getContact().subscribe({
-      next: (res) => {
-        if (res.hasContact) {
-          this.patientContactsComplete = true;
-        } else {
-          this.patientContactsComplete = false;
-        }
-      },
-      error: (err) => {
-        console.error('Error fetching contact:', err);
-      },
+    this.loading = true; 
+    Promise.all([
+      this.patientContactService.getContact().toPromise(),
+      this.patientProfileService.getProfile().toPromise()
+    ])
+    .then(([contactRes, profileRes]) => {
+      this.patientContactsComplete = contactRes.hasContact ?? false;
+      this.patientDetailsComplete = profileRes.hasProfile ?? false;
+    })
+    .catch((err) => {
+      console.error('Error fetching data:', err);
+    })
+    .finally(() => {
+      this.loading = false; // hide loader after data is loaded
     });
-    this.patientProfileService.getProfile().subscribe({
-      next: (res) => {
-        if (res.hasProfile) {
-          this.patientDetailsComplete = true;
-        } else {
-          this.patientDetailsComplete = false;
-        }
-      },
-      error: (err) => {
-        console.error('Error fetching profile:', err);
-      },
-    });
+    // this.patientContactService.getContact().subscribe({
+    //   next: (res) => {
+    //     if (res.hasContact) {
+    //       this.patientContactsComplete = true;
+    //     } else {
+    //       this.patientContactsComplete = false;
+    //     }
+    //   },
+    //   error: (err) => {
+    //     console.error('Error fetching contact:', err);
+    //   },
+    // });
+    // this.patientProfileService.getProfile().subscribe({
+    //   next: (res) => {
+    //     if (res.hasProfile) {
+    //       this.patientDetailsComplete = true;
+    //     } else {
+    //       this.patientDetailsComplete = false;
+    //     }
+    //   },
+    //   error: (err) => {
+    //     console.error('Error fetching profile:', err);
+    //   },
+    // });
   }
 
   checkPatientDetails() {
