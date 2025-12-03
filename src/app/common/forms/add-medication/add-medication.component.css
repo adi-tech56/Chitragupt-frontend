@@ -80,3 +80,14 @@ input, select, textarea {
   box-sizing: border-box;
   margin-bottom: 8px;
 }
+.section {
+  margin-bottom: 30px;
+  padding: 20px;
+  border: 1px solid #d0d7de;
+  border-radius: 10px;
+  background: #f8fbff;
+}
+.notes-textarea {
+  height: 40px; /* adjust this to match your dropdown height */
+  resize: none; /* optional: prevent manual resizing */
+}

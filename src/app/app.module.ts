@@ -21,6 +21,7 @@ import { AuthInterceptor } from './core/Interceptors/auth-interceptor';
 import { SharePrescriptionComponent } from './common/share-prescription/share-prescription.component';
 
 
+
 @NgModule({
   declarations: [
     AppComponent,

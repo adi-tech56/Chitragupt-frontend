@@ -1,4 +1,8 @@
-<div class="d-flex justify-content-between align-items-center my-3 px-2">
+
+<div *ngIf="pageContext === 'HOME'" class="my-3 px-2">
+  <h4 class="m-0">Today's Medications</h4>
+</div>
+<div *ngIf="pageContext === 'MEDICATION'" class="d-flex justify-content-between align-items-center my-3 px-2">
   <h4 class="m-0">
     {{
     viewMode === 'TODAY' ? "Today's Medications" :
@@ -40,8 +44,8 @@
 
       <div class="accordion" id="todayMedsAccordion">
         <div *ngFor="let med of activeMeds | slice:0:4; let i = index" class="accordion-item">
-          <h2 class="accordion-header" >
-             <button class="accordion-button" [ngClass]="{'collapsed': openIndex !== i}" type="button"
+          <h2 class="accordion-header">
+            <button class="accordion-button" [ngClass]="{'collapsed': openIndex !== i}" type="button"
               (click)="toggleAccordion(i)">
 
               <strong class="me-2">{{ med.doseTime | date: 'shortTime' }}</strong>
@@ -49,7 +53,7 @@
 
             </button>
           </h2>
-<div class="accordion-collapse" [ngClass]="{'collapse': true, 'show': openIndex === i}">
+          <div class="accordion-collapse" [ngClass]="{'collapse': true, 'show': openIndex === i}">
 
             <div class="accordion-body d-flex justify-content-between align-items-start flex-wrap">
 

@@ -1,0 +1,21 @@
+<p>export-fhir-data works!</p>
+<div>
+  <h2>Prescriptions</h2>
+
+  <div *ngIf="prescriptions.length === 0">
+    No prescriptions available.
+  </div>
+
+  <ul *ngIf="prescriptions.length > 0">
+    <li *ngFor="let prescription of prescriptions">
+      <input
+        type="checkbox"
+        [value]="prescription.superPrescriptionId"
+        (change)="toggleSelection(prescription.superPrescriptionId, $event)"
+      />
+      {{ prescription.prescriptionDate }} <!-- Replace with prescription display field -->
+    </li>
+  </ul>
+
+  <button (click)="downloadSelected()">Download Selected</button>
+</div>
