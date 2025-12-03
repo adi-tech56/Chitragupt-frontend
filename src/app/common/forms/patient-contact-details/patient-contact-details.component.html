@@ -252,9 +252,9 @@
               class="mb-3 border rounded p-3"
             >
               <div class="row">
+                <!-- CONTACT USE -->
                 <div class="col-md-6 mb-3">
                   <label class="form-label fw-semibold">Contact Use</label>
-
                   <select class="form-select" formControlName="useCode">
                     <option value="">Select</option>
                     <option value="home">Home</option>
@@ -264,13 +264,50 @@
                     <option value="mobile">Mobile</option>
                   </select>
                 </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label fw-semibold">Value</label>
+
+                <div class="col-md-6 mb-3" *ngIf="i === 0">
+                  <label class="form-label fw-semibold">Email</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    formControlName="value"
+                    placeholder="e.g. example@email.com"
+                  />
+
+                  <!-- EMAIL VALIDATION -->
+                  <div
+                    class="text-danger"
+                    *ngIf="
+                      telecom.get('value')?.touched &&
+                      telecom.get('value')?.invalid
+                    "
+                  >
+                    <small *ngIf="telecom.get('value')?.errors?.['required']"
+                      >Email is required.</small
+                    >
+                    <small *ngIf="telecom.get('value')?.errors?.['email']"
+                      >Invalid email format.</small
+                    >
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-3" *ngIf="i > 0">
+                  <label class="form-label fw-semibold">Phone</label>
                   <input
                     class="form-control"
                     formControlName="value"
                     placeholder="e.g. +91 9999999999"
                   />
+
+                  <div
+                    class="text-danger"
+                    *ngIf="
+                      telecom.get('value')?.touched &&
+                      telecom.get('value')?.invalid
+                    "
+                  >
+                    <small>Phone number is required.</small>
+                  </div>
                 </div>
               </div>
 
@@ -279,7 +316,7 @@
                   type="button"
                   class="btn btn-outline-danger btn-sm"
                   (click)="removeTelecom(i)"
-                  *ngIf="telecoms.length > 1"
+                  *ngIf="i > 0"
                 >
                   <i class="fa fa-trash"></i>
                 </button>
