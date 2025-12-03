@@ -18,6 +18,7 @@ import { HomeLayoutModule } from './layout/home-layout/home-layout.module';
 import { UserLayoutModule } from './layout/user-layout/user-layout.module';
 
 import { AuthInterceptor } from './core/Interceptors/auth-interceptor';
+import { SharePrescriptionComponent } from './common/share-prescription/share-prescription.component';
 
 
 
@@ -30,6 +31,7 @@ import { AuthInterceptor } from './core/Interceptors/auth-interceptor';
     VerificationComponent,
     ResetPasswordComponent,
     SendEmailComponent,
+    SharePrescriptionComponent,
 
   ],
   imports: [

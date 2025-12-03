@@ -8,7 +8,7 @@ import { PatientDetailsComponent } from '../../common/forms/patient-details/pati
 import { PatientContactDetailsComponent } from '../../common/forms/patient-contact-details/patient-contact-details.component';
 import { HomePageComponent } from '../../common/user/home-page/home-page.component';
 import { ReactiveFormsModule } from '@angular/forms';
-import { SharedModule } from 'src/app/shared/shared.module';  // ⬅ IMPORTANT
+import { SharedModule } from 'src/app/shared/shared.module'; // ⬅ IMPORTANT
 import { SidebarComponent } from 'src/app/common/sidebar/sidebar.component';
 import { FormsModule } from '@angular/forms';
 import { PatientAllergyComponent } from 'src/app/common/forms/patient-allergy/patient-allergy.component';
@@ -16,7 +16,7 @@ import { HeaderComponent } from 'src/app/common/header/header.component';
 import { ProfilePageComponent } from 'src/app/common/user/profile-page/profile-page.component';
 import { ContactPageComponent } from 'src/app/common/user/contact-page/contact-page.component';
 import { AllergyFormsComponent } from 'src/app/common/user/allergy-forms/allergy-forms.component';
-
+import { DatePipe } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -29,7 +29,6 @@ import { AllergyFormsComponent } from 'src/app/common/user/allergy-forms/allergy
     ProfilePageComponent,
     ContactPageComponent,
     AllergyFormsComponent,
-
   ],
   imports: [
     CommonModule,
@@ -39,6 +38,6 @@ import { AllergyFormsComponent } from 'src/app/common/user/allergy-forms/allergy
     FormsModule,
     ReactiveFormsModule,
   ],
-
+  providers: [DatePipe],
 })
 export class UserLayoutModule {}

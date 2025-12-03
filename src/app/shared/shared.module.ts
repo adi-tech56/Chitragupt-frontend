@@ -22,7 +22,7 @@ import { ExportFhirDataComponent } from "../common/export-fhir-data/export-fhir-
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-      RouterModule  
+      RouterModule
   ],
   exports: [
     SidebarComponent,
@@ -31,7 +31,7 @@ import { ExportFhirDataComponent } from "../common/export-fhir-data/export-fhir-
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-      RouterModule  
+      RouterModule
   ]
 })
 export class SharedModule { }

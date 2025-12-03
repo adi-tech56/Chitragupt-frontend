@@ -1,38 +1,47 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Subscription, switchMap, timer, of } from 'rxjs';
 import { MedicationService } from './medication-service';
-import { MedicationWithStatus, PatientMedicationLogs } from 'src/app/core/Models/Medication';
+import {
+  MedicationWithStatus,
+  PatientMedicationLogs,
+} from 'src/app/core/Models/Medication';
+import { DatePipe } from '@angular/common';
 
 @Injectable({ providedIn: 'root' })
 export class DailyMedicationService implements OnDestroy {
-
   private todaysMedsSubject = new BehaviorSubject<MedicationWithStatus[]>([]);
   public todaysMeds$ = this.todaysMedsSubject.asObservable();
 
   private autoSkipSub: Subscription | null = null;
   private loadSub: Subscription | null = null;
 
-  constructor(private medicationService: MedicationService) {
+  constructor(
+    private medicationService: MedicationService,
+    private datePipe: DatePipe
+  ) {
     this.loadMeds();
     this.startAutoSkip();
+    this.startReminderCheck();
   }
+
   loadMeds() {
     if (this.loadSub) this.loadSub.unsubscribe();
 
-    this.loadSub = this.medicationService.getMedications()
+    this.loadSub = this.medicationService
+      .getMedications()
       .pipe(
-        switchMap(meds => {
+        switchMap((meds) => {
           // Convert normalized → MedicationWithStatus
-          const normalized: MedicationWithStatus[] = meds.map(m => ({
+          const normalized: MedicationWithStatus[] = meds.map((m) => ({
             ...m,
             taken: false,
             status: 'PENDING',
             doseTime: undefined,
-            logCreatedAt: undefined
+            logCreatedAt: undefined,
           }));
 
           return this.medicationService.getTodaysLogs().pipe(
-            switchMap(logs => {
+            switchMap((logs) => {
               const doses = this.applyLogsToMeds(normalized, logs);
               this.todaysMedsSubject.next(doses);
               return of(null);
@@ -44,19 +53,23 @@ export class DailyMedicationService implements OnDestroy {
   }
 
   // ----------------------------------------------
-  private applyLogsToMeds(meds: MedicationWithStatus[], logs: PatientMedicationLogs[]): MedicationWithStatus[] {
+  private applyLogsToMeds(
+    meds: MedicationWithStatus[],
+    logs: PatientMedicationLogs[]
+  ): MedicationWithStatus[] {
     const todays: MedicationWithStatus[] = [];
 
-    meds.forEach(med => {
+    meds.forEach((med) => {
       const doses = this.generateDosesForToday(med);
 
-      doses.forEach(dose => {
-        const log = logs.find(l =>
-          l.superPrescriptionId === med.prescriptionId &&
-          l.prescriptionId === med.prescriptionConditionId &&
-          l.statementId === med.statementId &&
-          l.doseTime &&
-          new Date(l.doseTime).getTime() === dose.doseTime?.getTime()
+      doses.forEach((dose) => {
+        const log = logs.find(
+          (l) =>
+            l.superPrescriptionId === med.prescriptionId &&
+            l.prescriptionId === med.prescriptionConditionId &&
+            l.statementId === med.statementId &&
+            l.doseTime &&
+            new Date(l.doseTime).getTime() === dose.doseTime?.getTime()
         );
 
         if (log) {
@@ -69,14 +82,83 @@ export class DailyMedicationService implements OnDestroy {
       todays.push(...doses);
     });
 
-    return todays.sort((a, b) =>
-      (a.doseTime?.getTime() ?? 0) - (b.doseTime?.getTime() ?? 0)
+    return todays.sort(
+      (a, b) => (a.doseTime?.getTime() ?? 0) - (b.doseTime?.getTime() ?? 0)
     );
   }
-  private generateDosesForToday(med: MedicationWithStatus): MedicationWithStatus[] {
-    if (!med.timing?.frequency || !med.timing.period || !med.timing.periodUnit) return [];
+
+  //reminder for medicines check
+
+  private isSameMinute(t1: Date, t2: Date): boolean {
+    return (
+      t1.getFullYear() === t2.getFullYear() &&
+      t1.getMonth() === t2.getMonth() &&
+      t1.getDate() === t2.getDate() &&
+      t1.getHours() === t2.getHours() &&
+      t1.getMinutes() === t2.getMinutes()
+    );
+  }
+
+  startReminderCheck() {
+    timer(0, 60000).subscribe(() => {
+      // check every minute
+      const now = new Date();
+      const meds = this.todaysMedsSubject.value;
+
+      meds.forEach((med) => {
+        if (!med.doseTime || med.status !== 'PENDING') return;
+        console.log('Reminder', med);
+        const doseTime = med.doseTime;
+
+        // Reminder 1 (5 minutes before)
+        const reminder1 = new Date(doseTime.getTime() - 5 * 60000);
+
+        // Reminder 2 (55 minutes after)
+        const reminder2 = new Date(doseTime.getTime() + 55 * 60000);
+
+        if (this.isSameMinute(now, reminder1)) {
+          this.sendReminderToBackend(med, 1);
+        }
+
+        if (!med.taken && this.isSameMinute(now, reminder2)) {
+          this.sendReminderToBackend(med, 2);
+        }
+      });
+    });
+  }
+
+  sendReminderToBackend(med: MedicationWithStatus, type: number) {
+    const formattedTime = this.datePipe.transform(med.doseTime, 'h:mm a');
+
+    const payload = {
+      superPrescriptionId: med.prescriptionId,
+      medicationName: med.medication,
+      doseTime: formattedTime, // send only time
+      reminderType: type,
+    };
+
+    this.medicationService.sendReminder(payload).subscribe({
+      next: () => {
+        console.log('Reminder triggered:', payload);
+      },
+      error: (err) => {
+        console.error('Reminder error:', err);
+      },
+    });
+  }
+
+  // ----------------------------------------------
+  // SAME generateDosesForToday FROM YOUR COMPONENT
+  // ----------------------------------------------
+  private generateDosesForToday(
+    med: MedicationWithStatus
+  ): MedicationWithStatus[] {
+    if (!med.timing?.timeOfDay || !med.timing.frequency) return [];
 
     const doses: MedicationWithStatus[] = [];
+    // const [hours, minutes, seconds] = med.timing.timeOfDay
+    //   .split(':')
+    //   .map(Number);
 
     const frequency = med.timing.frequency;
     const period = med.timing.period;
@@ -99,22 +181,38 @@ export class DailyMedicationService implements OnDestroy {
     let periodMs = 0;
 
     switch (unit) {
-      case 'second': periodMs = period * 1000; break;
-      case 'minute': periodMs = period * 60 * 1000; break;
-      case 'hour': periodMs = period * 60 * 60 * 1000; break;
-      case 'day': periodMs = period * 24 * 60 * 60 * 1000; break;
-      case 'week': periodMs = period * 7 * 24 * 60 * 60 * 1000; break;
-      case 'month': periodMs = period * 30 * 24 * 60 * 60 * 1000; break; // approx
-      case 'year': periodMs = period * 365 * 24 * 60 * 60 * 1000; break;
-      default: periodMs = period * 24 * 60 * 60 * 1000;
+      case 'second':
+        periodMs = period * 1000;
+        break;
+      case 'minute':
+        periodMs = period * 60 * 1000;
+        break;
+      case 'hour':
+        periodMs = period * 60 * 60 * 1000;
+        break;
+      case 'day':
+        periodMs = period * 24 * 60 * 60 * 1000;
+        break;
+      case 'week':
+        periodMs = period * 7 * 24 * 60 * 60 * 1000;
+        break;
+      case 'month':
+        periodMs = period * 30 * 24 * 60 * 60 * 1000;
+        break; // approx
+      case 'year':
+        periodMs = period * 365 * 24 * 60 * 60 * 1000;
+        break;
+      default:
+        periodMs = period * 24 * 60 * 60 * 1000;
     }
 
     // Interval = window / frequency
     const intervalMs = frequency > 1 ? periodMs / (frequency - 1) : 0;
 
-
     // Extract base time (timeOfDay)
-    let hours = 0, minutes = 0, seconds = 0;
+    let hours = 0,
+      minutes = 0,
+      seconds = 0;
     if (med.timing.timeOfDay) {
       [hours, minutes, seconds] = med.timing.timeOfDay.split(':').map(Number);
     }
@@ -130,7 +228,6 @@ export class DailyMedicationService implements OnDestroy {
       doseTime = new Date(doseTime.getTime() + intervalMs);
     }
 
-
     // Generate doses until beyond today
     while (doseTime <= todayEnd && doseTime <= endDate) {
       if (doseTime >= todayStart) {
@@ -138,13 +235,15 @@ export class DailyMedicationService implements OnDestroy {
           ...med,
           doseTime: new Date(doseTime),
           status: 'PENDING',
-          taken: false
+          taken: false,
         });
       }
       doseTime = new Date(doseTime.getTime() + intervalMs);
     }
-console.log(doses)
-   return doses.sort((a, b) => (a.doseTime?.getTime() ?? 0) - (b.doseTime?.getTime() ?? 0));
+    console.log(doses);
+    return doses.sort(
+      (a, b) => (a.doseTime?.getTime() ?? 0) - (b.doseTime?.getTime() ?? 0)
+    );
   }
 
   // private generateDosesForToday(med: MedicationWithStatus): MedicationWithStatus[] {
@@ -209,7 +308,6 @@ console.log(doses)
   //   return doses.sort((a, b) => (a.doseTime?.getTime() ?? 0) - (b.doseTime?.getTime() ?? 0));
   // }
 
-
   // ----------------------------------------------
   // MARK TAKEN
   // ----------------------------------------------
@@ -218,18 +316,20 @@ console.log(doses)
 
     const dose = this.formatLocalDateTime(med.doseTime);
 
-    this.medicationService.markMedication(
-      med.prescriptionId,
-      med.prescriptionConditionId,
-      med.statementId,
-      true,
-      dose
-    ).subscribe(log => {
-      med.taken = true;
-      med.status = 'TAKEN';
-      med.logCreatedAt = new Date(log.doseTime ?? log.createdAt);
-      this.updateState();
-    });
+    this.medicationService
+      .markMedication(
+        med.prescriptionId,
+        med.prescriptionConditionId,
+        med.statementId,
+        true,
+        dose
+      )
+      .subscribe((log) => {
+        med.taken = true;
+        med.status = 'TAKEN';
+        med.logCreatedAt = new Date(log.doseTime ?? log.createdAt);
+        this.updateState();
+      });
   }
 
   // ----------------------------------------------
@@ -240,7 +340,7 @@ console.log(doses)
       const meds = this.todaysMedsSubject.value;
       const now = new Date();
 
-      meds.forEach(med => {
+      meds.forEach((med) => {
         if (!med.doseTime || med.status !== 'PENDING') return;
 
         const cutoff = new Date(med.doseTime.getTime() + 3600000);
@@ -248,18 +348,20 @@ console.log(doses)
         if (now > cutoff && !med.logCreatedAt) {
           const dose = this.formatLocalDateTime(med.doseTime);
 
-          this.medicationService.markMedication(
-            med.prescriptionId,
-            med.prescriptionConditionId,
-            med.statementId,
-            false,
-            dose
-          ).subscribe(() => {
-            med.status = 'SKIPPED';
-            med.taken = false;
-            med.logCreatedAt = new Date();
-            this.updateState();
-          });
+          this.medicationService
+            .markMedication(
+              med.prescriptionId,
+              med.prescriptionConditionId,
+              med.statementId,
+              false,
+              dose
+            )
+            .subscribe(() => {
+              med.status = 'SKIPPED';
+              med.taken = false;
+              med.logCreatedAt = new Date();
+              this.updateState();
+            });
         }
       });
     });
@@ -271,7 +373,11 @@ console.log(doses)
 
   private formatLocalDateTime(date: Date): string {
     const pad = (n: number) => n.toString().padStart(2, '0');
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
+      date.getDate()
+    )}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(
+      date.getSeconds()
+    )}`;
   }
 
   ngOnDestroy() {

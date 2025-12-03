@@ -57,8 +57,8 @@ export class PatientContactDetailsComponent implements OnInit, OnDestroy {
   ) {
     this.contactForm = this.fb.group({
       relationshipType: ['', Validators.required],
-      addresses: this.fb.array([this.createAddressGroup()]),
-      telecoms: this.fb.array([this.createTelecomGroup()]),
+      contactAddresses: this.fb.array([this.createAddressGroup()]),
+      contactTelecoms: this.fb.array([this.createTelecomGroup()]),
       firstName: ['', Validators.required],
       middleName: [''],
       lastName: [''],
@@ -103,10 +103,10 @@ export class PatientContactDetailsComponent implements OnInit, OnDestroy {
 
   createAddressGroup(): FormGroup {
     return this.fb.group({
-      addressUse: ['', Validators.required],
+      useCode: ['', Validators.required],
       addressType: ['', Validators.required],
-      addressText: ['', Validators.required],
-      line: [''],
+      text: ['', Validators.required],
+      line1: [''],
       line2: [''],
       city: ['', Validators.required],
       state: ['', Validators.required],
@@ -123,17 +123,17 @@ export class PatientContactDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
-  get addresses(): FormArray {
-    return this.contactForm.get('addresses') as FormArray;
+  get contactAddresses(): FormArray {
+    return this.contactForm.get('contactAddresses') as FormArray;
   }
 
-  get telecoms(): FormArray {
-    return this.contactForm.get('telecoms') as FormArray;
+  get contactTelecoms(): FormArray {
+    return this.contactForm.get('contactTelecoms') as FormArray;
   }
 
   addAddress() {
-    this.addresses.push(this.createAddressGroup());
-    const idx = this.addresses.length - 1;
+    this.contactAddresses.push(this.createAddressGroup());
+    const idx = this.contactAddresses.length - 1;
 
     this.filteredCountries[idx] = this.countries.slice(0, 200);
     this.filteredStates[idx] = this.statesList.slice(0, 200);
@@ -147,8 +147,8 @@ export class PatientContactDetailsComponent implements OnInit, OnDestroy {
   }
 
   removeAddress(index: number) {
-    if (this.addresses.length > 1) {
-      this.addresses.removeAt(index);
+    if (this.contactAddresses.length > 1) {
+      this.contactAddresses.removeAt(index);
       this.filteredCountries.splice(index, 1);
       this.filteredStates.splice(index, 1);
       this.filteredCities.splice(index, 1);
@@ -159,11 +159,11 @@ export class PatientContactDetailsComponent implements OnInit, OnDestroy {
   }
 
   addTelecom() {
-    this.telecoms.push(this.createTelecomGroup());
+    this.contactTelecoms.push(this.createTelecomGroup());
   }
 
   removeTelecom(index: number) {
-    if (this.telecoms.length > 1) this.telecoms.removeAt(index);
+    if (this.contactTelecoms.length > 1) this.contactTelecoms.removeAt(index);
   }
 
   setupAddressAutocomplete(index: number) {
@@ -178,7 +178,7 @@ export class PatientContactDetailsComponent implements OnInit, OnDestroy {
     this.showState[index] = this.showState[index] ?? false;
     this.showCity[index] = this.showCity[index] ?? false;
 
-    const group = this.addresses.at(index) as FormGroup;
+    const group = this.contactAddresses.at(index) as FormGroup;
 
     const subC = group
       .get('country')!
@@ -212,17 +212,17 @@ export class PatientContactDetailsComponent implements OnInit, OnDestroy {
   }
 
   selectCountry(i: number, value: string) {
-    this.addresses.at(i).get('country')?.setValue(value);
+    this.contactAddresses.at(i).get('country')?.setValue(value);
     this.showCountry[i] = false;
   }
 
   selectState(i: number, value: string) {
-    this.addresses.at(i).get('state')?.setValue(value);
+    this.contactAddresses.at(i).get('state')?.setValue(value);
     this.showState[i] = false;
   }
 
   selectCity(i: number, city: string) {
-    const group = this.addresses.at(i) as FormGroup;
+    const group = this.contactAddresses.at(i) as FormGroup;
     group.get('city')?.setValue(city);
 
     const found = this.cityData.find(
