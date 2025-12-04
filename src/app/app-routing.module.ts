@@ -7,41 +7,47 @@ import { ResetPasswordComponent } from './common/Authentication/reset-password/r
 import { AuthGuard } from './core/Gaurds/auth.guard';
 import { RoleGuard } from './core/Gaurds/role.guard';
 import { GuestGaurd } from './core/Gaurds/guest-gaurd';
+import { SharePrescriptionComponent } from './common/share-prescription/share-prescription.component';
 
 const routes: Routes = [
   {
-    path: "",
-    redirectTo: "home",
-    pathMatch: "full",
-        // canActivate: [GuestGaurd],
+    path: '',
+    redirectTo: 'home',
+    pathMatch: 'full',
+    // canActivate: [GuestGaurd],
   },
   {
-    path: "**",
-    redirectTo: "home",
+    path: '**',
+    redirectTo: 'home',
+  },
+  {
+    path: 'auth',
+    component: AuthLayoutComponent,
+    canActivate: [GuestGaurd],
+  },
+  {
+    path: 'reset-password',
+    component: ResetPasswordComponent,
+  },
 
-   
+  {
+    path: 'sharePrescription',
+    component: SharePrescriptionComponent,
   },
   {
-    path: "auth",
-    component:AuthLayoutComponent,
-     canActivate: [GuestGaurd],
+    path: 'user',
+    loadChildren: () =>
+      import('./layout/user-layout/user-layout.module').then(
+        (m) => m.UserLayoutModule
+      ),
+    canActivate: [AuthGuard, RoleGuard],
+
+    data: { roles: ['PATIENT'] },
   },
-  {
-    path: "reset-password",
-    component:ResetPasswordComponent,
-  },
-  {
-    path:"user",
-      loadChildren: () =>
-      import("./layout/user-layout/user-layout.module").then((m) => m.UserLayoutModule),
-     canActivate: [AuthGuard,RoleGuard],
-  
-    data: { roles: ['PATIENT'] }
-  }
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

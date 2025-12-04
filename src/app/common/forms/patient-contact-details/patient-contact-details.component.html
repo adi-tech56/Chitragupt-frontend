@@ -65,7 +65,7 @@
           </div>
         </div>
 
-        <div *ngIf="currentStep === 2" formArrayName="addresses">
+        <div *ngIf="currentStep === 2" formArrayName="contactAddresses">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="text-primary mb-0">Addresses</h4>
             <button
@@ -79,7 +79,7 @@
 
           <div class="scroll-section">
             <div
-              *ngFor="let address of addresses.controls; let i = index"
+              *ngFor="let address of contactAddresses.controls; let i = index"
               [formGroupName]="i"
               class="mb-3 border rounded p-3 position-relative"
             >
@@ -225,7 +225,7 @@
                 type="button"
                 class="btn btn-outline-danger btn-sm"
                 (click)="removeAddress(i)"
-                *ngIf="addresses.length > 1"
+                *ngIf="contactAddresses.length > 1"
               >
                 Remove
               </button>
@@ -233,7 +233,7 @@
           </div>
         </div>
 
-        <div *ngIf="currentStep === 3" formArrayName="telecoms">
+        <div *ngIf="currentStep === 3" formArrayName="contactTelecoms">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="text-primary mb-0">Telecom</h4>
             <button
@@ -247,7 +247,7 @@
 
           <div class="scroll-section">
             <div
-              *ngFor="let telecom of telecoms.controls; let i = index"
+              *ngFor="let telecom of contactTelecoms.controls; let i = index"
               [formGroupName]="i"
               class="mb-3 border rounded p-3"
             >

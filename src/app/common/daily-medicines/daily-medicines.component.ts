@@ -1,5 +1,5 @@
 
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { MedicationWithStatus } from 'src/app/core/Models/Medication';
 import { PaginationState } from 'src/app/core/Models/Pagination';
 import { DailyMedicationService } from '../../core/Services/PrescriptionServices/daily-medication.service'
@@ -12,14 +12,23 @@ import { getTotalPages, paginate } from 'src/app/shared/pagination.helper';
   styleUrls: ['./daily-medicines.component.css']
 })
 export class DailyMedicinesComponent {
-
+  @Input() pageContext: 'HOME' | 'MEDICATION' = 'MEDICATION';
+  
   todaysMeds: MedicationWithStatus[] = [];
-
   viewMode: 'TODAY' | 'SKIPPED' | 'COMPLETED' = 'TODAY';
   skippedPagination: PaginationState = { page: 1, pageSize: 4 };
   completedPagination: PaginationState = { page: 1, pageSize: 4 };
 
-  constructor(private state: DailyMedicationService) {}
+  constructor(private state: DailyMedicationService) { }
+  openIndex: number | null = null;
+
+  toggleAccordion(index: number) {
+    if (this.openIndex === index) {
+      this.openIndex = null;
+    } else {
+      this.openIndex = index;
+    }
+  }
 
   ngOnInit() {
     this.state.todaysMeds$.subscribe(meds => {
@@ -52,7 +61,7 @@ export class DailyMedicinesComponent {
     this.state.markTaken(med);
   }
 
-    get paginatedSkippedMeds() {
+  get paginatedSkippedMeds() {
     return paginate(this.skippedMeds, this.skippedPagination);
   }
 

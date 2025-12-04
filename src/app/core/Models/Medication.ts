@@ -63,8 +63,9 @@ export interface PrescriptionConditionResponse {
   medications: MedicationResponse[];
 }
 export interface MedicationResponse {
-  statementId: number,
-  medication: string;          // backend gives the medication NAME, not ID
+  statementId: number;
+  medication: string;   
+   medicationId: number;   
   status: string;
   effectiveStartDate: string;
   effectiveEndDate: string;
@@ -74,11 +75,15 @@ export interface MedicationResponse {
 }
 export interface DosageResponse {
   amount: number;
-  amountUnitId: string;      // backend returns text (e.g. "Drops")
-  routeId: string;           // backend returns text (e.g. "Oral route")
+  dosageId:number;
+  amountUnit: string; 
+  amountUnitId:number;     // backend returns text (e.g. "Drops")
+  route: string;      
+  routeId:number;     // backend returns text (e.g. "Oral route")
   instruction: string | null;
 }
 export interface TimingResponse {
+  timingId:number;
   frequency: number;
   period: number;
   periodUnit: string;

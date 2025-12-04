@@ -7,18 +7,22 @@ import { SidebarComponent } from "../common/sidebar/sidebar.component";
 import { AddMedicationComponent } from "../common/forms/add-medication/add-medication.component";
 import { DailyMedicinesComponent } from "../common/daily-medicines/daily-medicines.component";
 import { RouterModule } from "@angular/router";
+import { UpdatePrescriptionComponent } from "../common/forms/update-prescription/update-prescription.component";
+import { ExportFhirDataComponent } from "../common/export-fhir-data/export-fhir-data.component";
 
 @NgModule({
   declarations: [
     SidebarComponent,
     AddMedicationComponent,
     DailyMedicinesComponent,
+    UpdatePrescriptionComponent,
+    ExportFhirDataComponent
   ],
   imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-      RouterModule  
+      RouterModule
   ],
   exports: [
     SidebarComponent,
@@ -27,7 +31,7 @@ import { RouterModule } from "@angular/router";
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-      RouterModule  
+      RouterModule
   ]
 })
 export class SharedModule { }
