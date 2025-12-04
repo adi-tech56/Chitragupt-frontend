@@ -9,32 +9,64 @@ import { ProfilePageComponent } from 'src/app/common/user/profile-page/profile-p
 import { ContactPageComponent } from 'src/app/common/user/contact-page/contact-page.component';
 import { AllergyFormsComponent } from 'src/app/common/user/allergy-forms/allergy-forms.component';
 import { UpdatePrescriptionComponent } from 'src/app/common/forms/update-prescription/update-prescription.component';
+import { SharePrescriptionComponent } from 'src/app/common/share-prescription/share-prescription.component';
+import { ViewSharedPrescriptionComponent } from 'src/app/common/view-shared-prescription/view-shared-prescription.component';
 const routes: Routes = [
   {
-    path: "",
+    path: '',
     component: UserLayoutComponent,
     children: [
-      { path: "", component: HomePageComponent, canActivate: [AuthGuard, RoleGuard], data: { roles: ['PATIENT'] } },
+      {
+        path: '',
+        component: HomePageComponent,
+        canActivate: [AuthGuard, RoleGuard],
+        data: { roles: ['PATIENT'] },
+      },
       { path: 'profile', component: ProfilePageComponent },
       { path: 'emergencyContact', component: ContactPageComponent },
       { path: 'allergyForm', component: AllergyFormsComponent },
-      { path: "add-medication", component: AddMedicationComponent, canActivate: [AuthGuard, RoleGuard], data: { roles: ['PATIENT'] } },
-       { path: "update-medication", component: UpdatePrescriptionComponent, canActivate: [AuthGuard, RoleGuard], data: { roles: ['PATIENT'] } },
+      {
+        path: 'add-medication',
+        component: AddMedicationComponent,
+        canActivate: [AuthGuard, RoleGuard],
+        data: { roles: ['PATIENT'] },
+      },
+      {
+        path: 'update-medication',
+        component: UpdatePrescriptionComponent,
+        canActivate: [AuthGuard, RoleGuard],
+        data: { roles: ['PATIENT'] },
+      },
       // { path: "medications", component: MedicationPageComponent, canActivate: [AuthGuard, RoleGuard], data: { roles: ['PATIENT'] } },
       // { path: "view-prescription", component: ViewPrescriptionComponent, canActivate: [AuthGuard, RoleGuard], data: { roles: ['PATIENT'] } }
       {
-        path: "medications",
+        path: 'sharePrescription',
+        component: SharePrescriptionComponent,
+        canActivate: [AuthGuard, RoleGuard],
+        data: { roles: ['PATIENT'] },
+      },
+      {
+        path: 'viewsharePrescription/:id',
+        component: ViewSharedPrescriptionComponent,
+        canActivate: [AuthGuard, RoleGuard],
+        data: { roles: ['PATIENT'] },
+      },
+      {
+        path: 'medications',
         loadChildren: () =>
-          import("../medication-layout/medication-layout.module").then((m) => m.MedicationLayoutModule),
+          import('../medication-layout/medication-layout.module').then(
+            (m) => m.MedicationLayoutModule
+          ),
         canActivate: [AuthGuard, RoleGuard],
 
-        data: { roles: ['PATIENT'] }
-      }
+        data: { roles: ['PATIENT'] },
+      },
     ],
-  }]
+  },
+];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class UserLayoutRoutingModule { }
+export class UserLayoutRoutingModule {}

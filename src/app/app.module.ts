@@ -18,10 +18,6 @@ import { HomeLayoutModule } from './layout/home-layout/home-layout.module';
 import { UserLayoutModule } from './layout/user-layout/user-layout.module';
 
 import { AuthInterceptor } from './core/Interceptors/auth-interceptor';
-import { SharePrescriptionComponent } from './common/share-prescription/share-prescription.component';
-
-
-
 @NgModule({
   declarations: [
     AppComponent,
@@ -31,8 +27,6 @@ import { SharePrescriptionComponent } from './common/share-prescription/share-pr
     VerificationComponent,
     ResetPasswordComponent,
     SendEmailComponent,
-    SharePrescriptionComponent,
-
   ],
   imports: [
     BrowserModule,
@@ -41,10 +35,10 @@ import { SharePrescriptionComponent } from './common/share-prescription/share-pr
     FormsModule,
     ReactiveFormsModule,
     HomeLayoutModule,
-    UserLayoutModule
+    UserLayoutModule,
   ],
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
   ],
   bootstrap: [AppComponent],
 })

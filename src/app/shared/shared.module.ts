@@ -1,14 +1,16 @@
 // src/app/shared/shared.module.ts
-import { NgModule } from "@angular/core";
-import { CommonModule } from "@angular/common";
-import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { SidebarComponent } from "../common/sidebar/sidebar.component";
-import { AddMedicationComponent } from "../common/forms/add-medication/add-medication.component";
-import { DailyMedicinesComponent } from "../common/daily-medicines/daily-medicines.component";
-import { RouterModule } from "@angular/router";
-import { UpdatePrescriptionComponent } from "../common/forms/update-prescription/update-prescription.component";
-import { ExportFhirDataComponent } from "../common/export-fhir-data/export-fhir-data.component";
+import { SidebarComponent } from '../common/sidebar/sidebar.component';
+import { AddMedicationComponent } from '../common/forms/add-medication/add-medication.component';
+import { DailyMedicinesComponent } from '../common/daily-medicines/daily-medicines.component';
+import { RouterModule } from '@angular/router';
+import { UpdatePrescriptionComponent } from '../common/forms/update-prescription/update-prescription.component';
+import { ExportFhirDataComponent } from '../common/export-fhir-data/export-fhir-data.component';
+import { SharePrescriptionComponent } from '../common/share-prescription/share-prescription.component';
+import { ViewSharedPrescriptionComponent } from '../common/view-shared-prescription/view-shared-prescription.component';
 
 @NgModule({
   declarations: [
@@ -16,22 +18,21 @@ import { ExportFhirDataComponent } from "../common/export-fhir-data/export-fhir-
     AddMedicationComponent,
     DailyMedicinesComponent,
     UpdatePrescriptionComponent,
-    ExportFhirDataComponent
+    ExportFhirDataComponent,
+    SharePrescriptionComponent,
+    ViewSharedPrescriptionComponent,
   ],
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-      RouterModule
-  ],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
   exports: [
     SidebarComponent,
     AddMedicationComponent,
     DailyMedicinesComponent,
+    SharePrescriptionComponent,
+    ViewSharedPrescriptionComponent,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-      RouterModule
-  ]
+    RouterModule,
+  ],
 })
-export class SharedModule { }
+export class SharedModule {}

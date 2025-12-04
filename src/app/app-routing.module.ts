@@ -7,7 +7,6 @@ import { ResetPasswordComponent } from './common/Authentication/reset-password/r
 import { AuthGuard } from './core/Gaurds/auth.guard';
 import { RoleGuard } from './core/Gaurds/role.guard';
 import { GuestGaurd } from './core/Gaurds/guest-gaurd';
-import { SharePrescriptionComponent } from './common/share-prescription/share-prescription.component';
 
 const routes: Routes = [
   {
@@ -28,11 +27,6 @@ const routes: Routes = [
   {
     path: 'reset-password',
     component: ResetPasswordComponent,
-  },
-
-  {
-    path: 'sharePrescription',
-    component: SharePrescriptionComponent,
   },
   {
     path: 'user',

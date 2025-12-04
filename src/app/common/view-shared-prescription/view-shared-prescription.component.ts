@@ -1,23 +1,21 @@
-import { Component, OnInit } from '@angular/core';
-import {
-  MedicationNormalized,
-  MedicationWithStatus,
-  PrescriptionResponse,
-} from 'src/app/core/Models/Medication';
-import { MedicationService } from 'src/app/core/Services/PrescriptionServices/medication-service';
-import { Location } from '@angular/common';
+import { Component } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { PrescriptionResponse } from 'src/app/core/Models/Medication';
 import { DownloadPrescriptionService } from 'src/app/core/Services/PrescriptionServices/download-prescription.service';
-import { Router } from '@angular/router';
 import { ExportPrescriptionService } from 'src/app/core/Services/PrescriptionServices/export-prescription.service';
+import { SharePrescriptionService } from 'src/app/core/Services/PrescriptionServices/share-presecription.service';
+import { Location } from '@angular/common';
+
 @Component({
-  selector: 'app-view-prescription',
-  templateUrl: './view-prescription.component.html',
-  styleUrls: ['./view-prescription.component.css'],
+  selector: 'app-view-shared-prescription',
+  templateUrl: './view-shared-prescription.component.html',
+  styleUrls: ['./view-shared-prescription.component.css'],
 })
-export class ViewPrescriptionComponent implements OnInit {
+export class ViewSharedPrescriptionComponent {
   allMeds: PrescriptionResponse[] = [];
   constructor(
-    private medicationService: MedicationService,
+    private route: ActivatedRoute,
+    private sharePrescriptionService: SharePrescriptionService,
     private exportPrescripiton: ExportPrescriptionService,
     private router: Router,
     private location: Location,
@@ -34,7 +32,7 @@ export class ViewPrescriptionComponent implements OnInit {
   }
 
   openIndex: number | null = null;
-
+  patientId!: number;
   toggleAccordion(index: number) {
     if (this.openIndex === index) {
       this.openIndex = null;
@@ -44,10 +42,13 @@ export class ViewPrescriptionComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.medicationService.getPrescriptions().subscribe((meds) => {
-      this.allMeds = meds;
-      console.log(meds);
-    });
+    this.patientId = Number(this.route.snapshot.paramMap.get('id'));
+    this.sharePrescriptionService
+      .getPrescriptionsByPatient(this.patientId)
+      .subscribe((meds) => {
+        this.allMeds = meds;
+        console.log(meds);
+      });
   }
   downloadPdf(superPrescriptionId: number) {
     this.download
