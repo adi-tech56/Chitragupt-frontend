@@ -21,6 +21,29 @@
                 <div class="col-md-6 mb-3">
                     <label class="form-label  fw-semibold">Prescription Date</label>
                     <input class="form-control" type="date" formControlName="prescriptionDate">
+                    <div *ngIf="superPrescription.get('prescriptionDate')?.hasError('required') &&
+              (superPrescription.get('prescriptionDate')?.touched ||
+            superPrescription.get('prescriptionDate')?.dirty)" class="text-danger">
+                        PrescriptionDate date is required.
+                    </div>
+
+                    <div *ngIf="superPrescription.get('prescriptionDate')?.hasError('invalidDate') &&
+              (superPrescription.get('prescriptionDate')?.touched ||
+               superPrescription.get('prescriptionDate')?.dirty)" class="text-danger">
+                        Enter a valid date.
+                    </div>
+
+                    <div *ngIf="superPrescription.get('prescriptionDate')?.hasError('minDateExceeded') &&
+              (superPrescription.get('prescriptionDate')?.touched ||
+               superPrescription.get('prescriptionDate')?.dirty)" class="text-danger">
+                        Date cannot be earlier than 1700.
+                    </div>
+
+                    <div *ngIf="superPrescription.get('prescriptionDate')?.hasError('maxDateExceeded') &&
+              (superPrescription.get('prescriptionDate')?.touched ||
+              superPrescription.get('prescriptionDate')?.dirty)" class="text-danger">
+                        Date cannot be later than 2040.
+                    </div>
                 </div>
             </div>
             <div class="form-group">
@@ -126,7 +149,13 @@
                                             <div class="form-group position-relative">
                                                 <label class="form-label fw-semibold">Medicine</label>
                                                 <input type="text" class="form-control" formControlName="medicationName"
-                                                    placeholder="Search medicine">
+                                                    placeholder="Search medicine" [ngClass]="{'is-invalid': med.get('medicineValid')?.invalid && 
+                     (med.get('medicationName')?.touched || med.get('medicationName')?.dirty)}">
+
+                                                <div *ngIf="med.get('medicineValid')?.invalid &&
+              (med.get('medicationName')?.touched || med.get('medicationName')?.dirty)" class="text-danger">
+                                                    Medicine not found, please enter valid medicine name.
+                                                </div>
 
                                                 <ul class="dropdown-menu show w-100" *ngIf="medicines.length > 0">
                                                     <li *ngFor="let m of medicines" class="dropdown-item"
@@ -135,6 +164,19 @@
                                                     </li>
                                                 </ul>
                                             </div>
+
+                                            <!-- <div class="form-group position-relative">
+                                                <label class="form-label fw-semibold">Medicine</label>
+                                                <input type="text" class="form-control" formControlName="medicationName"
+                                                    placeholder="Search medicine">
+
+                                                <ul class="dropdown-menu show w-100" *ngIf="medicines.length > 0">
+                                                    <li *ngFor="let m of medicines" class="dropdown-item"
+                                                        (click)="selectMedicine(m, pIndex, mIndex)">
+                                                        {{ m.brandName }}
+                                                    </li>
+                                                </ul>
+                                            </div> -->
                                         </div>
 
                                         <div class="col-md-6 mb-3">
@@ -155,10 +197,56 @@
                                             <label class="form-label fw-semibold">Start Date</label>
                                             <input type="date" class="form-control"
                                                 formControlName="effectiveStartDate">
+                                            <div *ngIf="getMedicationControl(pIndex, mIndex, 'effectiveStartDate')?.hasError('required') &&
+              (getMedicationControl(pIndex, mIndex, 'effectiveStartDate')?.touched ||
+               getMedicationControl(pIndex, mIndex, 'effectiveStartDate')?.dirty)" class="text-danger">
+                                                Effective start date is required.
+                                            </div>
+
+                                            <div *ngIf="getMedicationControl(pIndex, mIndex, 'effectiveStartDate')?.hasError('invalidDate') &&
+              (getMedicationControl(pIndex, mIndex, 'effectiveStartDate')?.touched ||
+               getMedicationControl(pIndex, mIndex, 'effectiveStartDate')?.dirty)" class="text-danger">
+                                                Enter a valid date.
+                                            </div>
+
+                                            <div *ngIf="getMedicationControl(pIndex, mIndex, 'effectiveStartDate')?.hasError('minDateExceeded') &&
+              (getMedicationControl(pIndex, mIndex, 'effectiveStartDate')?.touched ||
+               getMedicationControl(pIndex, mIndex, 'effectiveStartDate')?.dirty)" class="text-danger">
+                                                Date cannot be earlier than 1700.
+                                            </div>
+
+                                            <div *ngIf="getMedicationControl(pIndex, mIndex, 'effectiveStartDate')?.hasError('maxDateExceeded') &&
+              (getMedicationControl(pIndex, mIndex, 'effectiveStartDate')?.touched ||
+               getMedicationControl(pIndex, mIndex, 'effectiveStartDate')?.dirty)" class="text-danger">
+                                                Date cannot be later than 2040.
+                                            </div>
                                         </div>
                                         <div class="col">
                                             <label class="form-label fw-semibold">End Date</label>
                                             <input type="date" class="form-control" formControlName="effectiveEndDate">
+                                            <div *ngIf="getMedicationControl(pIndex, mIndex, 'effectiveEndDate')?.hasError('required') &&
+              (getMedicationControl(pIndex, mIndex, 'effectiveEndDate')?.touched ||
+               getMedicationControl(pIndex, mIndex, 'effectiveEndDate')?.dirty)" class="text-danger">
+                                                Effective start date is required.
+                                            </div>
+
+                                            <div *ngIf="getMedicationControl(pIndex, mIndex, 'effectiveEndDate')?.hasError('invalidDate') &&
+              (getMedicationControl(pIndex, mIndex, 'effectiveEndDate')?.touched ||
+               getMedicationControl(pIndex, mIndex, 'effectiveEndDate')?.dirty)" class="text-danger">
+                                                Enter a valid date.
+                                            </div>
+
+                                            <div *ngIf="getMedicationControl(pIndex, mIndex, 'effectiveEndDate')?.hasError('minDateExceeded') &&
+              (getMedicationControl(pIndex, mIndex, 'effectiveEndDate')?.touched ||
+               getMedicationControl(pIndex, mIndex, 'effectiveEndDate')?.dirty)" class="text-danger">
+                                                Date cannot be earlier than 1700.
+                                            </div>
+
+                                            <div *ngIf="getMedicationControl(pIndex, mIndex, 'effectiveEndDate')?.hasError('maxDateExceeded') &&
+              (getMedicationControl(pIndex, mIndex, 'effectiveEndDate')?.touched ||
+               getMedicationControl(pIndex, mIndex, 'effectiveEndDate')?.dirty)" class="text-danger">
+                                                Date cannot be later than 2040.
+                                            </div>
                                         </div>
                                     </div>
 
