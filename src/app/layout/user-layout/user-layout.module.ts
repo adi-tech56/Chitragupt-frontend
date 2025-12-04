@@ -36,7 +36,6 @@ import { DatePipe } from '@angular/common';
     ReactiveFormsModule,
     SharedModule,
     FormsModule,
-    ReactiveFormsModule,
   ],
   providers: [DatePipe],
 })

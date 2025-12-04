@@ -11,7 +11,6 @@ export interface Amount {
   conceptName: string;
 }
 export interface SuperPrescriptionData {
-
   doctorName: string;
   prescriptionDate: Date;
   notes?: string;
@@ -49,7 +48,7 @@ export interface TimingData {
 }
 
 export interface PrescriptionResponse {
-  superPrescriptionId: number,
+  superPrescriptionId: number;
   patientId: number;
   doctorName: string;
   prescriptionDate: string;
@@ -57,15 +56,15 @@ export interface PrescriptionResponse {
   prescriptions: PrescriptionConditionResponse[];
 }
 export interface PrescriptionConditionResponse {
-  prescriptionId: number,
+  prescriptionId: number;
   conditionName: string;
   notes: string | null;
   medications: MedicationResponse[];
 }
 export interface MedicationResponse {
   statementId: number;
-  medication: string;   
-   medicationId: number;   
+  medication: string;
+  medicationId: number;
   status: string;
   effectiveStartDate: string;
   effectiveEndDate: string;
@@ -75,20 +74,20 @@ export interface MedicationResponse {
 }
 export interface DosageResponse {
   amount: number;
-  dosageId:number;
-  amountUnit: string; 
-  amountUnitId:number;     // backend returns text (e.g. "Drops")
-  route: string;      
-  routeId:number;     // backend returns text (e.g. "Oral route")
+  dosageId: number;
+  amountUnit: string;
+  amountUnitId: number; // backend returns text (e.g. "Drops")
+  route: string;
+  routeId: number; // backend returns text (e.g. "Oral route")
   instruction: string | null;
 }
 export interface TimingResponse {
-  timingId:number;
+  timingId: number;
   frequency: number;
   period: number;
   periodUnit: string;
-  timeOfDay: string;         // "07:30:00"
-  whenCode: string;          // "Early Morning"
+  timeOfDay: string; // "07:30:00"
+  whenCode: string; // "Early Morning"
 }
 export interface MedicationNormalized extends MedicationResponse {
   doctorName: string;
@@ -99,19 +98,28 @@ export interface MedicationNormalized extends MedicationResponse {
   conditionNotes: string | null;
 }
 export interface MedicationWithStatus extends MedicationNormalized {
-  taken?: boolean; 
+  taken?: boolean;
   status: 'PENDING' | 'TAKEN' | 'SKIPPED';
-  doseTime?: Date;     
+  doseTime?: Date;
   logCreatedAt?: Date;
 }
 export interface PatientMedicationLogs {
-  id: number;                    
-  patientId: number;             
-  superPrescriptionId: number;   
-  prescriptionId: number;        
-  statementId: number;           
-  taken: boolean;                
-  doseTime: string;              // ISO string of the scheduled dose time
-  createdAt: string;             
-  updatedAt: string;             
+  id: number;
+  patientId: number;
+  superPrescriptionId: number;
+  prescriptionId: number;
+  statementId: number;
+  taken: boolean;
+  doseTime: string; // ISO string of the scheduled dose time
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface EmergencyContactPatientDto {
+  patientId: number;
+  firstName?: string;
+  middleName?: string;
+  lastName?: string;
+  relationshipType?: string;
+  prescriptions?: SuperPrescriptionData[];
 }
