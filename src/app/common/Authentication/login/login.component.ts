@@ -31,7 +31,8 @@ export class LoginComponent implements OnInit {
   password = '';
   userReset: Boolean = false;
   formSubmit = true;
-
+loginError: string = '';
+invalidFieldsMessage: string = '';
   ngOnInit(): void {
     this.loginForm.valueChanges
       .pipe(debounceTime(300))
@@ -80,9 +81,25 @@ export class LoginComponent implements OnInit {
         console.log('Post created successfully:', res);
           this.tokenRefresh.startAutoRefresh(); 
         this.loginSuccess.emit();
+         this.loginError = '';
       },
       error: (err) => {
         console.error('Error creating post:', err);
+  if (err.error && err.error.error) {
+  const backendMsg = err.error.error;
+
+  if (backendMsg.includes('Bad credentials')) {
+    this.loginError = 'Incorrect password. Please try again.';
+  } else if (backendMsg.includes('Invalid email or password')) {
+    this.loginError = 'Invalid email or password. Please check your credentials.';
+  } else if (backendMsg.includes('User signed up via OAuth')) {
+    this.loginError = 'This account uses OAuth login. Please sign in with Google or set a password to use email login.';
+  } else {
+    this.loginError = 'Login failed. ' + backendMsg;
+  }
+} else {
+  this.loginError = 'Login failed. Please try again.';
+}
       }
     });
 

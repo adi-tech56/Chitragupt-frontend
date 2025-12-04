@@ -20,6 +20,30 @@
         <div class="col-md-6 mb-3">
           <label class="form-label  fw-semibold">Prescription Date</label>
           <input class="form-control" type="date" formControlName="prescriptionDate">
+          <div *ngIf="superPrescription.get('prescriptionDate')?.hasError('required') &&
+              (superPrescription.get('prescriptionDate')?.touched ||
+            superPrescription.get('prescriptionDate')?.dirty)" class="text-danger">
+           PrescriptionDate date is required.
+          </div>
+
+          <div *ngIf="superPrescription.get('prescriptionDate')?.hasError('invalidDate') &&
+              (superPrescription.get('prescriptionDate')?.touched ||
+               superPrescription.get('prescriptionDate')?.dirty)" class="text-danger">
+            Enter a valid date.
+          </div>
+
+          <div *ngIf="superPrescription.get('prescriptionDate')?.hasError('minDateExceeded') &&
+              (superPrescription.get('prescriptionDate')?.touched ||
+               superPrescription.get('prescriptionDate')?.dirty)" class="text-danger">
+            Date cannot be earlier than 1700.
+          </div>
+
+          <div *ngIf="superPrescription.get('prescriptionDate')?.hasError('maxDateExceeded') &&
+              (superPrescription.get('prescriptionDate')?.touched ||
+              superPrescription.get('prescriptionDate')?.dirty)" class="text-danger">
+            Date cannot be later than 2040.
+          </div>
+
         </div>
       </div>
       <div class="form-group">
@@ -61,6 +85,14 @@
               <div class="dropdown-container">
                 <label class="form-label  fw-semibold">Reason</label>
                 <input type="text" formControlName="reason" placeholder="Search medical condition" />
+                <!-- Show error if user typed manually and did NOT pick from dropdown -->
+                <div *ngIf="
+    currentPrescriptionGroup.get('reasonValid')?.invalid &&
+    currentPrescriptionGroup.get('reason')?.touched" class="text-danger">
+                  Please select a condition from the dropdown.
+                </div>
+
+
                 <ul *ngIf="conditions.length > 0" class="dropdown">
                   <li *ngFor="let item of conditions" (click)="selectCondition(item)">
                     {{ item.name || item }}
@@ -98,8 +130,17 @@
               <div class="row">
                 <div class="col-md-6 mb-3">
                   <label class="form-label fw-semibold">Medicine</label>
+                  <!-- <input type="text" [value]="currentMedicineName(stepIndex, medIndex)"
+                    (input)="onMedicineInput($event, stepIndex, medIndex)" placeholder="Search medicine" /> -->
                   <input type="text" [value]="currentMedicineName(stepIndex, medIndex)"
-                    (input)="onMedicineInput($event, stepIndex, medIndex)" placeholder="Search medicine" />
+                    (input)="onMedicineInput($event, stepIndex, medIndex)" placeholder="Search medicine" [ngClass]="{'is-invalid': getMedicationControl(stepIndex, medIndex, 'medicationId')?.invalid &&
+                                 (getMedicationControl(stepIndex, medIndex, 'medicationId')?.touched ||
+                                  getMedicationControl(stepIndex, medIndex, 'medicationId')?.dirty)}" />
+                  <div *ngIf="getMedicationControl(stepIndex, medIndex, 'medicationId')?.hasError('notFound')"
+                    class="text-danger">
+                    Medicine not found, please enter valid medicine name.
+                  </div>
+
 
                   <ul *ngIf="medicines.length > 0" class="dropdown">
                     <li *ngFor="let m of medicines" (click)="selectMedicine(m, stepIndex, medIndex)">
@@ -107,6 +148,7 @@
                     </li>
                   </ul>
                 </div>
+
                 <div class="col-md-6 mb-3">
                   <label class="form-label fw-semibold">Status</label>
                   <select class="form-select" formControlName="status">
@@ -123,15 +165,63 @@
 
 
                   <label class="form-label fw-semibold"> EffectiveStart Date</label>
+
                   <input type="date" formControlName="effectiveStartDate" />
 
+                  <div *ngIf="getMedicationControl(stepIndex, medIndex, 'effectiveStartDate')?.hasError('required') &&
+              (getMedicationControl(stepIndex, medIndex, 'effectiveStartDate')?.touched ||
+               getMedicationControl(stepIndex, medIndex, 'effectiveStartDate')?.dirty)" class="text-danger">
+                    Effective start date is required.
+                  </div>
+
+                  <div *ngIf="getMedicationControl(stepIndex, medIndex, 'effectiveStartDate')?.hasError('invalidDate') &&
+              (getMedicationControl(stepIndex, medIndex, 'effectiveStartDate')?.touched ||
+               getMedicationControl(stepIndex, medIndex, 'effectiveStartDate')?.dirty)" class="text-danger">
+                    Enter a valid date.
+                  </div>
+
+                  <div *ngIf="getMedicationControl(stepIndex, medIndex, 'effectiveStartDate')?.hasError('minDateExceeded') &&
+              (getMedicationControl(stepIndex, medIndex, 'effectiveStartDate')?.touched ||
+               getMedicationControl(stepIndex, medIndex, 'effectiveStartDate')?.dirty)" class="text-danger">
+                    Date cannot be earlier than 1700.
+                  </div>
+
+                  <div *ngIf="getMedicationControl(stepIndex, medIndex, 'effectiveStartDate')?.hasError('maxDateExceeded') &&
+              (getMedicationControl(stepIndex, medIndex, 'effectiveStartDate')?.touched ||
+               getMedicationControl(stepIndex, medIndex, 'effectiveStartDate')?.dirty)" class="text-danger">
+                    Date cannot be later than 2040.
+                  </div>
                 </div>
                 <div class="col-md-6 mb-3">
                   <label class="form-label fw-semibold"> EffectiveEnd Date</label>
                   <input type="date" formControlName="effectiveEndDate" />
+                  <div *ngIf="getMedicationControl(stepIndex, medIndex, 'effectiveEndDate')?.hasError('required') &&
+              (getMedicationControl(stepIndex, medIndex, 'effectiveEndDate')?.touched ||
+               getMedicationControl(stepIndex, medIndex, 'effectiveEndDate')?.dirty)" class="text-danger">
+                    Effective start date is required.
+                  </div>
+
+                  <div *ngIf="getMedicationControl(stepIndex, medIndex, 'effectiveEndDate')?.hasError('invalidDate') &&
+              (getMedicationControl(stepIndex, medIndex, 'effectiveEndDate')?.touched ||
+               getMedicationControl(stepIndex, medIndex, 'effectiveEndDate')?.dirty)" class="text-danger">
+                    Enter a valid date.
+                  </div>
+
+                  <div *ngIf="getMedicationControl(stepIndex, medIndex, 'effectiveEndDate')?.hasError('minDateExceeded') &&
+              (getMedicationControl(stepIndex, medIndex, 'effectiveEndDate')?.touched ||
+               getMedicationControl(stepIndex, medIndex, 'effectiveEndDate')?.dirty)" class="text-danger">
+                    Date cannot be earlier than 1700.
+                  </div>
+
+                  <div *ngIf="getMedicationControl(stepIndex, medIndex, 'effectiveEndDate')?.hasError('maxDateExceeded') &&
+              (getMedicationControl(stepIndex, medIndex, 'effectiveEndDate')?.touched ||
+               getMedicationControl(stepIndex, medIndex, 'effectiveEndDate')?.dirty)" class="text-danger">
+                    Date cannot be later than 2040.
+                  </div>
                 </div>
               </div>
               <hr />
+
               <!-- Dosage -->
               <div formGroupName="dosage">
                 <h6 class="fw-bold">Dosage</h6>
@@ -145,7 +235,10 @@
                     <label>Unit</label>
                     <input type="text" [value]="currentAmountUnitName(stepIndex, medIndex)"
                       (input)="onAmountUnitInput($event, stepIndex, medIndex)" placeholder="Search amount unit" />
-
+                    <div *ngIf="getAmountControl(stepIndex, medIndex, 'amountUnitId')?.hasError('notFound')"
+                      class="text-danger">
+                      Amount not found, please enter valid amount unit.
+                    </div>
                     <ul *ngIf="amountUnit.length > 0" class="dropdown">
                       <li *ngFor="let u of amountUnit" (click)="selectAmountUnit(u, stepIndex, medIndex)">
                         {{ u.conceptName }}
@@ -157,6 +250,10 @@
                     <label>Route</label>
                     <input type="text" [value]="currentRouteName(stepIndex, medIndex)"
                       (input)="onRouteInput($event, stepIndex, medIndex)" placeholder="Search route of medicine" />
+                    <div *ngIf="getRouteControl(stepIndex, medIndex, 'routeId')?.hasError('notFound')"
+                      class="text-danger">
+                      Route not found, please select a valid route from the dropdown.
+                    </div>
 
                     <ul *ngIf="routeUnit.length > 0" class="dropdown">
                       <li *ngFor="let u of routeUnit" (click)="selectRoute(u, stepIndex, medIndex)">
