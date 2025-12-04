@@ -58,7 +58,7 @@ export class PatientContactDetailsComponent implements OnInit, OnDestroy {
     this.contactForm = this.fb.group({
       relationshipType: ['', Validators.required],
       contactAddresses: this.fb.array([this.createAddressGroup()]),
-      contactTelecoms: this.fb.array([this.createTelecomGroup()]),
+      contactTelecoms: this.fb.array([this.createFirstTelecomGroup()]),
       firstName: ['', Validators.required],
       middleName: [''],
       lastName: [''],
@@ -115,10 +115,18 @@ export class PatientContactDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
+  createFirstTelecomGroup(): FormGroup {
+    return this.fb.group({
+      system: ['email', Validators.required], // default email
+      useCode: [''],
+      value: ['', [Validators.required, Validators.email]],
+    });
+  }
+
   createTelecomGroup(): FormGroup {
     return this.fb.group({
       system: ['Phone', Validators.required],
-      useCode: ['', Validators.required],
+      useCode: [''],
       value: ['', Validators.required],
     });
   }
