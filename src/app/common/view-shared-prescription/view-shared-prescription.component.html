@@ -14,7 +14,7 @@
     >
       <h4 class="mb-0">Prescription {{ i + 1 }}</h4>
       <button
-        class="btn btn-light d-flex align-items-center"
+        class="btn btn-light"
         (click)="downloadPdf(p.superPrescriptionId)"
       >
         <i class="fa-solid fa-download me-2"></i>
@@ -26,7 +26,7 @@
         (click)="downloadBundle(p.superPrescriptionId)"
       >
         <i class="fa-solid fa-download me-2"></i>
-        EXport Fhir
+        Export Fhir
       </button>
     </div>
 

@@ -1,5 +1,6 @@
 import { SharePrescriptionService } from './../../core/Services/PrescriptionServices/share-presecription.service';
 import { Component, OnInit } from '@angular/core';
+import { Location } from '@angular/common';
 import {
   EmergencyContactPatientDto,
   SuperPrescriptionData,
@@ -20,7 +21,13 @@ export class SharePrescriptionComponent implements OnInit {
   activePatientPrescriptions: SuperPrescriptionData[] = [];
   isModalOpen = false;
 
-  constructor(private service: SharePrescriptionService) {}
+  constructor(
+    private service: SharePrescriptionService,
+    private location: Location
+  ) {}
+  goBack() {
+    this.location.back();
+  }
 
   ngOnInit(): void {
     this.loadSharedPatients();
