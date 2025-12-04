@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { PatientContactService } from 'src/app/core/Services/PatientServices/patient-contact.service';
 import { AuthService } from 'src/app/core/Services/auth-service.service';
 import { LocationService } from 'src/app/core/Services/PatientServices/locationService.service';
+import { Location } from '@angular/common';
 declare var bootstrap: any;
 
 @Component({
@@ -14,6 +15,7 @@ declare var bootstrap: any;
   styleUrls: ['./contact-page.component.css'],
 })
 export class ContactPageComponent implements OnInit, OnDestroy {
+  
   loading = false;
   contacts: any[] = [];
   firstLetter = '';
@@ -52,7 +54,8 @@ export class ContactPageComponent implements OnInit, OnDestroy {
     private contactService: PatientContactService,
     private locationService: LocationService,
     private http: HttpClient,
-    private auth: AuthService
+    private auth: AuthService,
+    private location:Location
   ) {
     // build form with same shape as your backend expects
     this.contactForm = this.fb.group({
@@ -65,7 +68,9 @@ export class ContactPageComponent implements OnInit, OnDestroy {
       contactAddresses: this.fb.array([this.createAddressGroup()]),
     });
   }
-
+  goBack() {
+    this.location.back();
+  }
   ngOnInit(): void {
     this.loadContacts();
     const name = this.auth.getUserName();

@@ -1,9 +1,10 @@
 
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { MedicationWithStatus } from 'src/app/core/Models/Medication';
 import { PaginationState } from 'src/app/core/Models/Pagination';
 import { DailyMedicationService } from '../../core/Services/PrescriptionServices/daily-medication.service'
 import { getTotalPages, paginate } from 'src/app/shared/pagination.helper';
+import { Subscription } from 'rxjs';
 
 
 @Component({
@@ -11,9 +12,9 @@ import { getTotalPages, paginate } from 'src/app/shared/pagination.helper';
   templateUrl: './daily-medicines.component.html',
   styleUrls: ['./daily-medicines.component.css']
 })
-export class DailyMedicinesComponent {
+export class DailyMedicinesComponent  implements OnInit, OnDestroy{
   @Input() pageContext: 'HOME' | 'MEDICATION' = 'MEDICATION';
-  
+   private medsSubscription!: Subscription;
   todaysMeds: MedicationWithStatus[] = [];
   viewMode: 'TODAY' | 'SKIPPED' | 'COMPLETED' = 'TODAY';
   skippedPagination: PaginationState = { page: 1, pageSize: 4 };
@@ -30,12 +31,23 @@ export class DailyMedicinesComponent {
     }
   }
 
+  // ngOnInit() {
+  //   this.state.todaysMeds$.subscribe(meds => {
+  //     this.todaysMeds = meds;
+  //   });
+  // }
   ngOnInit() {
-    this.state.todaysMeds$.subscribe(meds => {
+    this.medsSubscription = this.state.todaysMeds$.subscribe(meds => {
       this.todaysMeds = meds;
     });
   }
 
+  ngOnDestroy() {
+    // Unsubscribe when the component is destroyed
+    if (this.medsSubscription) {
+      this.medsSubscription.unsubscribe();
+    }
+  }
   setView(mode: 'TODAY' | 'SKIPPED' | 'COMPLETED') {
     this.viewMode = mode;
   }

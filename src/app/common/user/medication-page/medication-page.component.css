@@ -82,6 +82,15 @@
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
+/* Default: all screens stacked vertically (col-12 already) */
+
+
+@media (min-width: 1340px) {
+  .custom-col-lg {
+    flex: 0 0 33.3333%;
+    max-width: 33.3333%;
+  }
+}
 
 /* Text styling */
 .accordion-body p {

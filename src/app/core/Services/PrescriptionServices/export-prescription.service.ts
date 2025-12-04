@@ -5,16 +5,21 @@ import { HttpClient } from '@angular/common/http';
 @Injectable({
   providedIn: 'root'
 })
-export class ExportPrescriptionService{
+export class ExportPrescriptionService {
 
-  private apiUrl = 'http://localhost:8089/patient/prescriptions';
+  private apiUrl = 'http://localhost:8089/patient';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   downloadMedicationBundle(prescriptionId: number | number[]) {
-      const body = Array.isArray(prescriptionId) ? prescriptionId : [prescriptionId];
-    // POST request, responseType 'blob' for file download
-    return this.http.post(`${this.apiUrl}/bundle-export`, body, {
+    const body = Array.isArray(prescriptionId) ? prescriptionId : [prescriptionId];
+
+    return this.http.post(`${this.apiUrl}/fhir/bundle-medication`, body, {
+      responseType: 'blob'
+    });
+  }
+  downloadPatientBundle() {
+    return this.http.post(`${this.apiUrl}/fhir/bundle-patient`,{}, {
       responseType: 'blob'
     });
   }

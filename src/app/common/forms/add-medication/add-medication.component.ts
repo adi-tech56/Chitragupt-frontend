@@ -16,7 +16,7 @@ export class AddMedicationComponent implements OnInit, OnDestroy {
 
   superPrescription: FormGroup;
   currentStep = 0;
-
+  timingDescriptions: string[][] = [];
   conditions: any[] = [];
   medicines: Medicine[] = [];
   whenCode: any[] = [];
@@ -39,7 +39,7 @@ export class AddMedicationComponent implements OnInit, OnDestroy {
     private medicationService: MedicationService,
     private http: HttpClient,
     private autoComplete: AutoCompleteService,
-    private location:Location
+    private location: Location
   ) {
     this.superPrescription = this.fb.group({
       doctorName: ['', Validators.required],
@@ -49,8 +49,8 @@ export class AddMedicationComponent implements OnInit, OnDestroy {
     });
   }
   goBack() {
-  this.location.back();
-}
+    this.location.back();
+  }
   ngOnInit(): void {
     this.http.get<any[]>('assets/when-code.json').subscribe(data => this.whenCode = data);
     this.http.get<any[]>('assets/period-unit.json').subscribe(data => this.periodUnit = data);
@@ -59,12 +59,57 @@ export class AddMedicationComponent implements OnInit, OnDestroy {
     this.subscribeMedicineValueChanges(0);
     this.subscribeRouteValueChanges(0);
     this.subscribeAmountValueChanges(0);
+     this.prescriptions.controls.forEach((_, presIndex) => {
+    this.initTimingDescriptions(presIndex);
+  });
   }
 
   ngOnDestroy(): void {
     this.reasonSubscriptions.forEach(s => s.unsubscribe());
     this.medicineSubscriptions.forEach(s => s.unsubscribe());
   }
+  generateTimingDescription(timingGroup: FormGroup): string {
+    if (!timingGroup) return '';
+
+    const values = timingGroup.value;
+    if (!values.frequency || !values.period || !values.periodUnit) return '';
+
+    let desc = `Take ${values.frequency} time${values.frequency > 1 ? 's' : ''} every ${values.period} ${values.periodUnit}${values.period > 1 ? 's' : ''}`;
+
+    if (values.timeOfDay) {
+      const [hour, minute, second] = values.timeOfDay.split(':');
+
+      const hour12 = Number(hour) % 12 || 12;
+      const ampm = Number(hour) < 12 ? 'AM' : 'PM';
+      desc += ` at ${hour12}:${minute}${second && second !== '00' ? ':' + second : ''} ${ampm}`;
+    }
+
+    if (values.whenCode && values.whenCode !== 'anytime') {
+      const when = this.whenCode.find(w => w.value === values.whenCode)?.display;
+      desc += ` (${when})`;
+    }
+
+    return desc;
+  }
+initTimingDescriptions(presIndex: number) {
+  const medsArray = this.getMedications(presIndex);
+  if (!this.timingDescriptions[presIndex]) {
+    this.timingDescriptions[presIndex] = [];
+  }
+
+  medsArray.controls.forEach((medGroup, medIndex) => {
+    const timingGroup = (medGroup as FormGroup).get('timing') as FormGroup;
+
+    // Initialize description
+    this.timingDescriptions[presIndex][medIndex] = this.generateTimingDescription(timingGroup);
+
+    // Subscribe to changes
+    timingGroup.valueChanges.subscribe(() => {
+      this.timingDescriptions[presIndex][medIndex] = this.generateTimingDescription(timingGroup);
+    });
+  });
+}
+
 
   // ---------------- Form Builders ----------------
   createPrescriptionGroup(): FormGroup {
@@ -153,6 +198,7 @@ export class AddMedicationComponent implements OnInit, OnDestroy {
   addMedication(presIndex: number) {
     this.getMedications(presIndex).push(this.createMedicationGroup());
     this.subscribeMedicineValueChanges(presIndex);
+    this.initTimingDescriptions(presIndex); //
   }
 
   removeMedication(presIndex: number, medIndex: number) {
@@ -405,10 +451,10 @@ export class AddMedicationComponent implements OnInit, OnDestroy {
     console.log("FINAL PAYLOAD:", payload);
 
     this.medicationService.savePrescription(payload).subscribe({
-      next: res =>{
+      next: res => {
         console.log("Saved!", res);
         this.goBack();
-      } ,
+      },
       error: err => console.error("Save failed", err)
     });
   }

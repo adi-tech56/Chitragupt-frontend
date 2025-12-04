@@ -43,7 +43,7 @@
 
                         <button type="button" class="btn btn-danger btn-sm" (click)="removePrescription(currentStep)"
                             *ngIf="currentStep > 0">
-                            Remove  Medication Course
+                            Remove Medication Course
                         </button>
                     </div>
 
@@ -177,7 +177,7 @@
                                             <div class="col position-relative">
                                                 <label>Unit</label>
                                                 <input type="text" class="form-control"
-                                                    formControlName="amountUnitName" >
+                                                    formControlName="amountUnitName">
 
                                                 <ul class="dropdown-menu show w-100" *ngIf="amountUnit.length > 0">
                                                     <li class="dropdown-item" *ngFor="let u of amountUnit"
@@ -243,6 +243,10 @@
                                                 </select>
                                             </div>
                                         </div>
+                                        <p class="mt-2 alert alert-info"
+                                            *ngIf="timingDescriptions[pIndex] && timingDescriptions[pIndex][mIndex]">
+                                            {{ timingDescriptions[pIndex][mIndex] }}
+                                        </p>
                                     </div>
 
                                 </div>
