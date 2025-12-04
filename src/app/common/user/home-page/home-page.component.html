@@ -26,6 +26,7 @@
     </div>
 
   </div>
+<!--   
   <div *ngIf="!hasPrescriptions">
     <div class="row d-flex ">
       <div class="card m-3" style="width: 18rem;">
@@ -39,5 +40,41 @@
       </div>
 
     </div>
+  </div> -->
+  <div *ngIf="!hasPrescriptions" class="d-flex align-items-center justify-content-center">
+
+  <div class="full-card-content  text-center">
+
+    <!-- Illustration -->
+    <img src="assets/image.webp" class="empty-image mb-4" alt="No medications">
+
+    <!-- Title -->
+    <h2 class="fw-bold">Your Health Journey Starts Here</h2>
+
+    <!-- Message -->
+    <p class="text-muted fs-5 mb-4">
+     Take control of your wellbeing! Add your first medication to stay on top of your health, or check the data of someone you care for as an emergency contact.
+    </p>
+
+  <div class="row g-2 mt-3">
+
+  <!-- Primary Button (Left) -->
+  <div class="col-12 col-md-6">
+    <a [routerLink]="['/add-medication']" class="btn btn-outline-primary btn-sm w-100">
+      <i class="fa-solid fa-plus me-2"></i> Add Medication
+    </a>
   </div>
+
+  <!-- Secondary Button (Right) -->
+  <div class="col-12 col-md-6">
+    <a [routerLink]="['/health-data']" class="btn btn-outline-primary btn-sm w-100">
+      <i class="fa-solid fa-user-shield me-2"></i> View Emergency Contact’s Health Data
+    </a>
+  </div>
+
+</div>
+
+  </div>
+</div>
+
 </div>

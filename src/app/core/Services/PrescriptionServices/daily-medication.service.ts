@@ -6,6 +6,7 @@ import {
   PatientMedicationLogs,
 } from 'src/app/core/Models/Medication';
 import { DatePipe } from '@angular/common';
+import { StateService } from '../state-service.service';
 
 @Injectable({ providedIn: 'root' })
 export class DailyMedicationService implements OnDestroy {
@@ -17,12 +18,17 @@ export class DailyMedicationService implements OnDestroy {
 
   constructor(
     private medicationService: MedicationService,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private stateService:StateService 
   ) {
+      this.stateService.register(this.todaysMedsSubject);
     this.loadMeds();
     this.startAutoSkip();
     this.startReminderCheck();
   }
+clearState() {
+  this.todaysMedsSubject.next([]);
+}
 
   loadMeds() {
     if (this.loadSub) this.loadSub.unsubscribe();

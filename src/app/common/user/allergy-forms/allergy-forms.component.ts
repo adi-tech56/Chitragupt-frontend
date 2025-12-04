@@ -15,7 +15,7 @@ import {
 } from 'rxjs';
 import { PatientAllergyService } from 'src/app/core/Services/PatientServices/patient-allergy.service';
 import { AuthService } from 'src/app/core/Services/auth-service.service';
-
+import { Location } from '@angular/common';
 @Component({
   selector: 'app-allergy-forms',
   templateUrl: './allergy-forms.component.html',
@@ -31,13 +31,16 @@ export class AllergyFormsComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private allergyService: PatientAllergyService,
-    private auth: AuthService
+    private auth: AuthService,
+    private location:Location
   ) {
     this.allergyForm = this.fb.group({
       allergies: this.fb.array([]),
     });
   }
-
+  goBack() {
+    this.location.back();
+  }
   ngOnInit() {
     if (this.allergies.length === 0) {
       this.addAllergy();

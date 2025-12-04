@@ -17,7 +17,7 @@ export class UpdatePrescriptionComponent implements OnInit, OnDestroy {
 
   superPrescription: FormGroup;
   currentStep = 0;
-
+timingDescriptions: string[][] = [];
   // Received object from previous page
   receivedData: any;
 
@@ -62,6 +62,7 @@ export class UpdatePrescriptionComponent implements OnInit, OnDestroy {
       notes: [''],
       prescription: this.fb.array([])
     });
+    
   }
 
   goBack() {
@@ -107,6 +108,9 @@ export class UpdatePrescriptionComponent implements OnInit, OnDestroy {
     if (this.receivedData) {
       this.patchFormWithReceivedData();
     }
+     this.prescriptions.controls.forEach((_, presIndex) => {
+    this.initTimingDescriptions(presIndex);
+  });
   
   }
 
@@ -116,7 +120,48 @@ export class UpdatePrescriptionComponent implements OnInit, OnDestroy {
     this.amountSubscriptions.forEach(s => s.unsubscribe());
     
   }
+//Descripiton for the timing
+  generateTimingDescription(timingGroup: FormGroup): string {
+    if (!timingGroup) return '';
 
+    const values = timingGroup.value;
+    if (!values.frequency || !values.period || !values.periodUnit) return '';
+
+    let desc = `Take ${values.frequency} time${values.frequency > 1 ? 's' : ''} every ${values.period} ${values.periodUnit}${values.period > 1 ? 's' : ''}`;
+
+    if (values.timeOfDay) {
+      const [hour, minute, second] = values.timeOfDay.split(':');
+
+      const hour12 = Number(hour) % 12 || 12;
+      const ampm = Number(hour) < 12 ? 'AM' : 'PM';
+      desc += ` at ${hour12}:${minute}${second && second !== '00' ? ':' + second : ''} ${ampm}`;
+    }
+
+    if (values.whenCode && values.whenCode !== 'anytime') {
+      const when = this.whenCode.find(w => w.value === values.whenCode)?.display;
+      desc += ` (${when})`;
+    }
+
+    return desc;
+  }
+initTimingDescriptions(presIndex: number) {
+  const medsArray = this.getMedications(presIndex);
+  if (!this.timingDescriptions[presIndex]) {
+    this.timingDescriptions[presIndex] = [];
+  }
+
+  medsArray.controls.forEach((medGroup, medIndex) => {
+    const timingGroup = (medGroup as FormGroup).get('timing') as FormGroup;
+
+    // Initialize description
+    this.timingDescriptions[presIndex][medIndex] = this.generateTimingDescription(timingGroup);
+
+    // Subscribe to changes
+    timingGroup.valueChanges.subscribe(() => {
+      this.timingDescriptions[presIndex][medIndex] = this.generateTimingDescription(timingGroup);
+    });
+  });
+}
   // ---------------- FORM GROUP BUILDERS ----------------
 
   createPrescriptionGroup(): FormGroup {

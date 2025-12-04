@@ -203,6 +203,11 @@
                     </select>
                   </div>
                 </div>
+                <p class="mt-2 alert alert-info"
+                  *ngIf="timingDescriptions[stepIndex] && timingDescriptions[stepIndex][medIndex]">
+                  {{ timingDescriptions[stepIndex][medIndex] }}
+                </p>
+
 
 
               </div>

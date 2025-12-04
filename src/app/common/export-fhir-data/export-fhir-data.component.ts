@@ -1,21 +1,35 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { PrescriptionResponse } from 'src/app/core/Models/Medication';
+import { PaginationState } from 'src/app/core/Models/Pagination';
 import { ExportPrescriptionService } from 'src/app/core/Services/PrescriptionServices/export-prescription.service';
 import { MedicationService } from 'src/app/core/Services/PrescriptionServices/medication-service';
-
+import { getTotalPages, paginate } from 'src/app/shared/pagination.helper';
+import { Location } from '@angular/common';
 @Component({
   selector: 'app-export-fhir-data',
   templateUrl: './export-fhir-data.component.html',
   styleUrls: ['./export-fhir-data.component.css']
 })
 export class ExportFhirDataComponent {
- prescriptions: PrescriptionResponse[] = [];
+  prescriptions: PrescriptionResponse[] = [];
   selectedIds: number[] = [];
-
+  pagination: PaginationState = { page: 1, pageSize: 4 };
   constructor(private prescriptionService: ExportPrescriptionService,
-   private medicationService:MedicationService , private http: HttpClient) {}
+    private medicationService: MedicationService, private http: HttpClient, private location: Location) { }
 
+  goBack() {
+    this.location.back();
+  }
+  openIndex: number | null = null;
+
+  toggleAccordion(index: number) {
+    if (this.openIndex === index) {
+      this.openIndex = null;
+    } else {
+      this.openIndex = index;
+    }
+  }
   ngOnInit(): void {
     this.loadPrescriptions();
   }
@@ -26,7 +40,16 @@ export class ExportFhirDataComponent {
       (err) => console.error(err)
     );
   }
+  get paginatedMeds() {
+    return paginate(this.prescriptions, this.pagination);
+  }
 
+  get totalPages() {
+    return getTotalPages(this.prescriptions.length, this.pagination.pageSize);
+  }
+  setPage(page: number) {
+    this.pagination.page = page;
+  }
   toggleSelection(prescriptionId: number, event: Event): void {
     const checked = (event.target as HTMLInputElement).checked;
     if (checked) {
@@ -41,19 +64,6 @@ export class ExportFhirDataComponent {
       alert('Please select at least one prescription.');
       return;
     }
-  // this.prescriptionService.downloadMedicationBundle(this.selectedIds).subscribe(
-  // (response: any) => {
-  //   const blob = new Blob([JSON.stringify(response)], { type: 'application/json' });
-  //   const url = window.URL.createObjectURL(blob);
-  //   const a = document.createElement('a');
-  //   a.href = url;
-  //   a.download = 'medication-bundle.json';
-  //   a.click();
-  //   window.URL.revokeObjectURL(url);
-  // },
-  // (error: any) => {
-  //   console.error('Download failed', error);
-  // }
     this.prescriptionService.downloadMedicationBundle(this.selectedIds)
       .subscribe(blob => {
         // Create a download link
@@ -71,4 +81,4 @@ export class ExportFhirDataComponent {
   }
 
 
-  }
+}

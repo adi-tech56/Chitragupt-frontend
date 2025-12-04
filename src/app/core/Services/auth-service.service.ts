@@ -4,12 +4,15 @@ import { UserLoginDetails, UserRegisterDetails } from '../Models/Authentication'
 import { catchError, map, Observable, of } from 'rxjs';
 import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
+import { StateService } from './state-service.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  constructor(private router: Router) {}
+  constructor(private router: Router,
+    private stateService:StateService
+  ) {}
   verifyOtp(payload: { email: any; otp: any }) {
     throw new Error('Method not implemented.');
   }
@@ -154,8 +157,8 @@ export class AuthService {
   logout(): void {
     this.cookieService.delete('accessToken', '/');
     this.cookieService.delete('refreshToken', '/');
-
-    // Optional: Clear all local data
+ this.stateService.clearAll();
+    
     localStorage.clear();
     sessionStorage.clear();
 

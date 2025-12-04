@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserLayoutComponent } from 'src/app/layout/user-layout/user-layout.component';
+import { ExportPrescriptionService } from 'src/app/core/Services/PrescriptionServices/export-prescription.service';
 
 declare var bootstrap: any; // bootstrap modal
 
@@ -47,7 +48,8 @@ export class ProfilePageComponent implements OnInit {
     private allergyService: PatientAllergyService,
     private auth: AuthService,
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private fhirService: ExportPrescriptionService,
   ) {}
 
   ngOnInit(): void {
@@ -132,6 +134,22 @@ export class ProfilePageComponent implements OnInit {
     ].filter(Boolean);
     return parts.join(', ');
   }
+downloadSelected(): void {
+    this.fhirService.downloadPatientBundle()
+      .subscribe(blob => {
+        // Create a download link
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'patient_bundle.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      }, error => {
+        console.error('Download failed', error);
+      });
+}
 
   // ============ BASIC INFO EDIT ============
 

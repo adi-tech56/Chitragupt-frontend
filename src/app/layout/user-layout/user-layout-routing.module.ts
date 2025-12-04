@@ -5,8 +5,6 @@ import { HomePageComponent } from 'src/app/common/user/home-page/home-page.compo
 import { AddMedicationComponent } from 'src/app/common/forms/add-medication/add-medication.component';
 import { AuthGuard } from 'src/app/core/Gaurds/auth.guard';
 import { RoleGuard } from 'src/app/core/Gaurds/role.guard';
-import { MedicationPageComponent } from 'src/app/common/user/medication-page/medication-page.component';
-import { ViewPrescriptionComponent } from 'src/app/common/view-prescription/view-prescription.component';
 import { ProfilePageComponent } from 'src/app/common/user/profile-page/profile-page.component';
 import { ContactPageComponent } from 'src/app/common/user/contact-page/contact-page.component';
 import { AllergyFormsComponent } from 'src/app/common/user/allergy-forms/allergy-forms.component';

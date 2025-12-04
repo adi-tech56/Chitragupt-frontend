@@ -60,22 +60,5 @@ export class ViewPrescriptionComponent implements OnInit {
       });
   }
   
-  downloadBundle(superPrescriptionId: number) {
 
-
-    this.exportPrescripiton.downloadMedicationBundle(superPrescriptionId)
-      .subscribe(blob => {
-        // Create a download link
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'medications_bundle.json';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-      }, error => {
-        console.error('Download failed', error);
-      });
-  }
 }
