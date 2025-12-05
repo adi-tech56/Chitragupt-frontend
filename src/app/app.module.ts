@@ -18,6 +18,7 @@ import { HomeLayoutModule } from './layout/home-layout/home-layout.module';
 import { UserLayoutModule } from './layout/user-layout/user-layout.module';
 
 import { AuthInterceptor } from './core/Interceptors/auth-interceptor';
+import { ToasterComponent } from './common/toaster/toaster.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -27,6 +28,7 @@ import { AuthInterceptor } from './core/Interceptors/auth-interceptor';
     VerificationComponent,
     ResetPasswordComponent,
     SendEmailComponent,
+    ToasterComponent,
   ],
   imports: [
     BrowserModule,

@@ -14,3 +14,15 @@
   border-color: #dcdcdc !important;
   box-shadow: none !important; /* remove any bootstrap shadow on focus/active */
 }
+.password-toggle-icon {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #6c757d; 
+}
+
+.form-control {
+  padding-right: 2.5rem; /* space for the icon */
+}

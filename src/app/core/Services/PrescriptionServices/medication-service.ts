@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import {
   MedicationNormalized,
+  MedicationWithStatus,
   PatientMedicationLogs,
   PrescriptionData,
   PrescriptionResponse,
@@ -38,10 +39,10 @@ export class MedicationService {
       `${this.baseUrl}/prescription`
     );
   }
-  getMedications(): Observable<MedicationNormalized[]> {
+  getMedications(): Observable<MedicationWithStatus[]> {
     return this.http
-      .get<PrescriptionResponse[]>(`${this.baseUrl}/prescription`)
-      .pipe(map((data) => this.normalize(data)));
+      .get<MedicationWithStatus[]>(`${this.baseUrl}/daily-meds`);
+     
   }
   updatePrescriptions(
     superPrescriptionId: number,
@@ -53,32 +54,11 @@ export class MedicationService {
       prescription
     );
   }
-  private normalize(data: PrescriptionResponse[]): MedicationNormalized[] {
-    const meds: MedicationNormalized[] = [];
-
-    data.forEach((entry) => {
-      entry.prescriptions.forEach((condition) => {
-        condition.medications.forEach((med) => {
-          meds.push({
-            doctorName: entry.doctorName,
-            prescriptionDate: entry.prescriptionDate,
-            conditionName: condition.conditionName,
-            conditionNotes: condition.notes,
-            prescriptionId: entry.superPrescriptionId,
-            prescriptionConditionId: condition.prescriptionId,
-            ...med,
-          });
-        });
-      });
-    });
-
-    return meds;
-  }
-  getTodaysLogs(): Observable<PatientMedicationLogs[]> {
-    return this.http.get<PatientMedicationLogs[]>(`${this.logUrl}/today`, {
-      withCredentials: true,
-    });
-  }
+  // getTodaysLogs(): Observable<PatientMedicationLogs[]> {
+  //   return this.http.get<PatientMedicationLogs[]>(`${this.logUrl}/today`, {
+  //     withCredentials: true,
+  //   });
+  // }
   markMedication(
     superPrescriptionId: number,
     prescriptionId: number,

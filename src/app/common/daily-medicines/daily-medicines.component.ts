@@ -12,9 +12,9 @@ import { Subscription } from 'rxjs';
   templateUrl: './daily-medicines.component.html',
   styleUrls: ['./daily-medicines.component.css']
 })
-export class DailyMedicinesComponent  implements OnInit, OnDestroy{
+export class DailyMedicinesComponent implements OnInit, OnDestroy {
   @Input() pageContext: 'HOME' | 'MEDICATION' = 'MEDICATION';
-   private medsSubscription!: Subscription;
+  private medsSubscription!: Subscription;
   todaysMeds: MedicationWithStatus[] = [];
   viewMode: 'TODAY' | 'SKIPPED' | 'COMPLETED' = 'TODAY';
   skippedPagination: PaginationState = { page: 1, pageSize: 4 };
@@ -30,14 +30,9 @@ export class DailyMedicinesComponent  implements OnInit, OnDestroy{
       this.openIndex = index;
     }
   }
-
-  // ngOnInit() {
-  //   this.state.todaysMeds$.subscribe(meds => {
-  //     this.todaysMeds = meds;
-  //   });
-  // }
   ngOnInit() {
     this.medsSubscription = this.state.todaysMeds$.subscribe(meds => {
+      console.log(meds)
       this.todaysMeds = meds;
     });
   }
@@ -52,21 +47,28 @@ export class DailyMedicinesComponent  implements OnInit, OnDestroy{
     this.viewMode = mode;
   }
   isWithinCompletionWindow(med: MedicationWithStatus): boolean {
+ console.log('isWithinCompletionWindow called for:', med.medication, med.doseTime);
     if (!med.doseTime) return false;
     if (med.logCreatedAt) return false;
-
+ 
+    console.log(med)
     const now = new Date();
     const windowEnd = new Date(med.doseTime.getTime() + 60 * 60 * 1000);
+    console.log(windowEnd)
     return now >= med.doseTime && now <= windowEnd;
   }
   get activeMeds() {
-    return this.todaysMeds.filter(m => m.status === 'PENDING');
+    
+    return this.todaysMeds.filter(m => m.takenStatus
+      === 'PENDING');
   }
   get completedMeds() {
-    return this.todaysMeds.filter(m => m.status === 'TAKEN');
+    return this.todaysMeds.filter(m => m.takenStatus
+ === 'TAKEN');
   }
   get skippedMeds() {
-    return this.todaysMeds.filter(m => m.status === 'SKIPPED');
+    return this.todaysMeds.filter(m => m.takenStatus
+ === 'SKIPPED');
   }
 
   markTaken(med: MedicationWithStatus) {
