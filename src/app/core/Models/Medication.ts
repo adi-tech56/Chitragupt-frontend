@@ -99,7 +99,7 @@ export interface MedicationNormalized extends MedicationResponse {
 }
 export interface MedicationWithStatus extends MedicationNormalized {
   taken?: boolean;
-  status: 'PENDING' | 'TAKEN' | 'SKIPPED';
+  takenStatus: 'PENDING' | 'TAKEN' | 'SKIPPED';
   doseTime?: Date;
   logCreatedAt?: Date;
 }

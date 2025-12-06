@@ -5,7 +5,9 @@
 
   <div class="header-right">
     <button
+    *ngIf="showProfileButton"
       class="icon-btn"
+       
       aria-label="Profile"
       (click)="goToProfile()">
       <i class="fas fa-user"></i>

@@ -1,47 +1,53 @@
 
-<div *ngIf="loading " class="d-flex justify-content-center align-items-center" 
-     style="height: 80vh;">
-  <div class="spinner-border text-primary" role="status">
-    <span class="visually-hidden">Loading...</span>
-  </div>
+<div style="position: fixed; top: 0; left: 0; width: 100%; z-index: 1000">
+   <app-header 
+    [showProfileButton]="patientContactsComplete && patientDetailsComplete && patientAllergyComplete" ></app-header>
 </div>
-<app-patient-contact-details
-  *ngIf="!patientContactsComplete"
-  (contactSubmitted)="onContactSubmitted()"
->
-</app-patient-contact-details>
 
-<app-patient-details
-  *ngIf="patientContactsComplete && !patientDetailsComplete && !loading"
-  (detailsSubmitted)="onDetailsSubmitted()"
->
-</app-patient-details>
-<app-patient-allergy
-  *ngIf="
-    patientContactsComplete && patientDetailsComplete && !patientAllergyComplete  && !loading
-  "
-  (allergySubmitted)="onAllergySubmitted()"
->
-</app-patient-allergy>
 
-<div
-  class="user-layout"
-  *ngIf="
-    patientContactsComplete && patientDetailsComplete && patientAllergyComplete  && !loading
-  "
->
-  <div style="position: fixed; top: 0; left: 0; width: 100%; z-index: 1000">
-    <app-header></app-header>
-  </div>
+<div style="margin-top: 60px;"> 
 
-  <div style="margin-top: 60px">
-    <!-- adjust height if needed -->
-    <app-sidebar></app-sidebar>
-
-    <div class="content-area">
-      <h4>{{ greetingMessage }} {{ userName }}!</h4>
-
-      <router-outlet></router-outlet>
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="d-flex justify-content-center align-items-center" style="height: 80vh;">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
     </div>
   </div>
+
+  <!-- Step 1: Contact Details -->
+  <app-patient-contact-details
+    *ngIf="!patientContactsComplete && !loading"
+    (contactSubmitted)="onContactSubmitted()"
+  >
+  </app-patient-contact-details>
+
+  <!-- Step 2: Patient Details -->
+  <app-patient-details
+    *ngIf="patientContactsComplete && !patientDetailsComplete && !loading"
+    (detailsSubmitted)="onDetailsSubmitted()"
+  >
+  </app-patient-details>
+
+  <!-- Step 3: Allergies -->
+  <app-patient-allergy
+    *ngIf="patientContactsComplete && patientDetailsComplete && !patientAllergyComplete && !loading"
+    (allergySubmitted)="onAllergySubmitted()"
+  >
+  </app-patient-allergy>
+
+  <!-- Final Layout -->
+  <div
+    class="user-layout"
+    *ngIf="patientContactsComplete && patientDetailsComplete && patientAllergyComplete && !loading"
+  >
+    <div style="display: flex;">
+      <app-sidebar></app-sidebar>
+
+      <div class="content-area" style="flex: 1; padding: 20px;">
+        <h4>{{ greetingMessage }} {{ userName }}!</h4>
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  </div>
+
 </div>

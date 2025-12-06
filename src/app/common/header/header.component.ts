@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/core/Services/auth-service.service';
 
@@ -8,6 +8,8 @@ import { AuthService } from 'src/app/core/Services/auth-service.service';
   styleUrls: ['./header.component.css'],
 })
 export class HeaderComponent {
+   @Input() showProfileButton: boolean = true; // default true
+
   constructor(private router: Router, private auth: AuthService) {}
 
   goToProfile() {

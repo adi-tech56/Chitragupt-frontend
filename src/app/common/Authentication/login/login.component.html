@@ -3,16 +3,44 @@
 
 
     <h3 class="text-primary text-center mb-4 fw-bold">Login</h3>
-     <div *ngIf="loginError" class="alert alert-danger mt-2">
-    {{ loginError }}
-  </div>
+    <div *ngIf="loginError" class="alert alert-danger mt-2">
+      {{ loginError }}
+    </div>
     <div class="mb-3">
       <label class="form-label text-primary fw-semibold">Email</label>
-      <input type="email" class="form-control" formControlName="email" name="email" required>
+      <input type="email" class="form-control mb-1" formControlName="email" name="email" required>
+      <p *ngIf="emailIsInvalid" class="text-danger">Enter a valid email</p>
     </div>
     <div class="mb-3">
       <label class="form-label text-primary fw-semibold">Password</label>
-      <input type="password" class="form-control" formControlName="password" name="password" required>
+
+<div class="position-relative">
+  <input 
+    [type]="showPassword ? 'text' : 'password'" 
+    class="form-control mb-1"
+    formControlName="password"
+    name="password"
+    required>
+
+  <i 
+    [ngClass]="showPassword ? 'fa fa-eye' : 'fa fa-eye-slash'"
+    (click)="showPassword = !showPassword"
+    class="password-toggle-icon">
+  </i>
+</div>
+
+
+
+      <!-- <input [type]="showPassword ? 'text' : 'password'" class="form-control" formControlName="password" name="password"
+        required> -->
+  <div class="text-danger" *ngIf="showRequiredError">
+  Password is required
+</div>
+
+<div class="text-danger" *ngIf="showMinLengthError">
+  Password must be at least 6 characters
+</div>
+
     </div>
     <div class="mb-3">
       <button type="button" class="btn btn-link text-secondary float-end fw-semibold" (click)="goToSendMail()">
@@ -37,6 +65,6 @@
         Don’t have an account? Sign up
       </button>
     </div>
-    <p *ngIf="passwordIsInvalid">Enter a valid password</p>
+
   </form>
 </div>
