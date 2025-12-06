@@ -1,5 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  FormArray,
+  FormBuilder,
+  FormGroup,
+  Validators,
+  AbstractControl,
+} from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
@@ -15,7 +21,6 @@ declare var bootstrap: any;
   styleUrls: ['./contact-page.component.css'],
 })
 export class ContactPageComponent implements OnInit, OnDestroy {
-  
   loading = false;
   contacts: any[] = [];
   firstLetter = '';
@@ -42,12 +47,15 @@ export class ContactPageComponent implements OnInit, OnDestroy {
   showCountry: boolean[] = [];
   showState: boolean[] = [];
   showCity: boolean[] = [];
+  removedTelecomIds: number[] = [];
+  removedAddressIds: number[] = [];
 
   // store one Subscription per address (composite subscription)
   private subs: Subscription[] = [];
 
   // reactive modal form (uses backend field names contactTelecoms/contactAddresses)
   contactForm: FormGroup;
+  private phoneRegex = /^(?!.*^(\d)\1{9}$)\d{10}$/;
 
   constructor(
     private fb: FormBuilder,
@@ -55,19 +63,20 @@ export class ContactPageComponent implements OnInit, OnDestroy {
     private locationService: LocationService,
     private http: HttpClient,
     private auth: AuthService,
-    private location:Location
+    private location: Location
   ) {
     // build form with same shape as your backend expects
     this.contactForm = this.fb.group({
       firstName: ['', Validators.required],
       middleName: [''],
-      lastName: ['', Validators.required],
+      lastName: [''],
       relationshipType: ['', Validators.required],
       patientId: [this.auth.getUserId()],
-      contactTelecoms: this.fb.array([this.createTelecomGroup()]),
+      contactTelecoms: this.fb.array([]),
       contactAddresses: this.fb.array([this.createAddressGroup()]),
     });
   }
+
   goBack() {
     this.location.back();
   }
@@ -76,9 +85,10 @@ export class ContactPageComponent implements OnInit, OnDestroy {
     const name = this.auth.getUserName();
     this.firstLetter = name ? name[0].toUpperCase() : '';
 
-    // load relationship types (supports array of strings or objects with display/code)
-    this.http.get<any[]>('assets/data/relations-type.json').subscribe(
-      (data) => {
+    // load relationship types
+    this.http
+      .get<any[]>('assets/data/relations-type.json')
+      .subscribe((data) => {
         if (!data) return;
         if (typeof data[0] === 'string')
           this.relationshipOptions = data as string[];
@@ -86,11 +96,7 @@ export class ContactPageComponent implements OnInit, OnDestroy {
           this.relationshipOptions = (data as any[]).map(
             (x) => x.display ?? x.code ?? x
           );
-      },
-      (err) => {
-        console.warn('Failed to load relations-type.json', err);
-      }
-    );
+      });
 
     // load city/state/country dataset
     this.http.get<any[]>('assets/data/india-locations.json').subscribe(
@@ -111,9 +117,7 @@ export class ContactPageComponent implements OnInit, OnDestroy {
         this.filteredStates[0] = this.statesList.slice(0, 200);
         this.filteredCountries[0] = this.countries.slice(0, 200);
       },
-      (err) => {
-        console.warn('Failed to load india-locations.json', err);
-      }
+      (err) => console.warn('Failed to load india-locations.json', err)
     );
 
     // ensure ui flags exist for index 0
@@ -132,10 +136,10 @@ export class ContactPageComponent implements OnInit, OnDestroy {
   /** form group factories **/
   createAddressGroup(): FormGroup {
     return this.fb.group({
-      id: [null], // preserve id for edits (backend expects id)
+      id: [null],
       useCode: ['', Validators.required],
       addressType: [''],
-      text: [''],
+      text: ['', Validators.required],
       line1: [''],
       line2: [''],
       city: ['', Validators.required],
@@ -146,12 +150,20 @@ export class ContactPageComponent implements OnInit, OnDestroy {
     });
   }
 
-  createTelecomGroup(): FormGroup {
+  createTelecomGroup(
+    system: 'email' | 'phone',
+    value = '',
+    id: any = null,
+    isFirstTelecom: boolean = false
+  ): FormGroup {
     return this.fb.group({
-      id: [null], // preserve id for edits
-      system: ['phone', Validators.required],
+      id: [id ?? null],
+      system: [
+        { value: system, disabled: isFirstTelecom },
+        Validators.required,
+      ],
       useCode: [''],
-      value: ['', Validators.required],
+      value: [value, Validators.required],
     });
   }
 
@@ -175,11 +187,33 @@ export class ContactPageComponent implements OnInit, OnDestroy {
 
   /** add/remove **/
   addTelecom() {
-    this.contactTelecoms.push(this.createTelecomGroup());
+    // if no telecoms exist (shouldn't happen because we always ensure first is email), add first as email
+    if (this.contactTelecoms.length === 0) {
+      const g = this.createTelecomGroup('email', '', null);
+      this.contactTelecoms.push(g);
+      this.updateTelecomValidators(0);
+      return;
+    }
+
+    const g = this.createTelecomGroup('phone', '', null);
+    this.contactTelecoms.push(g);
+    const idx = this.contactTelecoms.length - 1;
+    this.updateTelecomValidators(idx);
+    // subscribe to system changes for placeholder/validators
+    this.contactTelecoms
+      .at(idx)
+      .get('system')!
+      .valueChanges.subscribe(() => this.updateTelecomValidators(idx));
   }
 
   removeTelecom(index: number) {
-    if (this.contactTelecoms.length > 1) this.contactTelecoms.removeAt(index);
+    if (this.contactTelecoms.length <= 1) return;
+
+    const group = this.contactTelecoms.at(index) as FormGroup;
+    const id = group?.get('id')?.value;
+    if (id) this.removedTelecomIds.push(id);
+
+    this.contactTelecoms.removeAt(index);
   }
 
   addAddress() {
@@ -198,28 +232,65 @@ export class ContactPageComponent implements OnInit, OnDestroy {
   }
 
   removeAddress(index: number) {
-    if (this.contactAddresses.length > 1) {
-      // unsubscribe and remove the composite subscription for this index
-      const s = this.subs[index];
-      if (s) {
-        s.unsubscribe();
-        this.subs.splice(index, 1);
-      }
+    if (this.contactAddresses.length <= 1) return;
 
-      this.contactAddresses.removeAt(index);
-      this.filteredCountries.splice(index, 1);
-      this.filteredStates.splice(index, 1);
-      this.filteredCities.splice(index, 1);
-      this.showCountry.splice(index, 1);
-      this.showState.splice(index, 1);
-      this.showCity.splice(index, 1);
+    const group = this.contactAddresses.at(index) as FormGroup;
+    const id = group?.get('id')?.value;
+    if (id) this.removedAddressIds.push(id);
+
+    const s = this.subs[index];
+    if (s) {
+      s.unsubscribe();
+      this.subs.splice(index, 1);
     }
+
+    this.contactAddresses.removeAt(index);
+    this.filteredCountries.splice(index, 1);
+    this.filteredStates.splice(index, 1);
+    this.filteredCities.splice(index, 1);
+    this.showCity.splice(index, 1);
+    this.showState.splice(index, 1);
+    this.showCountry.splice(index, 1);
   }
 
   /**
-   * Create valueChanges subscriptions for country/state/city of the address group.
-   * Stores a composite Subscription per address index so we can cleanly unsubscribe later.
+   * Update validators & placeholder for a telecom index based on its system
    */
+  updateTelecomValidators(index: number) {
+    const group = this.contactTelecoms.at(index) as FormGroup;
+    const system = group.get('system')?.value;
+
+    const valueControl = group.get('value')!;
+    valueControl.clearValidators();
+
+    if (system === 'email') {
+      valueControl.setValidators([Validators.required, Validators.email]);
+    } else {
+      valueControl.setValidators([
+        Validators.required,
+        Validators.pattern(this.phoneRegex),
+      ]);
+    }
+    valueControl.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+  }
+
+  getTelecomValueControl(index: number) {
+    return (this.contactTelecoms.at(index) as FormGroup).get(
+      'value'
+    ) as AbstractControl;
+  }
+
+  getTelecomSystem(index: number) {
+    return (this.contactTelecoms.at(index) as FormGroup).get('system')?.value;
+  }
+
+  getTelecomPlaceholder(index: number) {
+    const sys = this.getTelecomSystem(index);
+    if (sys === 'email') return 'user@example.com';
+    return '9876546758';
+  }
+
+  /** address autocomplete setup (same as your previous implementation) **/
   setupAddressAutocomplete(index: number) {
     this.filteredCountries[index] =
       this.filteredCountries[index] || this.countries.slice(0, 200);
@@ -233,7 +304,6 @@ export class ContactPageComponent implements OnInit, OnDestroy {
     this.showCity[index] = this.showCity[index] ?? false;
 
     const group = this.contactAddresses.at(index) as FormGroup;
-
     const composite = new Subscription();
 
     const subC = group
@@ -260,7 +330,6 @@ export class ContactPageComponent implements OnInit, OnDestroy {
       });
     composite.add(subCity);
 
-    // put composite subscription in subs at correct index
     this.subs[index] = composite;
   }
 
@@ -285,7 +354,6 @@ export class ContactPageComponent implements OnInit, OnDestroy {
   selectCity(i: number, city: string) {
     const group = this.contactAddresses.at(i) as FormGroup;
     group.get('city')?.setValue(city);
-
     const found = this.cityData.find(
       (c) => c.city.toLowerCase() === city.toLowerCase()
     );
@@ -294,7 +362,6 @@ export class ContactPageComponent implements OnInit, OnDestroy {
       group.get('country')?.setValue(found.country);
       group.get('postalCode')?.setValue(found.postalCode);
     }
-
     this.showCity[i] = false;
   }
 
@@ -313,9 +380,7 @@ export class ContactPageComponent implements OnInit, OnDestroy {
       next: (res: any) => {
         this.contacts = res?.contacts ?? [];
       },
-      error: (err) => {
-        console.error('Failed to load contacts', err);
-      },
+      error: (err) => console.error('Failed to load contacts', err),
       complete: () => (this.loading = false),
     });
   }
@@ -324,6 +389,8 @@ export class ContactPageComponent implements OnInit, OnDestroy {
   openAddModal() {
     this.isEditMode = false;
     this.editingId = null;
+    this.removedTelecomIds = [];
+    this.removedAddressIds = [];
 
     // reset core fields
     this.contactForm.reset({
@@ -346,9 +413,14 @@ export class ContactPageComponent implements OnInit, OnDestroy {
     this.showState = [];
     this.showCountry = [];
 
-    // add defaults (with backend field names)
-    this.addTelecom();
-    this.addAddress();
+    // ensure first telecom is email (disabled in UI)
+    const first = this.createTelecomGroup('email', '', null);
+    this.contactTelecoms.push(first);
+    this.updateTelecomValidators(0);
+
+    // ensure at least one address
+    this.contactAddresses.push(this.createAddressGroup());
+    this.setupAddressAutocomplete(0);
 
     const modalEl = document.getElementById('editContactModal')!;
     const modal = new bootstrap.Modal(modalEl);
@@ -359,6 +431,8 @@ export class ContactPageComponent implements OnInit, OnDestroy {
   openEditModal(contact: any) {
     this.isEditMode = true;
     this.editingId = contact.id ?? null;
+    this.removedTelecomIds = [];
+    this.removedAddressIds = [];
 
     // patch main fields
     this.contactForm.patchValue({
@@ -381,24 +455,34 @@ export class ContactPageComponent implements OnInit, OnDestroy {
     this.showState = [];
     this.showCountry = [];
 
-    // populate telecoms (preserve id & useCode)
+    // populate telecoms (enforce first as email)
     const telList =
       contact.contactTelecoms && contact.contactTelecoms.length
         ? contact.contactTelecoms
-        : [{ id: null, system: 'phone', useCode: '', value: '' }];
+        : [{ id: null, system: 'email', useCode: '', value: '' }];
 
-    telList.forEach((t: any) => {
-      this.contactTelecoms.push(
-        this.fb.group({
-          id: [t.id ?? null],
-          system: [t.system ?? 'phone', Validators.required],
-          useCode: [t.useCode ?? ''],
-          value: [t.value ?? '', Validators.required],
-        })
+    telList.forEach((t: any, idx: number) => {
+      // if first index ensure system = email (force)
+      const system = idx === 0 ? 'email' : t.system ?? 'phone';
+      const group = this.createTelecomGroup(
+        system,
+        t.value ?? '',
+        t.id ?? null
       );
+      this.contactTelecoms.push(group);
+      this.updateTelecomValidators(idx);
+      // subscribe to system changes for dynamic validators (except first since disabled)
+      if (idx > 0) {
+        group
+          .get('system')!
+          .valueChanges.subscribe(() => this.updateTelecomValidators(idx));
+      } else {
+        // make sure the first control has system 'email' (and disabled in template)
+        group.get('system')!.setValue('email', { emitEvent: false });
+      }
     });
 
-    // populate addresses (preserve id and backend field names)
+    // populate addresses (preserve id)
     const addrList =
       contact.contactAddresses && contact.contactAddresses.length
         ? contact.contactAddresses
@@ -435,7 +519,6 @@ export class ContactPageComponent implements OnInit, OnDestroy {
         })
       );
 
-      // init autocomplete helpers & attach subscription
       this.filteredCities[idx] = this.citiesList.slice(0, 200);
       this.filteredStates[idx] = this.statesList.slice(0, 200);
       this.filteredCountries[idx] = this.countries.slice(0, 200);
@@ -482,11 +565,28 @@ export class ContactPageComponent implements OnInit, OnDestroy {
 
   /** Save (create or update) */
   saveModal() {
+    // mark touched to show validation
+    this.contactForm.markAllAsTouched();
+
+    // ensure first telecom exists and is email
+    if (this.contactTelecoms.length === 0) {
+      alert('Please add an email contact (first telecom).');
+      return;
+    }
+
+    if (this.getTelecomSystem(0) !== 'email') {
+      alert('The first telecom must be an Email.');
+      return;
+    }
+
+    // ensure validators are up-to-date for all telecoms
+    for (let i = 0; i < this.contactTelecoms.length; i++)
+      this.updateTelecomValidators(i);
+
     if (this.contactForm.invalid) {
-      this.contactForm.markAllAsTouched();
       console.log('❌ Form is invalid. Below are the invalid fields:');
       this.logInvalidFields(this.contactForm);
-      alert('Please fill required fields.');
+      alert('Please fill required fields correctly.');
       return;
     }
 
@@ -494,14 +594,16 @@ export class ContactPageComponent implements OnInit, OnDestroy {
     const payload = {
       ...this.contactForm.value,
       patientId: this.auth.getUserId(),
+      removedTelecomIds: this.removedTelecomIds,
+      removedAddressIds: this.removedAddressIds,
     };
 
     if (this.isEditMode && this.editingId) {
       this.contactService.updateContact(this.editingId, payload).subscribe({
         next: (res) => {
           const idx = this.contacts.findIndex((c) => c.id === this.editingId);
-          if (idx >= 0)
-            this.contacts[idx] = res ?? { ...payload, id: this.editingId };
+          if (idx >= 0) this.contacts[idx] = res;
+          else this.loadContacts();
           (
             document.querySelector(
               '#editContactModal .btn-close'
@@ -516,7 +618,7 @@ export class ContactPageComponent implements OnInit, OnDestroy {
     } else {
       this.contactService.saveContact(payload).subscribe({
         next: (res) => {
-          this.contacts.push(res ?? payload);
+          this.contacts.push(res);
           (
             document.querySelector(
               '#editContactModal .btn-close'
@@ -567,5 +669,14 @@ export class ContactPageComponent implements OnInit, OnDestroy {
     ]
       .filter(Boolean)
       .join(', ');
+  }
+
+  /** small helper used in template to mark invalid fields */
+  isInvalid(control: AbstractControl | null | undefined) {
+    return !!(
+      control &&
+      control.invalid &&
+      (control.touched || control.dirty || this.contactForm.touched)
+    );
   }
 }
