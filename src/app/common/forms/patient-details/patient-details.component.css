@@ -13,13 +13,17 @@
   width: 90%;
   max-width: 500px;
   max-height: 90vh;
-  
+}
+.required::after {
+  content: " *";
+  color: red;
+  font-weight: bold;
 }
 @media (max-width: 768px) {
   .auth-card {
     padding: 2rem 1rem;
     overflow: auto;
-      max-width: 452px;
+    max-width: 452px;
   }
 }
 .scroll-section {
@@ -27,9 +31,7 @@
   overflow-y: auto;
   padding-right: 8px;
   margin-bottom: 1rem;
-
 }
-
 
 .scroll-section::-webkit-scrollbar {
   width: 6px;

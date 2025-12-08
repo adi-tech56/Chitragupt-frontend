@@ -8,7 +8,7 @@
         <div *ngIf="currentStep === 1">
           <div class="row">
             <div class="col-md-12 mb-3">
-              <label class="form-label text-primary fw-semibold">
+              <label class="form-label text-primary fw-semibold required">
                 Do you have any allergies?
               </label>
             </div>
@@ -53,13 +53,19 @@
 
         <!-- STEP 2: YES -->
         <div
-          *ngIf="currentStep === 2 && allergyForm.get('hasAllergy')?.value === 'yes'"
+          *ngIf="
+            currentStep === 2 && allergyForm.get('hasAllergy')?.value === 'yes'
+          "
           formArrayName="allergies"
         >
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="text-primary mb-0">Allergy Details</h4>
 
-            <button type="button" class="btn btn-outline-primary" (click)="addAllergy()">
+            <button
+              type="button"
+              class="btn btn-outline-primary"
+              (click)="addAllergy()"
+            >
               <i class="fa fa-plus"></i>
             </button>
           </div>
@@ -71,10 +77,8 @@
               class="mb-3 border rounded p-3"
             >
               <div class="row">
-
-
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Allergy Name</label>
+                  <label class="form-label required">Allergy Name</label>
 
                   <div class="autocomplete-container position-relative">
                     <input
@@ -87,7 +91,7 @@
                     <ul
                       class="dropdown-menu show"
                       *ngIf="suggestions[i]?.length"
-                      style="width: 100%; max-height: 200px; overflow-y: auto;"
+                      style="width: 100%; max-height: 200px; overflow-y: auto"
                     >
                       <li
                         class="dropdown-item"
@@ -101,7 +105,7 @@
                 </div>
 
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Clinical Status</label>
+                  <label class="form-label required">Clinical Status</label>
                   <select class="form-select" formControlName="clinicalStatus">
                     <option value="">Select</option>
                     <option value="active">Active</option>
@@ -111,8 +115,11 @@
                 </div>
 
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Verification Status</label>
-                  <select class="form-select" formControlName="verificationStatus">
+                  <label class="form-label required">Verification Status</label>
+                  <select
+                    class="form-select"
+                    formControlName="verificationStatus"
+                  >
                     <option value="">Select</option>
                     <option value="unconfirmed">Unconfirmed</option>
                     <option value="presumed">Presumed</option>
@@ -123,7 +130,7 @@
                 </div>
 
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Allergy Type</label>
+                  <label class="form-label required">Allergy Type</label>
                   <select class="form-select" formControlName="allergyType">
                     <option value="">Select</option>
                     <option value="allergy">Allergy</option>
@@ -132,7 +139,7 @@
                 </div>
 
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Category</label>
+                  <label class="form-label required">Category</label>
                   <select class="form-select" formControlName="category">
                     <option value="">Select</option>
                     <option value="food">Food</option>
@@ -143,7 +150,7 @@
                 </div>
 
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Criticality</label>
+                  <label class="form-label required">Criticality</label>
                   <select class="form-select" formControlName="criticality">
                     <option value="">Select</option>
                     <option value="low">Low</option>
@@ -153,8 +160,14 @@
                 </div>
 
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Onset Date</label>
-                  <input type="date" class="form-control" formControlName="onsetDate" />
+                  <label class="form-label required"
+                    >Onset Date(When the allergy started)</label
+                  >
+                  <input
+                    type="date"
+                    class="form-control"
+                    formControlName="onsetDate"
+                  />
                 </div>
               </div>
 
@@ -172,24 +185,45 @@
           </div>
 
           <div class="d-flex justify-content-between mt-4">
-            <button type="button" class="btn btn-secondary" (click)="previousStep()">Previous</button>
-            <button type="submit" class="btn btn-success" [disabled]="allergyForm.invalid">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              (click)="previousStep()"
+            >
+              Previous
+            </button>
+            <button
+              type="submit"
+              class="btn btn-success"
+              [disabled]="allergyForm.invalid"
+            >
               Submit
             </button>
           </div>
         </div>
 
         <!-- STEP 2: NO -->
-        <div *ngIf="currentStep === 2 && allergyForm.get('hasAllergy')?.value === 'no'">
+        <div
+          *ngIf="
+            currentStep === 2 && allergyForm.get('hasAllergy')?.value === 'no'
+          "
+        >
           <h5 class="text-center">No allergies reported.</h5>
 
           <div class="d-flex justify-content-between mt-4">
-            <button type="button" class="btn btn-secondary" (click)="previousStep()">Previous</button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              (click)="previousStep()"
+            >
+              Previous
+            </button>
 
-            <button type="button" class="btn btn-success" (click)="onSubmit()">Submit</button>
+            <button type="button" class="btn btn-success" (click)="onSubmit()">
+              Submit
+            </button>
           </div>
         </div>
-
       </form>
     </div>
   </div>

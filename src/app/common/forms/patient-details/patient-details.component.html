@@ -6,43 +6,59 @@
         <div *ngIf="currentStep === 1">
           <div class="row">
             <div class="col-md-6 mb-3">
-              <label class="form-label text-primary fw-semibold"
+              <label class="form-label text-primary fw-semibold required"
                 >Birth Date</label
               >
-              <input
-                type="date"
-                class="form-control"
-                formControlName="birthDate"
-              />
+              <div class="input-group">
+                <input
+                  type="date"
+                  class="form-control"
+                  formControlName="birthDate"
+                  [appErrorTooltip]="patientForm.get('birthDate')"
+                  [max]="today"
+                />
+              </div>
             </div>
             <div class="col-md-6 mb-3">
-              <label class="form-label text-primary fw-semibold">Gender</label>
-              <select class="form-select" formControlName="gender">
-                <option value="">Select</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-              </select>
+              <label class="form-label text-primary fw-semibold required"
+                >Gender</label
+              >
+              <div class="input-group">
+                <select
+                  class="form-select"
+                  formControlName="gender"
+                  [appErrorTooltip]="patientForm.get('gender')"
+                >
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
             </div>
             <div class="col-md-6 mb-3">
-              <label class="form-label text-primary fw-semibold"
+              <label class="form-label text-primary fw-semibold required"
                 >Marital Status</label
               >
-              <select class="form-select" formControlName="maritalStatus">
-                <option value="">Select</option>
-                <option value="unmarried">Unmarried</option>
-                <option value="Married">Married</option>
-                <option value="Widowed">Widowed</option>
-                <option value="unknown">unknown</option>
-                <option value="NeverMarried">NeverMarried</option>
-                <option value="Annulled">Annulled</option>
-                <option value="Divorced">Divorced</option>
-                <option value="Interlocutory">Interlocutory</option>
-                <option value="LegallySeparated">LegallySeparated</option>
-                <option value="CommonLaw">CommonLaw</option>
-                <option value="Polygamous">Polygamous</option>
-                <option value="Domesticpartner">Domesticpartner</option>
-              </select>
+              <div class="input-group">
+                <select
+                  class="form-select"
+                  formControlName="maritalStatus"
+                  [appErrorTooltip]="patientForm.get('maritalStatus')"
+                >
+                  <option value="unmarried">Unmarried</option>
+                  <option value="Married">Married</option>
+                  <option value="Widowed">Widowed</option>
+                  <option value="unknown">unknown</option>
+                  <option value="NeverMarried">NeverMarried</option>
+                  <option value="Annulled">Annulled</option>
+                  <option value="Divorced">Divorced</option>
+                  <option value="Interlocutory">Interlocutory</option>
+                  <option value="LegallySeparated">LegallySeparated</option>
+                  <option value="CommonLaw">CommonLaw</option>
+                  <option value="Polygamous">Polygamous</option>
+                  <option value="Domesticpartner">Domesticpartner</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
@@ -66,62 +82,100 @@
             >
               <div class="row">
                 <div class="col-md-6 mb-3">
-                  <label>Address Use</label>
-                  <select class="form-select" formControlName="useCode">
-                    <option value="">Select</option>
-                    <option value="home">Home</option>
-                    <option value="work">Work</option>
-                    <option value="temp">Temp</option>
-                    <option value="old">Old</option>
-                    <option value="billing">Billing</option>
-                  </select>
+                  <label class="required">Address Use</label>
+                  <div class="input-group">
+                    <select
+                      class="form-select"
+                      formControlName="useCode"
+                      [appErrorTooltip]="address.get('useCode')"
+                    >
+                      <option value="home">Home</option>
+                      <option value="work">Work</option>
+                      <option value="temp">Temp</option>
+                      <option value="old">Old</option>
+                      <option value="billing">Billing</option>
+                    </select>
+                  </div>
                 </div>
                 <div class="col-md-6 mb-3">
-                  <label>Address Type</label>
-                  <select class="form-select" formControlName="addressType">
-                    <option value="">Select</option>
-                    <option value="postal">Postal</option>
-                    <option value="physical">Physical</option>
-                    <option value="both">Both</option>
-                  </select>
+                  <label class="required">Address Type</label>
+                  <div class="input-group">
+                    <select
+                      class="form-select"
+                      formControlName="addressType"
+                      [appErrorTooltip]="address.get('addressType')"
+                    >
+                      <option value="">Select</option>
+                      <option value="postal">Postal</option>
+                      <option value="physical">Physical</option>
+                      <option value="both">Both</option>
+                    </select>
+                  </div>
                 </div>
                 <div class="col-md-6 mb-3">
-                  <label>Address Text</label>
-                  <input class="form-control" formControlName="text" />
+                  <label class="required">Address Text</label>
+                  <div class="input-group">
+                    <input
+                      class="form-control"
+                      formControlName="text"
+                      [appErrorTooltip]="address.get('text')"
+                    />
+                  </div>
                 </div>
                 <div class="col-md-6 mb-3 position-relative">
-                  <label>City</label>
-                  <input
-                    class="form-control"
-                    formControlName="city"
-                    (input)="onCityInput(i)"
-                    (focus)="onCityInput(i)"
-                  />
-                  <ul
-                    *ngIf="cityDropdownIndex === i"
-                    class="list-group position-absolute w-100"
-                    style="z-index: 1000; max-height: 150px; overflow: auto"
-                  >
-                    <li
-                      *ngFor="let c of filteredCities"
-                      class="list-group-item list-group-item-action"
-                      (click)="selectCity(i, c)"
+                  <label class="required">City</label>
+                  <div class="input-group">
+                    <input
+                      class="form-control"
+                      formControlName="city"
+                      [appErrorTooltip]="address.get('city')"
+                      (input)="onCityInput(i)"
+                      (focus)="onCityInput(i)"
+                    />
+                    <ul
+                      *ngIf="cityDropdownIndex === i"
+                      class="list-group position-absolute w-100"
+                      style="z-index: 1000; max-height: 150px; overflow: auto"
                     >
-                      {{ c.city }}
-                    </li>
-                  </ul>
+                      <li
+                        *ngFor="let c of filteredCities"
+                        class="list-group-item list-group-item-action"
+                        (click)="selectCity(i, c)"
+                      >
+                        {{ c.city }}
+                      </li>
+                    </ul>
+                  </div>
                 </div>
                 <div class="col-md-6 mb-3">
-                  <label>State</label>
-                  <input class="form-control" formControlName="state" />
+                  <label class="required">State</label>
+                  <div class="input-group">
+                    <input
+                      class="form-control"
+                      formControlName="state"
+                      [appErrorTooltip]="address.get('state')"
+                    />
+                  </div>
                 </div>
                 <div class="col-md-6 mb-3">
-                  <label>Postal Code</label>
-                  <input class="form-control" formControlName="postalCode" />
+                  <label class="required">Postal Code</label>
+                  <div class="input-group">
+                    <input
+                      class="form-control"
+                      formControlName="postalCode"
+                      [appErrorTooltip]="address.get('postalCode')"
+                    />
+                  </div>
                 </div>
                 <div class="col-md-6 mb-3">
-                  <label>Country</label>
-                  <input class="form-control" formControlName="country" />
+                  <label class="required">Country</label>
+                  <div class="input-group">
+                    <input
+                      class="form-control"
+                      formControlName="country"
+                      [appErrorTooltip]="address.get('country')"
+                    />
+                  </div>
                 </div>
               </div>
               <button
@@ -155,19 +209,33 @@
             >
               <div class="row">
                 <div class="col-md-6 mb-3">
-                  <label class="form-label fw-semibold">Contact Use</label>
-                  <select class="form-select" formControlName="useCode">
-                    <option value="">Select</option>
-                    <option value="home">Home</option>
-                    <option value="work">Work</option>
-                    <option value="temp">Temp</option>
-                    <option value="old">Old</option>
-                    <option value="mobile">Mobile</option>
-                  </select>
+                  <label class="form-label fw-semibold required"
+                    >Contact Use</label
+                  >
+                  <div class="input-group">
+                    <select
+                      class="form-select"
+                      formControlName="useCode"
+                      [appErrorTooltip]="telecom.get('useCode')"
+                    >
+                      <option value="home">Home</option>
+                      <option value="work">Work</option>
+                      <option value="temp">Temp</option>
+                      <option value="old">Old</option>
+                      <option value="mobile">Mobile</option>
+                    </select>
+                  </div>
                 </div>
                 <div class="col-md-6 mb-3">
-                  <label class="form-label fw-semibold">Value</label>
-                  <input class="form-control" formControlName="value" />
+                  <label class="form-label fw-semibold required">Value</label>
+                  <div class="input-group">
+                    <input
+                      class="form-control"
+                      formControlName="value"
+                      placeholder="eg 9876543219"
+                      [appErrorTooltip]="telecom.get('value')"
+                    />
+                  </div>
                 </div>
               </div>
               <div class="text-end">

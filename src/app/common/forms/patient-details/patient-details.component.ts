@@ -1,8 +1,15 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  FormArray,
+  AbstractControl,
+} from '@angular/forms';
 import cities from '../../../../assets/data/india-locations.json';
 import { AuthService } from 'src/app/core/Services/auth-service.service';
 import { PatientProfileService } from 'src/app/core/Services/PatientServices/patient-profile.service';
+import { ToastService } from 'src/app/core/Services/toast.service';
 
 @Component({
   selector: 'app-patient-details',
@@ -17,14 +24,16 @@ export class PatientDetailsComponent {
   allCities: any[] = cities;
   filteredCities: any[] = [];
   cityDropdownIndex: number | null = null;
+  today = new Date().toISOString().split('T')[0];
 
   constructor(
     private fb: FormBuilder,
     private auth: AuthService,
-    private profileService: PatientProfileService
+    private profileService: PatientProfileService,
+    private toaster: ToastService
   ) {
     this.patientForm = this.fb.group({
-      birthDate: ['', Validators.required],
+      birthDate: ['', [Validators.required, this.futureDateValidator]],
       gender: ['', Validators.required],
       maritalStatus: ['', Validators.required],
       addresses: this.fb.array([this.createAddressGroup()]),
@@ -41,7 +50,7 @@ export class PatientDetailsComponent {
       line2: [''],
       city: ['', Validators.required],
       state: ['', Validators.required],
-      postalCode: ['', Validators.required],
+      postalCode: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]],
       country: ['', Validators.required],
     });
   }
@@ -50,8 +59,31 @@ export class PatientDetailsComponent {
     return this.fb.group({
       system: ['Phone', Validators.required],
       useCode: ['', Validators.required],
-      value: ['', Validators.required],
+      value: ['', [Validators.required, this.phoneValidator]],
     });
+  }
+
+  futureDateValidator(control: AbstractControl) {
+    if (!control.value) return null;
+
+    const selected = new Date(control.value);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return selected > today ? { futureDate: true } : null;
+  }
+
+  phoneValidator(control: any) {
+    const value = control.value;
+    if (!value) return null;
+    if (!/^[0-9]{10}$/.test(value)) {
+      return { invalidPhone: true };
+    }
+    if (/^(\d)\1{9}$/.test(value)) {
+      return { sameDigit: true };
+    }
+
+    return null;
   }
 
   get addresses(): FormArray {
@@ -104,7 +136,22 @@ export class PatientDetailsComponent {
   }
 
   nextStep() {
-    if (this.currentStep < this.maxStep) this.currentStep++;
+    if (
+      this.currentStep === 1 &&
+      (this.patientForm.get('birthDate')?.invalid ||
+        this.patientForm.get('gender')?.invalid ||
+        this.patientForm.get('maritalStatus')?.invalid)
+    ) {
+      this.patientForm.markAllAsTouched();
+      return;
+    }
+
+    if (this.currentStep === 2 && this.addresses.invalid) {
+      this.addresses.markAllAsTouched();
+      return;
+    }
+
+    this.currentStep++;
   }
 
   previousStep() {
@@ -126,12 +173,12 @@ export class PatientDetailsComponent {
     this.profileService.saveProfile(patientId, payload).subscribe({
       next: (res) => {
         console.log('Saved successfully:', res);
-        alert('Patient profile updated');
+        this.toaster.show('Profile saved successfully!', 'success');
         this.detailsSubmitted.emit();
       },
       error: (err) => {
         console.error(err);
-        alert('Failed to update profile');
+        this.toaster.show('Profile is not saved , Error Occured!', 'error');
       },
     });
   }

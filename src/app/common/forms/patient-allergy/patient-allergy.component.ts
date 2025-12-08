@@ -5,6 +5,7 @@ import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { debounceTime, switchMap, Observable, forkJoin, of } from 'rxjs';
 import { PatientAllergyService } from 'src/app/core/Services/PatientServices/patient-allergy.service';
 import { AuthService } from 'src/app/core/Services/auth-service.service';
+import { ToastService } from 'src/app/core/Services/toast.service';
 
 @Component({
   selector: 'app-patient-allergy',
@@ -23,7 +24,8 @@ export class PatientAllergyComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private allergyService: PatientAllergyService,
-    private auth: AuthService
+    private auth: AuthService,
+    private toaster: ToastService
   ) {
     this.allergyForm = this.fb.group({
       hasAllergy: ['', Validators.required],
@@ -162,10 +164,13 @@ export class PatientAllergyComponent implements OnInit {
     });
 
     forkJoin(calls).subscribe({
-      next: () => this.allergySubmitted.emit(),
+      next: () => {
+        this.toaster.show('Allergy saved successfully!', 'success');
+        this.allergySubmitted.emit();
+      },
       error: (err) => {
         console.error('Failed to save allergy:', err);
-        alert('Error saving allergy. Check console.');
+        this.toaster.show('Something went wrong. Try again.', 'error');
       },
     });
   }
