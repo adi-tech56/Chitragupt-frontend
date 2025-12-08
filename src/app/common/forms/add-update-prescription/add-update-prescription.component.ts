@@ -1,111 +1,252 @@
-import { Location } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { debounceTime, of, Subscription, switchMap, timer } from 'rxjs';
-import { Amount, Medicine, Routes, SuperPrescriptionData } from 'src/app/core/Models/Medication';
+import { ActivatedRoute, Route } from '@angular/router';
+import { debounceTime, of, Subscription, switchMap } from 'rxjs';
+import { Amount, Medicine, PrescriptionResponse, SuperPrescriptionData } from 'src/app/core/Models/Medication';
 import { AutoCompleteService } from 'src/app/core/Services/PrescriptionServices/auto-complete.service';
 import { DailyMedicationService } from 'src/app/core/Services/PrescriptionServices/daily-medication.service';
 import { MedicationService } from 'src/app/core/Services/PrescriptionServices/medication-service';
-// Checks if the value is a valid date
-function dateValidator(control: AbstractControl) {
-  const value = control.value;
-  if (!value) return null; // required is handled separately
-  const date = new Date(value);
-  return isNaN(date.getTime()) ? { invalidDate: true } : null;
-}
-
-function dateRangeValidator(minDate: Date, maxDate: Date) {
-  return (control: AbstractControl) => {
-    const value = control.value;
-    if (!value) return null; // required is handled separately
-
-    const date = new Date(value);
-
-    if (isNaN(date.getTime())) {
-      return { invalidDate: true }; // not a valid date
-    }
-
-    if (date < minDate) {
-      return { minDateExceeded: true }; // date is before allowed min
-    }
-
-    if (date > maxDate) {
-      return { maxDateExceeded: true }; // date is after allowed max
-    }
-
-    return null; // valid
-  };
-}
-
-
+import { Location } from '@angular/common';
+import { Routes } from 'src/app/core/Models/Medication';
+export type PrescriptionMode = 'add' | 'update';
 
 @Component({
-  selector: 'app-add-medication',
-  templateUrl: './add-medication.component.html',
-  styleUrls: ['./add-medication.component.css']
+  selector: 'app-add-update-prescription',
+  templateUrl: './add-update-prescription.component.html',
+  styleUrls: ['./add-update-prescription.component.css']
 })
-export class AddMedicationComponent implements OnInit, OnDestroy {
+export class AddUpdatePrescriptionComponent implements OnInit, OnDestroy {
+
+  mode: PrescriptionMode = 'add';
+  prescriptionId: string | null = null;
+  receivedData: any | null = null;
 
   superPrescription: FormGroup;
   currentStep = 0;
   timingDescriptions: string[][] = [];
+
+  // for autocomplete
   conditions: any[] = [];
-  medicines: Medicine[] = [];
+  medicines: any[] = [];
   whenCode: any[] = [];
   periodUnit: any[] = [];
   amountUnit: any[] = [];
   routeUnit: any[] = [];
+  openIndex: number | null = null;
 
+  // Toggle function for existing accordions
+  toggleAccordion(index: number) {
+    this.openIndex = this.openIndex === index ? null : index;
+  }
   private skipConditionFetch = false;
   private skipMedicineFetch = false;
   private skipAmountCodeFetch = false;
   private skipRouteCodeFetch = false;
-
+  // for unsubscribing
   private reasonSubscriptions: Subscription[] = [];
   private medicineSubscriptions: Subscription[] = [];
   private amountSubscriptions: Subscription[] = [];
   private routeSubscriptions: Subscription[] = [];
+
+
 
   constructor(
     private fb: FormBuilder,
     private medicationService: MedicationService,
     private http: HttpClient,
     private autoComplete: AutoCompleteService,
+    private route: ActivatedRoute,
     private location: Location,
-    private dailyMeds :DailyMedicationService
+    private dailyMeds: DailyMedicationService
   ) {
     this.superPrescription = this.fb.group({
       doctorName: ['', Validators.required],
-      prescriptionDate: ['', [  
-      Validators.required,
-      dateValidator,
-      dateRangeValidator(new Date('1700-01-01'), new Date('2040-12-31'))
-    ]],
+      prescriptionDate: ['', Validators.required],
       notes: [''],
-      prescription: this.fb.array([this.createPrescriptionGroup()])
+      prescription: this.fb.array([])
     });
   }
-  goBack() {
-    this.location.back();
-  }
-  ngOnInit(): void {
-    this.http.get<any[]>('assets/when-code.json').subscribe(data => this.whenCode = data);
-    this.http.get<any[]>('assets/period-unit.json').subscribe(data => this.periodUnit = data);
 
-    this.subscribeReasonValueChanges(0);
-    this.subscribeMedicineValueChanges(0);
-    this.subscribeRouteValueChanges(0);
-    this.subscribeAmountValueChanges(0);
-    this.prescriptions.controls.forEach((_, presIndex) => {
-      this.initTimingDescriptions(presIndex);
+  ngOnInit(): void {
+
+    // load static json
+    this.http.get<any[]>('assets/when-code.json').subscribe(d => this.whenCode = d);
+    this.http.get<any[]>('assets/period-unit.json').subscribe(d => this.periodUnit = d);
+
+    // detect mode from URL
+    this.route.url.subscribe(url => {
+      if (url.some(seg => seg.path === 'update')) {
+        this.mode = 'update';
+      } else {
+        this.mode = 'add';
+      }
     });
+
+    // detect ID for update mode
+    this.route.paramMap.subscribe(params => {
+      this.prescriptionId = params.get('id');
+
+      if (this.mode === 'update' && this.prescriptionId) {
+        this.loadPrescription(this.prescriptionId);
+      } else {
+        this.initializeAddMode();
+      }
+    });
+
+
   }
 
   ngOnDestroy(): void {
     this.reasonSubscriptions.forEach(s => s.unsubscribe());
     this.medicineSubscriptions.forEach(s => s.unsubscribe());
+    this.amountSubscriptions.forEach(s => s.unsubscribe());
+    this.routeSubscriptions.forEach(s => s.unsubscribe());
   }
+
+
+  initializeAddMode() {
+    this.addNewPrescription();
+    this.initAutocompleteForStep(0);
+    this.initTimingDescriptions(0);
+  }
+
+  loadPrescription(id: string) {
+    this.medicationService.getMedicationById(id).subscribe({
+      next: data => {
+        this.receivedData = data;
+        console.log(this.receivedData)
+        this.patchFormWithReceivedData();
+      },
+      error: err => console.error(err)
+    });
+  }
+
+  patchFormWithReceivedData() {
+    const data = this.receivedData;
+
+    this.superPrescription.patchValue({
+      doctorName: data.doctorName,
+      prescriptionDate: data.prescriptionDate,
+      notes: data.notes
+    });
+
+    // reset prescription array
+    this.prescriptions.clear();
+
+    data.prescriptions.forEach((pres: any) => {
+      const group = this.createPrescriptionGroup();
+      group.patchValue({
+        reason: pres.conditionName,
+        notes: pres.notes
+      });
+
+      const medsArray = group.get('medications') as FormArray;
+      medsArray.clear();
+
+      pres.medications.forEach((med: any) => {
+        const medGroup = this.createMedicationGroup(true);
+        medGroup.patchValue({
+          medicationId: med.medicationId,
+          medicationName: med.medication,
+          effectiveStartDate: med.effectiveStartDate,
+          effectiveEndDate: med.effectiveEndDate,
+          status: med.status,
+          dosage: {
+            amount: med.dosage.amount,
+            amountUnitId: med.dosage.amountUnitId,
+            amountUnitName: med.dosage.amountUnit,
+            routeId: med.dosage.routeId,
+            routeName: med.dosage.route,
+            instruction: med.dosage.instruction
+          },
+          timing: {
+            frequency: med.timing.frequency,
+            period: med.timing.period,
+            periodUnit: med.timing.periodUnit,
+            timeOfDay: med.timing.timeOfDay,
+            whenCode: med.timing.whenCode
+          }
+        });
+        medsArray.push(medGroup);
+      });
+
+      this.prescriptions.push(group);
+    });
+
+    this.currentStep = 0;
+    this.initAutocompleteForStep(0);
+    this.initTimingDescriptions(0);
+  }
+
+  // ============= FORM GETTERS =================
+
+  get prescriptions() {
+    return this.superPrescription.get('prescription') as FormArray;
+  }
+
+  createPrescriptionGroup(): FormGroup {
+    return this.fb.group({
+      reason: ['', Validators.required],
+      notes: [''],
+      medications: this.fb.array([this.createMedicationGroup()])
+    });
+  }
+
+  createMedicationGroup(isExisting: boolean = false): FormGroup {
+    return this.fb.group({
+      medicationId: [null, Validators.required],
+      medicationName: [''],
+      effectiveStartDate: ['', Validators.required],
+      effectiveEndDate: ['', Validators.required],
+      status: ['ACTIVE', Validators.required],
+      isExisting: [isExisting],
+      dosage: this.fb.group({
+        amount: [null, Validators.required],
+        amountUnitName: [''],
+        amountUnitId: [null, Validators.required],
+        routeName: [''],
+        routeId: [null, Validators.required],
+        instruction: ['']
+      }),
+      timing: this.fb.group({
+        frequency: [null, Validators.required],
+        period: [null, Validators.required],
+        periodUnit: ['', Validators.required],
+        timeOfDay: [''],
+        whenCode: ['']
+      })
+    });
+  }
+
+  initAutocompleteForStep(step: number) {
+    this.subscribeReasonValueChanges(step);
+    this.subscribeMedicineValueChanges(step);
+    this.subscribeAmountValueChanges(step);
+    this.subscribeRouteValueChanges(step);
+  }
+
+  // ============ TIMING DESCRIPTION ===============
+
+  initTimingDescriptions(presIndex: number) {
+    const medsArray = this.getMedications(presIndex);
+    if (!this.timingDescriptions[presIndex]) {
+      this.timingDescriptions[presIndex] = [];
+    }
+
+    medsArray.controls.forEach((medGroup, medIndex) => {
+      const timingGroup = (medGroup as FormGroup).get('timing') as FormGroup;
+
+      // Initialize description
+      this.timingDescriptions[presIndex][medIndex] = this.generateTimingDescription(timingGroup);
+
+      // Subscribe to changes
+      timingGroup.valueChanges.subscribe(() => {
+        this.timingDescriptions[presIndex][medIndex] = this.generateTimingDescription(timingGroup);
+      });
+    });
+  }
+
   generateTimingDescription(timingGroup: FormGroup): string {
     if (!timingGroup) return '';
 
@@ -129,90 +270,16 @@ export class AddMedicationComponent implements OnInit, OnDestroy {
 
     return desc;
   }
-  initTimingDescriptions(presIndex: number) {
-    const medsArray = this.getMedications(presIndex);
-    if (!this.timingDescriptions[presIndex]) {
-      this.timingDescriptions[presIndex] = [];
-    }
-
-    medsArray.controls.forEach((medGroup, medIndex) => {
-      const timingGroup = (medGroup as FormGroup).get('timing') as FormGroup;
-
-      // Initialize description
-      this.timingDescriptions[presIndex][medIndex] = this.generateTimingDescription(timingGroup);
-
-      // Subscribe to changes
-      timingGroup.valueChanges.subscribe(() => {
-        this.timingDescriptions[presIndex][medIndex] = this.generateTimingDescription(timingGroup);
-      });
-    });
-  }
 
 
-  // ---------------- Form Builders ----------------
-  createPrescriptionGroup(): FormGroup {
-    return this.fb.group({
-      reason: ['', Validators.required],
-      reasonValid: [false, Validators.requiredTrue],
-      notes: [''],
-      medications: this.fb.array([this.createMedicationGroup()])
-    });
-  }
-
-  createMedicationGroup(): FormGroup {
-    return this.fb.group({
-      medicationId: [null, Validators.required],
-      medicationName: [''],
-   effectiveStartDate: ['', [  
-      Validators.required,
-      dateValidator,
-      dateRangeValidator(new Date('1700-01-01'), new Date('2040-12-31'))
-    ]],
-    effectiveEndDate: ['', [
-      Validators.required,
-      dateValidator,
-      dateRangeValidator(new Date('1700-01-01'), new Date('2040-12-31'))
-    ]],
-      status: ['ACTIVE', Validators.required],
-      dosage: this.fb.group({
-        amount: [null, Validators.required],
-        amountUnitName: [''],
-        amountUnitId: [null, Validators.required],
-        routeName: [''],
-        routeId: [null, Validators.required],
-        instruction: ['']
-      }),
-      timing: this.fb.group({
-        frequency: [null, Validators.required],
-        period: [null, Validators.required],
-        periodUnit: ['', Validators.required],
-        timeOfDay: [''],
-        whenCode: ['']
-      })
-    });
-  }
-
-  // ---------------- Getters ----------------
-  get prescriptions(): FormArray {
-    return this.superPrescription.get('prescription') as FormArray;
-  }
+  //Getters
 
   getMedications(presIndex: number): FormArray {
     return this.prescriptions.at(presIndex).get('medications') as FormArray;
   }
-  getMedicationControl(stepIndex: number, medIndex: number, controlName: string): AbstractControl | null {
-    const medsArray = this.getMedications(stepIndex);
-    if (!medsArray) return null;
-    const medGroup = medsArray.at(medIndex) as FormGroup;
-    if (!medGroup) return null;
-    return medGroup.get(controlName);
-  }
-
-
   get currentPrescriptionGroup(): FormGroup {
     return this.prescriptions.at(this.currentStep) as FormGroup;
   }
-
   // ---------------- Navigation ----------------
   nextStep() {
     if (this.currentStep < this.prescriptions.length - 1) {
@@ -261,8 +328,7 @@ export class AddMedicationComponent implements OnInit, OnDestroy {
     this.getMedications(presIndex).removeAt(medIndex);
     this.subscribeMedicineValueChanges(presIndex);
   }
-
-
+  //ReasonValue
   subscribeReasonValueChanges(stepIndex: number) {
 
     this.reasonSubscriptions.forEach(s => s.unsubscribe());
@@ -296,8 +362,7 @@ export class AddMedicationComponent implements OnInit, OnDestroy {
     this.conditions = [];
     this.skipConditionFetch = true;
   }
-
-  /** MEDICINE AUTOCOMPLETE */
+  //Medicine
   subscribeMedicineValueChanges(stepIndex: number) {
     this.medicineSubscriptions.forEach(s => s.unsubscribe());
     this.medicineSubscriptions = [];
@@ -361,8 +426,13 @@ export class AddMedicationComponent implements OnInit, OnDestroy {
     return medGroup.get('medicationName')?.value || '';
   }
 
-
-
+  getMedicationControl(stepIndex: number, medIndex: number, controlName: string): AbstractControl | null {
+    const medsArray = this.getMedications(stepIndex);
+    if (!medsArray) return null;
+    const medGroup = medsArray.at(medIndex) as FormGroup;
+    if (!medGroup) return null;
+    return medGroup.get(controlName);
+  }
   // ---------------- AMOUNT AUTOCOMPLETE ----------------
   subscribeAmountValueChanges(stepIndex: number) {
     this.amountSubscriptions.forEach(s => s.unsubscribe());
@@ -535,110 +605,112 @@ export class AddMedicationComponent implements OnInit, OnDestroy {
 
     return dosageGroup.get('routeName')?.value || '';
   }
-
-  // subscribeRouteValueChanges(stepIndex: number) {
-  //   this.routeSubscriptions.forEach(s => s.unsubscribe());
-  //   this.routeSubscriptions = [];
-
-  //   const medsArray = this.getMedications(stepIndex);
-
-  //   medsArray.controls.forEach(medGroup => {
-  //     const control = medGroup.get('dosage.routeName');
-  //     if (!control) return;
-
-  //     const sub = control.valueChanges.pipe(
-  //       debounceTime(200),
-  //       switchMap(term => {
-  //         if (!term || term.length < 2 || this.skipRouteCodeFetch) {
-  //           this.skipRouteCodeFetch = false;
-  //           return of([]);
-  //         }
-  //         return this.autoComplete.routeSearch(term);
-  //       })
-  //     ).subscribe(data => this.routeUnit = data);
-
-  //     this.routeSubscriptions.push(sub);
-  //   });
-  // }
-  // onRouteInput(event: Event, stepIndex: number, medIndex: number) {
-  //   const value = (event.target as HTMLInputElement).value;
-  //   const medGroup = this.getMedications(stepIndex).at(medIndex) as FormGroup;
-  //   const dosageGroup = medGroup.get('dosage') as FormGroup;
-
-  //   if (value && value.length > 1) {
-  //     this.autoComplete.routeSearch(value).subscribe(data => this.routeUnit = data);
-  //   } else {
-  //     this.routeUnit = [];
-  //     dosageGroup.get('routeId')?.setValue(null);
-  //     dosageGroup.get('routeName')?.setValue('');
-  //   }
-  // }
-
-  // selectRoute(route: Route, stepIndex: number, medIndex: number) {
-  //   const medGroup = this.getMedications(stepIndex).at(medIndex) as FormGroup;
-  //   const dosageGroup = medGroup.get('dosage') as FormGroup;
-
-  //   dosageGroup.get('routeId')?.setValue(route.conceptId);
-  //   dosageGroup.get('routeName')?.setValue(route.conceptName);
-
-  //   this.routeUnit = [];
-  //   this.skipRouteCodeFetch = true;
-  // }
-
-
-  // currentRouteName(stepIndex: number, medIndex: number): string {
-  //   const medGroup = this.getMedications(stepIndex).at(medIndex) as FormGroup;
-  //   const dosageGroup = medGroup.get('dosage') as FormGroup;
-
-  //   return dosageGroup.get('routeName')?.value || '';
-  // }
+  // ============= SUBMIT ===================
 
   submit() {
     if (this.superPrescription.invalid) {
       this.superPrescription.markAllAsTouched();
-
-      alert("Please fill all required fields.");
+      alert('Please fill all required fields.');
       return;
     }
-
+   function formatTimeToBackend(time: string | null): string | null {
+      if (!time) return null;
+      const t = new Date(`1970-01-01T${time}`);
+      const hh = ('0' + t.getHours()).slice(-2);
+      const mm = ('0' + t.getMinutes()).slice(-2);
+      const ss = ('0' + t.getSeconds()).slice(-2);
+      return `${hh}:${mm}:${ss}`;
+    }
     const raw = this.superPrescription.value;
 
-    const payload: SuperPrescriptionData = {
+    if (this.mode === 'add') {
+      const payload: SuperPrescriptionData = {
+        doctorName: raw.doctorName,
+        prescriptionDate: raw.prescriptionDate,
+        notes: raw.notes,
+
+        prescriptions: raw.prescription.map((pres: any) => ({
+          conditionName: pres.reason,
+
+          notes: pres.notes,
+
+          medications: pres.medications.map((med: any) => ({
+            medicationId: med.medicationId,
+            status: med.status,
+            effectiveStartDate: med.effectiveStartDate,
+            effectiveEndDate: med.effectiveEndDate,
+            dosage: {
+              amount: med.dosage.amount,
+              amountUnitId: med.dosage.amountUnitId,
+              routeId: med.dosage.routeId,
+
+              instruction: med.dosage.instruction
+            },
+
+            timing: {
+              frequency: med.timing.frequency,
+              period: med.timing.period,
+              periodUnit: med.timing.periodUnit,
+              timeOfDay:formatTimeToBackend(med.timing.timeOfDay),
+              whenCode: med.timing.whenCode
+            }
+          }))
+        }))
+      };
+
+
+      this.medicationService.savePrescription(payload).subscribe({
+        next: res => {
+          console.log("Saved!", res);
+          this.goBack();
+          this.dailyMeds.refreshMeds();
+        },
+        error: err => console.error("Save failed", err)
+      });
+    }
+
+    if (this.mode === 'update' && this.prescriptionId) {
+
+    const payload: PrescriptionResponse = {
+      ...this.receivedData, // include all original top-level fields
       doctorName: raw.doctorName,
       prescriptionDate: raw.prescriptionDate,
       notes: raw.notes,
 
-      prescriptions: raw.prescription.map((pres: any) => ({
+      prescriptions: raw.prescription.map((pres: any, presIndex: number) => ({
+        ...this.receivedData.prescriptions?.[presIndex], // preserve any original fields
         conditionName: pres.reason,
-
         notes: pres.notes,
 
-        medications: pres.medications.map((med: any) => ({
+        medications: pres.medications.map((med: any, medIndex: number) => ({
+          ...this.receivedData.prescriptions?.[presIndex]?.medications?.[medIndex], // preserve original medication fields
           medicationId: med.medicationId,
+          medication: med.medicationName,
           status: med.status,
-          effectiveStartDate: med.effectiveStartDate,
+          effectiveStartDate: med.effectiveStartDate, // consider formatting to YYYY-MM-DD if using <input type="date">
           effectiveEndDate: med.effectiveEndDate,
           dosage: {
+            ...this.receivedData.prescriptions?.[presIndex]?.medications?.[medIndex].dosage, // overwrite with form values
             amount: med.dosage.amount,
             amountUnitId: med.dosage.amountUnitId,
+            amountUnit: med.dosage.amountUnitName,
+            instruction: med.dosage.instruction,
             routeId: med.dosage.routeId,
-
-            instruction: med.dosage.instruction
+            route: med.dosage.routeName
           },
-
           timing: {
+            ...this.receivedData.prescriptions?.[presIndex]?.medications?.[medIndex].timing, // overwrite with form values
             frequency: med.timing.frequency,
             period: med.timing.period,
             periodUnit: med.timing.periodUnit,
-            timeOfDay: med.timing.timeOfDay,
+            timeOfDay: formatTimeToBackend(med.timing.timeOfDay),
             whenCode: med.timing.whenCode
           }
         }))
       }))
     };
 
-
-    this.medicationService.savePrescription(payload).subscribe({
+    this.medicationService.updatePrescriptions(this.receivedData.superPrescriptionId, payload).subscribe({
       next: res => {
         console.log("Saved!", res);
         this.goBack();
@@ -646,6 +718,10 @@ export class AddMedicationComponent implements OnInit, OnDestroy {
       },
       error: err => console.error("Save failed", err)
     });
+    }
+  }
+
+  goBack() {
+    this.location.back();
   }
 }
-

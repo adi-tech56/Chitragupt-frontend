@@ -26,13 +26,16 @@ export class ViewPrescriptionComponent implements OnInit {
   goBack() {
     this.location.back();
   }
-  goToUpdatePage(med: any) {
+  // goToUpdatePage(med: any) {
+  //   // Store medication in sessionStorage
+  //   sessionStorage.setItem('medication', JSON.stringify(med));
+  // this.router.navigate(['/user/update-medication',med.superPrescriptionId]);
+  // }
+goToUpdatePage(med: any) {
     // Store medication in sessionStorage
     sessionStorage.setItem('medication', JSON.stringify(med));
-
-    this.router.navigate(['/user/update-medication']);
+  this.router.navigate(['/medication/update',med.superPrescriptionId]);
   }
-
   openIndex: number | null = null;
 
   toggleAccordion(index: number) {

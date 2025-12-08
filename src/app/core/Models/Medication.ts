@@ -2,7 +2,7 @@ export interface Medicine {
   medicationId: number;
   brandName: string;
 }
-export interface Route {
+export interface Routes {
   conceptId: number;
   conceptName: string;
 }

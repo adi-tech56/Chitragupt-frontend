@@ -19,6 +19,8 @@ import { UserLayoutModule } from './layout/user-layout/user-layout.module';
 
 import { AuthInterceptor } from './core/Interceptors/auth-interceptor';
 import { ToasterComponent } from './common/toaster/toaster.component';
+import { SharedModule } from './shared/shared.module';
+import { AddUpdatePrescriptionComponent } from './common/forms/add-update-prescription/add-update-prescription.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -29,6 +31,7 @@ import { ToasterComponent } from './common/toaster/toaster.component';
     ResetPasswordComponent,
     SendEmailComponent,
     ToasterComponent,
+    AddUpdatePrescriptionComponent,
   ],
   imports: [
     BrowserModule,
@@ -38,6 +41,7 @@ import { ToasterComponent } from './common/toaster/toaster.component';
     ReactiveFormsModule,
     HomeLayoutModule,
     UserLayoutModule,
+    SharedModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

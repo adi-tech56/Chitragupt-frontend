@@ -13,6 +13,7 @@
   width: 90%;
   max-width: 500px;
   max-height: 90vh;
+  overflow: auto;
   
 }
 @media (max-width: 768px) {

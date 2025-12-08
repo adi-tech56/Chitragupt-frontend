@@ -11,6 +11,7 @@ import { AllergyFormsComponent } from 'src/app/common/user/allergy-forms/allergy
 import { UpdatePrescriptionComponent } from 'src/app/common/forms/update-prescription/update-prescription.component';
 import { SharePrescriptionComponent } from 'src/app/common/share-prescription/share-prescription.component';
 import { ViewSharedPrescriptionComponent } from 'src/app/common/view-shared-prescription/view-shared-prescription.component';
+import { AddUpdatePrescriptionComponent } from 'src/app/common/forms/add-update-prescription/add-update-prescription.component';
 const routes: Routes = [
   {
     path: '',
@@ -32,7 +33,22 @@ const routes: Routes = [
         data: { roles: ['PATIENT'] },
       },
       {
-        path: 'update-medication',
+        path: 'medication',
+        canActivate: [AuthGuard, RoleGuard],
+        data: { roles: ['PATIENT'] },
+        children: [
+          {
+            path: 'add',
+            component: AddUpdatePrescriptionComponent
+          },
+          {
+            path: 'update/:id',
+            component: AddUpdatePrescriptionComponent
+          }
+        ]
+      },
+      {
+        path: 'update-medication/:id',
         component: UpdatePrescriptionComponent,
         canActivate: [AuthGuard, RoleGuard],
         data: { roles: ['PATIENT'] },
@@ -69,4 +85,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class UserLayoutRoutingModule {}
+export class UserLayoutRoutingModule { }

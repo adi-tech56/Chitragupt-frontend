@@ -32,13 +32,9 @@ clearState() {
 loadMeds() {
   if (this.loadSub) this.loadSub.unsubscribe();
 
-  // Timer emits immediately (0) and then every 10 minutes (600000 ms)
-  this.loadSub = timer(0, 10 * 60 * 1000)
-    .pipe(
-      switchMap(() => this.medicationService.getMedications())
-    )
+  this.loadSub = this.medicationService.getMedications()
     .subscribe((doses: MedicationWithStatus[]) => {
-      // Convert doseTime strings to Date
+      
       doses.forEach(d => {
         if (d.doseTime) d.doseTime = new Date(d.doseTime);
         if (d.logCreatedAt) d.logCreatedAt = new Date(d.logCreatedAt);
@@ -49,6 +45,10 @@ loadMeds() {
 
       this.todaysMedsSubject.next(doses);
     });
+}
+
+refreshMeds() {
+  this.loadMeds();
 }
 
   //reminder for medicines check
@@ -132,6 +132,7 @@ loadMeds() {
         med.logCreatedAt = new Date(log.doseTime ?? log.createdAt);
         this.updateState();
       });
+      this.refreshMeds();
   }
 
   // ----------------------------------------------
@@ -167,6 +168,8 @@ loadMeds() {
         }
       });
     });
+
+    this.refreshMeds();
   }
 
   private updateState() {

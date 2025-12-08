@@ -19,7 +19,7 @@ export class MedicationService {
   private reminderUrl =
     'http://localhost:8089/patient/medication/send-reminder';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   sendReminder(reminderData: any): Observable<any> {
     console.log(reminderData);
@@ -39,14 +39,19 @@ export class MedicationService {
       `${this.baseUrl}/prescription`
     );
   }
+  getMedicationById(id: string): Observable<PrescriptionResponse> {
+    return this.http.get<PrescriptionResponse>(`${this.baseUrl}/prescription/${id}`);
+  }
+
+
   getMedications(): Observable<MedicationWithStatus[]> {
     return this.http
       .get<MedicationWithStatus[]>(`${this.baseUrl}/daily-meds`);
-     
+
   }
   updatePrescriptions(
     superPrescriptionId: number,
-    prescription:PrescriptionResponse
+    prescription: PrescriptionResponse
   ): Observable<{ message: string }> {
 
     return this.http.put<{ message: string }>(
