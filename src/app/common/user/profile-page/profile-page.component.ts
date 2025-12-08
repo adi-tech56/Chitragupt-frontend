@@ -4,13 +4,11 @@ import { PatientContactService } from 'src/app/core/Services/PatientServices/pat
 import { PatientAllergyService } from 'src/app/core/Services/PatientServices/patient-allergy.service';
 import { AuthService } from 'src/app/core/Services/auth-service.service';
 import { HttpClient } from '@angular/common/http';
-import { FormsModule } from '@angular/forms';
-import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { UserLayoutComponent } from 'src/app/layout/user-layout/user-layout.component';
 import { ExportPrescriptionService } from 'src/app/core/Services/PrescriptionServices/export-prescription.service';
+import { debounceTime } from 'rxjs/operators';
 
-declare var bootstrap: any; // bootstrap modal
+declare var bootstrap: any;
 
 @Component({
   selector: 'app-profile-page',
@@ -40,6 +38,30 @@ export class ProfilePageComponent implements OnInit {
   };
   telecomForm: any = { id: null, system: '', value: '' };
 
+  // location/autocomplete datasets (same as emergency contact)
+  cityData: Array<{
+    city: string;
+    state: string;
+    country: string;
+    postalCode: string;
+  }> = [];
+  countries: string[] = [];
+  statesList: string[] = [];
+  citiesList: string[] = [];
+
+  filteredCountries: string[] = [];
+  filteredStates: string[] = [];
+  filteredCities: string[] = [];
+  maritalTypes: string[] = [];
+
+  showCountry = false;
+  showState = false;
+  showCity = false;
+
+  telecomErrors: { system?: string | null; value?: string | null } = {};
+
+  private phoneRegex = /^(?!.*^(\d)\1{9}$)\d{10}$/;
+
   private profileBase = 'http://localhost:8089/patient/profile';
 
   constructor(
@@ -49,11 +71,39 @@ export class ProfilePageComponent implements OnInit {
     private auth: AuthService,
     private http: HttpClient,
     private router: Router,
-    private fhirService: ExportPrescriptionService,
+    private fhirService: ExportPrescriptionService
   ) {}
 
   ngOnInit(): void {
     this.loadAll();
+    // Load marital status list
+    this.http.get<any[]>('assets/data/relations-type.json').subscribe({
+      next: (list) => {
+        this.maritalTypes = (list || []).map((x) => x.display || x.code || x);
+      },
+      error: () => console.warn('Failed to load relations-type.json'),
+    });
+
+    this.http.get<any[]>('assets/data/india-locations.json').subscribe({
+      next: (list) => {
+        this.cityData = list || [];
+        this.citiesList = Array.from(
+          new Set(this.cityData.map((x) => x.city))
+        ).sort();
+        this.statesList = Array.from(
+          new Set(this.cityData.map((x) => x.state))
+        ).sort();
+        this.countries = Array.from(
+          new Set(this.cityData.map((x) => x.country))
+        ).sort();
+
+        // init filtered lists
+        this.filteredCities = this.citiesList.slice(0, 200);
+        this.filteredStates = this.statesList.slice(0, 200);
+        this.filteredCountries = this.countries.slice(0, 200);
+      },
+      error: (err) => console.warn('Failed to load india-locations.json', err),
+    });
   }
 
   loadAll() {
@@ -75,6 +125,27 @@ export class ProfilePageComponent implements OnInit {
         this.loading = false;
       },
     });
+  }
+  validateBasicField(field: string, value: any): string | null {
+    if (field === 'firstName') {
+      if (!value || value.trim().length === 0) return 'First Name is required.';
+      if (!/^[A-Za-z ]+$/.test(value)) return 'Only letters allowed.';
+    }
+
+    if (field === 'birthDate') {
+      if (!value) return 'Birth Date is required.';
+      const date = new Date(value);
+      if (isNaN(date.getTime())) return 'Invalid date.';
+      const today = new Date();
+      if (date > today) return 'Birth date cannot be in the future.';
+    }
+
+    if (field === 'maritalStatus') {
+      if (!value || value.trim().length === 0)
+        return 'Marital Status is required.';
+    }
+
+    return null;
   }
 
   setProfileData(profile: any) {
@@ -134,10 +205,10 @@ export class ProfilePageComponent implements OnInit {
     ].filter(Boolean);
     return parts.join(', ');
   }
-downloadSelected(): void {
-    this.fhirService.downloadPatientBundle()
-      .subscribe(blob => {
-        // Create a download link
+
+  downloadSelected(): void {
+    this.fhirService.downloadPatientBundle().subscribe(
+      (blob) => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -146,18 +217,30 @@ downloadSelected(): void {
         a.click();
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
-      }, error => {
+      },
+      (error) => {
         console.error('Download failed', error);
-      });
-}
-
-  // ============ BASIC INFO EDIT ============
+      }
+    );
+  }
 
   openEditBasicModal(field: string) {
     this.editingField = field;
     this.editingFieldLabel = this.prettyLabel(field);
+
+    // Pre-fill value
     this.editingValue = this.basicInfo[field] ?? '';
-    const modalEl = document.getElementById('editBasicModal')!;
+
+    // Special handling for marital status (dropdown)
+    if (field === 'maritalStatus') {
+      // ensure maritalType list is already loaded
+      if (!this.maritalTypes || this.maritalTypes.length === 0) {
+        console.warn('Marital status list is empty or not loaded.');
+      }
+    }
+
+    // Open bootstrap modal
+    const modalEl = document.getElementById('editBasicModal') as any;
     const modal = new bootstrap.Modal(modalEl);
     modal.show();
   }
@@ -175,6 +258,12 @@ downloadSelected(): void {
   }
 
   saveBasicField() {
+    const error = this.validateBasicField(this.editingField, this.editingValue);
+    if (error) {
+      alert(error);
+      return;
+    }
+
     const patientId = this.auth.getUserId();
     if (!patientId) {
       alert('User not identified');
@@ -184,12 +273,11 @@ downloadSelected(): void {
     const payload: any = {};
     payload[this.editingField] = this.editingValue;
 
-    // call profile save endpoint
     this.profileService.saveProfile(patientId, payload).subscribe({
-      next: (res: any) => {
-        // update local UI
+      next: () => {
         this.basicInfo[this.editingField] = this.editingValue;
-        // hide modal
+
+        // close modal
         (
           document.querySelector('#editBasicModal .btn-close') as HTMLElement
         )?.click();
@@ -202,7 +290,6 @@ downloadSelected(): void {
   }
 
   // ============ ADDRESS EDIT ============
-
   openEditAddressModal(address: any) {
     this.addressForm = {
       id: address.id ?? null,
@@ -212,9 +299,84 @@ downloadSelected(): void {
       postalCode: address.postalCode ?? '',
       country: address.country ?? '',
     };
+
+    // init filtered lists and hide dropdowns
+    this.filteredCities = this.citiesList.slice(0, 200);
+    this.filteredStates = this.statesList.slice(0, 200);
+    this.filteredCountries = this.countries.slice(0, 200);
+    this.showCity = false;
+    this.showState = false;
+    this.showCountry = false;
+
     const modalEl = document.getElementById('editAddressModal')!;
     const modal = new bootstrap.Modal(modalEl);
     modal.show();
+  }
+
+  onAddressInput(type: 'city' | 'state' | 'country') {
+    const v = (this.addressForm as any)[type] || '';
+    const q = v.toString().toLowerCase().trim();
+    if (type === 'city') {
+      this.filteredCities = !q
+        ? this.citiesList.slice(0, 200)
+        : this.citiesList
+            .filter((x) => x.toLowerCase().includes(q))
+            .slice(0, 200);
+    } else if (type === 'state') {
+      this.filteredStates = !q
+        ? this.statesList.slice(0, 200)
+        : this.statesList
+            .filter((x) => x.toLowerCase().includes(q))
+            .slice(0, 200);
+    } else {
+      this.filteredCountries = !q
+        ? this.countries.slice(0, 200)
+        : this.countries
+            .filter((x) => x.toLowerCase().includes(q))
+            .slice(0, 200);
+    }
+  }
+
+  selectAddressCity(city: string) {
+    this.addressForm.city = city;
+    const found = this.cityData.find(
+      (c) => c.city.toLowerCase() === city.toLowerCase()
+    );
+    if (found) {
+      this.addressForm.state = found.state;
+      this.addressForm.country = found.country;
+      this.addressForm.postalCode = found.postalCode;
+    }
+    this.showCity = false;
+  }
+
+  selectAddressState(state: string) {
+    this.addressForm.state = state;
+    this.showState = false;
+  }
+
+  selectAddressCountry(country: string) {
+    this.addressForm.country = country;
+    this.showCountry = false;
+  }
+
+  hideAddressDropdownLater(type: 'city' | 'state' | 'country') {
+    setTimeout(() => {
+      if (type === 'city') this.showCity = false;
+      if (type === 'state') this.showState = false;
+      if (type === 'country') this.showCountry = false;
+    }, 180);
+  }
+
+  isAddressInvalid(field: string) {
+    // simple required checks used in template
+    if (!this.addressForm) return false;
+    if (field === 'text') return !this.addressForm.text?.trim();
+    if (field === 'city') return !this.addressForm.city?.trim();
+    if (field === 'state') return !this.addressForm.state?.trim();
+    if (field === 'postalCode') return !this.addressForm.postalCode?.trim();
+    if (field === 'country') return !this.addressForm.country?.trim();
+    return false;
   }
 
   saveAddress() {
@@ -224,7 +386,18 @@ downloadSelected(): void {
       return;
     }
 
-    // Build address dto as backend expects (PatientAddressDto)
+    // validate
+    if (
+      this.isAddressInvalid('text') ||
+      this.isAddressInvalid('city') ||
+      this.isAddressInvalid('state') ||
+      this.isAddressInvalid('postalCode') ||
+      this.isAddressInvalid('country')
+    ) {
+      alert('Please fill required address fields.');
+      return;
+    }
+
     const dto: any = {
       addresses: [
         {
@@ -244,11 +417,9 @@ downloadSelected(): void {
           (a) => a.id === this.addressForm.id
         );
         const updated = { ...this.addressForm };
-        if (idx >= 0) {
+        if (idx >= 0)
           this.addresses[idx] = { ...this.addresses[idx], ...updated };
-        } else {
-          this.addresses.push(updated);
-        }
+        else this.addresses.push(updated);
         (
           document.querySelector('#editAddressModal .btn-close') as HTMLElement
         )?.click();
@@ -277,22 +448,52 @@ downloadSelected(): void {
   }
 
   // ============ TELECOM EDIT ============
-
   openEditTelecomModal(telecom: any) {
     this.telecomForm = {
       id: telecom.id ?? null,
       system: telecom.system ?? '',
       value: telecom.value ?? '',
     };
+    this.telecomErrors = {};
     const modalEl = document.getElementById('editTelecomModal')!;
     const modal = new bootstrap.Modal(modalEl);
     modal.show();
+  }
+
+  validateTelecom() {
+    this.telecomErrors = {};
+    if (!this.telecomForm.system) {
+      this.telecomErrors.system = 'System is required.';
+    }
+    if (!this.telecomForm.value || !this.telecomForm.value.toString().trim()) {
+      this.telecomErrors.value = 'Value is required.';
+      return;
+    }
+    // validate based on system
+    if (this.telecomForm.system === 'email') {
+      // basic email regex (sufficient for client-side)
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(this.telecomForm.value)) {
+        this.telecomErrors.value = 'Enter a valid email address.';
+      }
+    } else if (this.telecomForm.system === 'phone') {
+      if (!this.phoneRegex.test(this.telecomForm.value)) {
+        this.telecomErrors.value =
+          'Enter a valid 10-digit phone number (not all digits same).';
+      }
+    }
   }
 
   saveTelecom() {
     const patientId = this.auth.getUserId();
     if (!patientId) {
       alert('User not identified');
+      return;
+    }
+
+    this.validateTelecom();
+    if (this.telecomErrors.system || this.telecomErrors.value) {
+      alert('Please fix telecom errors.');
       return;
     }
 
@@ -312,11 +513,9 @@ downloadSelected(): void {
           (t) => t.id === this.telecomForm.id
         );
         const updated = { ...this.telecomForm };
-        if (idx >= 0) {
+        if (idx >= 0)
           this.telecoms[idx] = { ...this.telecoms[idx], ...updated };
-        } else {
-          this.telecoms.push(updated);
-        }
+        else this.telecoms.push(updated);
         (
           document.querySelector('#editTelecomModal .btn-close') as HTMLElement
         )?.click();
@@ -360,10 +559,10 @@ downloadSelected(): void {
       },
     });
   }
+
   addEmergencyContact() {
     this.router.navigate(['/user/emergencyContact']);
   }
-
   addAllergy() {
     this.router.navigate(['/user/allergyForm']);
   }
