@@ -287,7 +287,7 @@ export class ContactPageComponent implements OnInit, OnDestroy {
   getTelecomPlaceholder(index: number) {
     const sys = this.getTelecomSystem(index);
     if (sys === 'email') return 'user@example.com';
-    return '9876546758';
+    return 'eg : 9876546758';
   }
 
   /** address autocomplete setup (same as your previous implementation) **/
