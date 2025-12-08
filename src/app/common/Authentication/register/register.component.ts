@@ -2,6 +2,7 @@ import { Component, EventEmitter, inject, Output } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { UserRegisterDetails } from 'src/app/core/Models/Authentication';
 import { AuthService } from 'src/app/core/Services/auth-service.service';
+import { ToastService } from 'src/app/core/Services/toast.service';
 
 function valuesCheck(controlName1: string, controlName2: string) {
   return (control: AbstractControl) => {
@@ -24,7 +25,8 @@ export class RegisterComponent {
   @Output() signupSuccess = new EventEmitter<void>();
   @Output() cancelSignup = new EventEmitter<void>();
   private auth = inject(AuthService);
-
+  private toast = inject(ToastService);
+  isSubmitted = false;
   formSubmit = true;
   showPassword: boolean = false;
   showConfirmPassword: boolean = false;
@@ -83,9 +85,11 @@ export class RegisterComponent {
 
 
   onSignup() {
+    this.isSubmitted = true;
     if (this.form.invalid) {
       this.formSubmit = false;
-      console.log("Form invalid")
+       this.form.markAllAsTouched();
+       this.toast.show('Please fill all required fields.', 'error');
       return;
     }
     const { firstName, lastName, middleName, emailId, contactNo } = this.form.value;

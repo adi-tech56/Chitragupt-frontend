@@ -17,6 +17,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HomeLayoutModule } from './layout/home-layout/home-layout.module';
 import { UserLayoutModule } from './layout/user-layout/user-layout.module';
 
+
 import { AuthInterceptor } from './core/Interceptors/auth-interceptor';
 import { ToasterComponent } from './common/toaster/toaster.component';
 import { SharedModule } from './shared/shared.module';
@@ -41,11 +42,12 @@ import { AddUpdatePrescriptionComponent } from './common/forms/add-update-prescr
     ReactiveFormsModule,
     HomeLayoutModule,
     UserLayoutModule,
-    SharedModule
+    SharedModule,
+
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

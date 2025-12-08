@@ -10,7 +10,7 @@
           </label>
           <div class="input-group">
             <input type="text" class="form-control" id="first-name" formControlName="firstName"
-              [appErrorTooltip]="form.get('firstName')" [customMessages]="{
+              [appErrorTooltip]="form.get('firstName')" [submitted]="isSubmitted" [customMessages]="{
       required: 'First name is required.'
     }" />
           </div>
@@ -36,7 +36,7 @@
         </label>
         <div class="input-group">
           <input type="text" class="form-control" formControlName="contactNo" [appErrorTooltip]="form.get('contactNo')"
-            [customMessages]="{
+           [submitted]="isSubmitted"  [customMessages]="{
       required: 'Contact number is required.',
       minlength: 'Must be at least 10 digits.',
       maxlength: 'Cannot exceed 15 digits.',
@@ -58,6 +58,7 @@
     class="form-control"
     formControlName="emailId"
     [appErrorTooltip]="form.get('emailId')"
+    [submitted]="isSubmitted" 
     [customMessages]="{
       required: 'Email is required.',
       email: 'Please enter a valid email address.'
@@ -70,43 +71,74 @@
       </div>
     </div>
     <hr />
-    <div class="row mb-2" formGroupName="passwords">
-      <div class="col-md-6 ">
-        <label for="password" class="form-label text-primary fw-semibold">Password
-          <span *ngIf="isRequired('passwords.password')" class="text-danger">*</span>
-        </label>
-        <div class="position-relative">
-          <input id="password" [type]="showPassword ? 'text' : 'password'" class="form-control mb-1"
-            formControlName="password" name="password" required>
+   <div class="row mb-2" formGroupName="passwords">
+  <div class="col-md-6">
+    <label for="password" class="form-label text-primary fw-semibold">
+      Password
+      <span *ngIf="isRequired('passwords.password')" class="text-danger">*</span>
+    </label>
+    <div class="position-relative">
+      <input id="password"
+             [type]="showPassword ? 'text' : 'password'"
+             class="form-control mb-1"
+             formControlName="password"
+             name="password"
+             [ngClass]="{
+               'is-invalid': form.get('passwords.password')?.invalid &&
+                             (form.get('passwords.password')?.touched ||
+                              form.get('passwords.password')?.dirty ||
+                              isSubmitted)
+             }">
 
-          <i [ngClass]="showPassword ? 'fa fa-eye' : 'fa fa-eye-slash'" (click)="togglePasswordVisibility('password')"
-            class="password-toggle-icon"></i>
-        </div>
-
-      </div>
-
-      <div class="col-md-6 ">
-        <label for="confirm-password" class="form-label text-primary fw-semibold">Confirm Password
-          <span *ngIf="isRequired('passwords.confirmPassword')" class="text-danger">*</span>
-        </label>
-        <div class="position-relative">
-          <input id="confirm-password" class="form-control mb-1" [type]="showConfirmPassword ? 'text' : 'password'"
-            name="confirm-password" formControlName="confirmPassword" required />
-          <i [ngClass]="showConfirmPassword ? 'fa fa-eye' : 'fa fa-eye-slash'"
-            (click)="togglePasswordVisibility('confirm')" class="password-toggle-icon"></i>
-        </div>
-
-
-      </div>
-      <small class="text-danger"
-        *ngIf="form.get('passwords.password')?.touched && form.get('passwords.password')?.hasError('required')">
-        Password is required.
-      </small>
-      <small class="text-danger"
-        *ngIf="form.get('passwords.password')?.touched && form.get('passwords.password')?.hasError('minlength')">
-        Password must be at least 6 characters.
-      </small>
+      <i [ngClass]="showPassword ? 'fa fa-eye' : 'fa fa-eye-slash'"
+         (click)="togglePasswordVisibility('password')"
+         class="password-toggle-icon"></i>
     </div>
+
+    <!-- Error messages -->
+    <small class="text-danger"
+           *ngIf="form.get('passwords.password')?.touched &&
+                  form.get('passwords.password')?.hasError('required')">
+      Password is required.
+    </small>
+    <small class="text-danger"
+           *ngIf="form.get('passwords.password')?.touched &&
+                  form.get('passwords.password')?.hasError('minlength')">
+      Password must be at least 6 characters.
+    </small>
+  </div>
+
+  <div class="col-md-6">
+    <label for="confirm-password" class="form-label text-primary fw-semibold">
+      Confirm Password
+      <span *ngIf="isRequired('passwords.confirmPassword')" class="text-danger">*</span>
+    </label>
+    <div class="position-relative">
+      <input id="confirm-password"
+             [type]="showConfirmPassword ? 'text' : 'password'"
+             class="form-control mb-1"
+             formControlName="confirmPassword"
+             name="confirm-password"
+             [ngClass]="{
+               'is-invalid': form.get('passwords.confirmPassword')?.invalid &&
+                             (form.get('passwords.confirmPassword')?.touched ||
+                              form.get('passwords.confirmPassword')?.dirty ||
+                              isSubmitted)
+             }">
+      <i [ngClass]="showConfirmPassword ? 'fa fa-eye' : 'fa fa-eye-slash'"
+         (click)="togglePasswordVisibility('confirm')"
+         class="password-toggle-icon"></i>
+    </div>
+
+    <!-- Error messages -->
+    <small class="text-danger"
+           *ngIf="form.get('passwords.confirmPassword')?.touched &&
+                  form.get('passwords.confirmPassword')?.hasError('required')">
+      Confirm Password is required.
+    </small>
+  </div>
+</div>
+
     <small *ngIf="passwordCheck?.errors?.['valuesNotEqual'] && passwordCheck.touched" class="text-danger">
       Passwords do not match.
     </small>
