@@ -17,41 +17,32 @@
         <div *ngIf="currentStep === 0">
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <label class="form-label  fw-semibold">Doctor Name</label>
+                    <label class="form-label  fw-semibold">Doctor Name <span *ngIf="isRequired('doctorName')"
+                            class="text-danger">*</span></label>
                     <div class="input-group">
                         <input class="form-control" type="text" formControlName="doctorName"
-                            [appErrorTooltip]="superPrescription.get('doctorName')" [customMessages]="{
+                            [appErrorTooltip]="superPrescription.get('doctorName')" [submitted]="isSubmitted"
+                            [customMessages]="{
       required: 'Doctor Name is required.',
     }">
                     </div>
 
                 </div>
                 <div class="col-md-6 mb-3">
-                    <label class="form-label  fw-semibold">Prescription Date</label>
-                    <input class="form-control" type="date" formControlName="prescriptionDate">
-                    <div *ngIf="superPrescription.get('prescriptionDate')?.hasError('required') &&
-              (superPrescription.get('prescriptionDate')?.touched ||
-            superPrescription.get('prescriptionDate')?.dirty)" class="text-danger">
-                        PrescriptionDate date is required.
+                    <label class="form-label  fw-semibold">Prescription Date <span
+                            *ngIf="isRequired('prescriptionDate')" class="text-danger">*</span></label>
+
+                    <div class="input-group">
+                        <input class="form-control" type="date" formControlName="prescriptionDate"
+                            [appErrorTooltip]="superPrescription.get('prescriptionDate')" [submitted]="isSubmitted"
+                            [customMessages]="{
+      required: 'Prescription Date is required.',
+      invalidDate:'Enter a valid date.',
+      minDateExceeded:'Date cannot be earlier than 1700.',
+      maxDateExceeded:'Date cannot be later than 2040'
+    }">
                     </div>
 
-                    <div *ngIf="superPrescription.get('prescriptionDate')?.hasError('invalidDate') &&
-              (superPrescription.get('prescriptionDate')?.touched ||
-               superPrescription.get('prescriptionDate')?.dirty)" class="text-danger">
-                        Enter a valid date.
-                    </div>
-
-                    <div *ngIf="superPrescription.get('prescriptionDate')?.hasError('minDateExceeded') &&
-              (superPrescription.get('prescriptionDate')?.touched ||
-               superPrescription.get('prescriptionDate')?.dirty)" class="text-danger">
-                        Date cannot be earlier than 1700.
-                    </div>
-
-                    <div *ngIf="superPrescription.get('prescriptionDate')?.hasError('maxDateExceeded') &&
-              (superPrescription.get('prescriptionDate')?.touched ||
-              superPrescription.get('prescriptionDate')?.dirty)" class="text-danger">
-                        Date cannot be later than 2040.
-                    </div>
 
                 </div>
             </div>
@@ -93,14 +84,19 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <div class="dropdown-container">
-                                <label class="form-label  fw-semibold">Reason</label>
-                                <input type="text" formControlName="reason" placeholder="Search medical condition" />
-                                <!-- Show error if user typed manually and did NOT pick from dropdown -->
-                                <div *ngIf="
-    currentPrescriptionGroup.get('reasonValid')?.invalid &&
-    currentPrescriptionGroup.get('reason')?.touched" class="text-danger">
-                                    Please select a condition from the dropdown.
+                                <label class="form-label  fw-semibold">Reason
+                                    <span *ngIf="isRequired(['prescription', currentStep, 'reason'])"
+                                        class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <input type="text" formControlName="reason" placeholder="Search medical condition"
+                                        [appErrorTooltip]="currentPrescriptionGroup.get('reason')"
+                                        [submitted]="isSubmitted" [customMessages]="{
+         required: 'Condition is required.',
+         conditionInvalid: 'Please select a valid condition from the dropdown.'
+       }" class="form-control" />
                                 </div>
+
 
 
                                 <ul *ngIf="conditions.length > 0" class="dropdown">
@@ -174,7 +170,12 @@
                                     <!-- MEDICINE AUTOCOMPLETE -->
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label fw-semibold">Medicine</label>
+                                            <label class="form-label fw-semibold">
+                                                Medicine
+                                                <span
+                                                    *ngIf="isRequired(['prescription', currentStep, 'medications', mIndex, 'medicationId'])"
+                                                    class="text-danger">*</span>
+                                            </label>
 
                                             <input type="text" class="form-control" formControlName="medicationName"
                                                 placeholder="Search medicine">
@@ -188,7 +189,12 @@
                                         </div>
 
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label fw-semibold">Status</label>
+                                            <label class="form-label fw-semibold">Status
+                                                <span
+                                                    *ngIf="isRequired(['prescription', currentStep, 'medications', mIndex, 'status'])"
+                                                    class="text-danger">*</span>
+                                            </label>
+
                                             <select class="form-control" formControlName="status">
                                                 <option value="ACTIVE">Active</option>
                                                 <option value="COMPLETED">Completed</option>
@@ -202,14 +208,44 @@
                                     <!-- DATES -->
                                     <div class="row">
                                         <div class="col">
-                                            <label class="form-label fw-semibold">Start Date</label>
-                                            <input type="date" class="form-control"
-                                                formControlName="effectiveStartDate">
+                                            <label class="form-label fw-semibold">Start Date
+                                                <span
+                                                    *ngIf="isRequired(['prescription', currentStep, 'medications', mIndex, 'effectiveStartDate'])"
+                                                    class="text-danger">*</span>
+                                            </label>
+                                            <div class="input-group">
+                                                <input type="date" class="form-control"
+                                                    formControlName="effectiveStartDate"
+                                                    [appErrorTooltip]="getMedicationControl(currentStep, mIndex, 'effectiveStartDate')"
+                                                    [submitted]="isSubmitted" [customMessages]="{
+      required: 'Effective Start Date is required.',
+      invalidDate:'Enter a valid date.',
+      minDateExceeded:'Date cannot be earlier than 1700.',
+      maxDateExceeded:'Date cannot be later than 2040'
+    }">
+                                            </div>
+
+
                                         </div>
 
                                         <div class="col">
-                                            <label class="form-label fw-semibold">End Date</label>
-                                            <input type="date" class="form-control" formControlName="effectiveEndDate">
+                                            <label class="form-label fw-semibold">End Date
+                                                <span
+                                                    *ngIf="isRequired(['prescription', currentStep, 'medications', mIndex, 'effectiveEndDate'])"
+                                                    class="text-danger">*</span>
+                                            </label>
+                                            <div class="input-group">
+                                                <input type="date" class="form-control"
+                                                    formControlName="effectiveEndDate"
+                                                    [appErrorTooltip]="getMedicationControl(currentStep, mIndex, 'effectiveEndDate')"
+                                                    [submitted]="isSubmitted" [customMessages]="{
+      required: 'Effective End Date is required.',
+      invalidDate:'Enter a valid date.',
+      minDateExceeded:'Date cannot be earlier than 1700.',
+      maxDateExceeded:'Date cannot be later than 2040'
+    }">
+                                            </div>
+
                                         </div>
                                     </div>
 
@@ -221,14 +257,29 @@
 
                                         <div class="row">
                                             <div class="col">
-                                                <label>Amount</label>
-                                                <input type="number" class="form-control" formControlName="amount">
+                                                <label>Amount
+                                                    <span
+                                                        *ngIf="isRequired(['prescription', currentStep, 'medications', mIndex, 'dosage', 'amount'])"
+                                                        class="text-danger">*</span>
+                                                </label>
+                                                <div class="input-group">
+                                                    <input type="number" class="form-control" formControlName="amount"
+                                                        [appErrorTooltip]="getMedicationControl(currentStep, mIndex, 'dosage.amount')"
+                                                        [submitted]="isSubmitted" [customMessages]="{
+      required: 'Amount is required.',  
+    }">
+                                                </div>
+
                                             </div>
 
                                             <div class="col position-relative">
-                                                <label>Unit</label>
-                                                <input type="text" class="form-control"
-                                                    formControlName="amountUnitName">
+                                                <label>Unit
+                                                    <span
+                                                        *ngIf="isRequired(['prescription', currentStep, 'medications', mIndex, 'dosage', 'amountUnitId'])"
+                                                        class="text-danger">*</span>
+                                                </label>
+                                                <input type="text" class="form-control" formControlName="amountUnitName"
+                                                    placeholder="Search unit for the amount">
                                                 <ul class="dropdown-menu show w-100" *ngIf="amountUnit.length > 0">
                                                     <li class="dropdown-item" *ngFor="let u of amountUnit"
                                                         (click)="selectAmountUnit(u, stepIndex, mIndex)">
@@ -238,8 +289,13 @@
                                             </div>
 
                                             <div class="col position-relative">
-                                                <label>Route</label>
-                                                <input type="text" class="form-control" formControlName="routeName">
+                                                <label>Route
+                                                    <span
+                                                        *ngIf="isRequired(['prescription', currentStep, 'medications', mIndex, 'dosage', 'routeId'])"
+                                                        class="text-danger">*</span>
+                                                </label>
+                                                <input type="text" class="form-control" formControlName="routeName"
+                                                    placeholder="Search medicine intake route">
                                                 <ul class="dropdown-menu show w-100" *ngIf="routeUnit.length > 0">
                                                     <li class="dropdown-item" *ngFor="let r of routeUnit"
                                                         (click)="selectRoute(r, stepIndex, mIndex)">
@@ -261,21 +317,53 @@
 
                                         <div class="row">
                                             <div class="col">
-                                                <label>Frequency</label>
-                                                <input type="number" class="form-control" formControlName="frequency">
+                                                <label>Frequency
+                                                    <span
+                                                        *ngIf="isRequired(['prescription', currentStep, 'medications', mIndex, 'timing', 'frequency'])"
+                                                        class="text-danger">*</span>
+                                                </label>
+                                                <div class="input-group">
+                                                    <input type="number" class="form-control"
+                                                        formControlName="frequency"
+                                                        [appErrorTooltip]="getMedicationControl(currentStep, mIndex, 'timing.frequency')"
+                                                        [submitted]="isSubmitted" [customMessages]="{
+      required: 'Frequency is required.',  
+    }">
+
+                                                </div>
+
                                             </div>
 
                                             <div class="col">
-                                                <label>Period</label>
-                                                <input type="number" class="form-control" formControlName="period">
+                                                <label>Period <span
+                                                        *ngIf="isRequired(['prescription', currentStep, 'medications', mIndex, 'timing', 'period'])"
+                                                        class="text-danger">*</span></label>
+                                                <div class="input-group">
+                                                    <input type="number" class="form-control" formControlName="period"
+                                                        [appErrorTooltip]="getMedicationControl(currentStep, mIndex, 'timing.period')"
+                                                        [submitted]="isSubmitted" [customMessages]="{
+      required: 'Period is required.',  
+    }">
+                                                </div>
+
                                             </div>
 
                                             <div class="col">
-                                                <label>Unit</label>
-                                                <select class="form-control" formControlName="periodUnit">
-                                                    <option *ngFor="let p of periodUnit" [value]="p.value">{{ p.display
-                                                        }}</option>
-                                                </select>
+                                                <label>Unit <span
+                                                        *ngIf="isRequired(['prescription', currentStep, 'medications', mIndex, 'timing', 'periodUnit'])"
+                                                        class="text-danger">*</span></label>
+                                                <div class="input-group">
+                                                    <select class="form-control" formControlName="periodUnit"
+                                                        [appErrorTooltip]="getMedicationControl(currentStep, mIndex, 'timing.periodUnit')"
+                                                        [submitted]="isSubmitted" [customMessages]="{
+      required: 'Period Unit is required.',  
+    }">
+                                                        <option *ngFor="let p of periodUnit" [value]="p.value">{{
+                                                            p.display
+                                                            }}</option>
+                                                    </select>
+                                                </div>
+
                                             </div>
                                         </div>
 

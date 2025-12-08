@@ -4,7 +4,9 @@ import {
   ElementRef,
   AfterViewInit,
   Renderer2,
-  OnDestroy
+  OnDestroy,
+  OnChanges,
+  SimpleChanges
 } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 
@@ -13,16 +15,21 @@ declare var bootstrap: any;
 @Directive({
   selector: '[appErrorTooltip]'
 })
-export class ErrorTooltipDirective implements AfterViewInit, OnDestroy {
+export class ErrorTooltipDirective implements AfterViewInit, OnDestroy, OnChanges{
 
   @Input('appErrorTooltip') control!: AbstractControl | null;
   @Input() customMessages: { [key: string]: string } = {};
-
+@Input() submitted = false;
   private iconElement!: HTMLElement;
   private tooltipInstance: any;
 
   constructor(private el: ElementRef, private renderer: Renderer2) {}
-
+ngOnChanges(changes: SimpleChanges) {
+  if (changes['submitted']) {
+    // Re-run validation check when form is submitted
+    this.updateTooltip();
+  }
+}
   ngAfterViewInit() {
     console.log('ErrorTooltipDirective initialized:', this.el.nativeElement);
 
@@ -61,9 +68,10 @@ export class ErrorTooltipDirective implements AfterViewInit, OnDestroy {
   }
 
 private updateTooltip() {
-  if (!this.control) return;
+   if (!this.control || !this.iconElement) return; 
+ 
 
-  const isInvalid = (this.control.touched || this.control.dirty) && this.control.invalid;
+  const isInvalid = (this.control.touched || this.control.dirty || this.submitted) && this.control.invalid;
   console.log('Updating tooltip. isInvalid?', isInvalid, 'Errors:', this.control.errors);
 
   if (isInvalid) {
@@ -138,6 +146,19 @@ private updateTooltip() {
     }
 if (errors['email']) {
       return this.customMessages['email'] || 'Invalid field';
+    }
+    if (errors['invalidDate']) {
+      return this.customMessages['invalidDate'] || 'Invalid field';
+    }
+     if (errors['minDateExceeded']) {
+      return this.customMessages['minDateExceeded'] || 'Invalid field';
+    }
+    if (errors['conditionInvalid']) {
+      return this.customMessages['conditionInvalid'] || 'Invalid field';
+    }
+   
+     if (errors['maxDateExceeded']) {
+      return this.customMessages['maxDateExceeded'] || 'Invalid field';
     }
     return this.customMessages['default'] || 'Invalid field.';
   }
