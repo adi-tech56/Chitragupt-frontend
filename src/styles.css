@@ -32,3 +32,6 @@
   --border-color: #e0e0e0;
   --shadow-color: rgba(0, 0, 0, 0.15);
 }
+input.is-invalid {
+  background-image: none !important; /* Optional if not using is-invalid */
+}

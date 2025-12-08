@@ -5,8 +5,9 @@ import { MedicationService } from '../../../core/Services/PrescriptionServices/m
 import { AutoCompleteService } from '../../../core/Services/PrescriptionServices/auto-complete.service';
 import { HttpClient } from '@angular/common/http';
 import { Location } from '@angular/common';
-import { Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { PrescriptionResponse } from 'src/app/core/Models/Medication';
+import { DailyMedicationService } from 'src/app/core/Services/PrescriptionServices/daily-medication.service';
 function dateValidator(control: AbstractControl) {
   const value = control.value;
   if (!value) return null; // required is handled separately
@@ -49,7 +50,7 @@ export class UpdatePrescriptionComponent implements OnInit, OnDestroy {
   timingDescriptions: string[][] = [];
   // Received object from previous page
   receivedData: any;
-
+  prescriptionId: string | null = null;
   // Autocomplete lists
   conditions: any[] = [];
   medicines: any[] = [];
@@ -76,12 +77,10 @@ export class UpdatePrescriptionComponent implements OnInit, OnDestroy {
     private http: HttpClient,
     private autoComplete: AutoCompleteService,
     private location: Location,
-    private router: Router
+    private router: Router,
+    private daileMeds: DailyMedicationService,
+    private route: ActivatedRoute
   ) {
-    // Retrieve object passed through router
-    // const nav = this.router.getCurrentNavigation();
-    // this.receivedData = nav?.extras.state?.['medication'];
-    // console.log(" RECEIVED UPDATE OBJECT:", this.receivedData);
 
     // Build empty form
     this.superPrescription = this.fb.group({
@@ -101,15 +100,7 @@ export class UpdatePrescriptionComponent implements OnInit, OnDestroy {
   goBack() {
     this.location.back();
   }
-  // openIndex: number | null = null;
 
-  // toggleAccordion(index: number) {
-  //   if (this.openIndex === index) {
-  //     this.openIndex = null;
-  //   } else {
-  //     this.openIndex = index;
-  //   }
-  // }
   openIndex: number | null = null;
 
   // Toggle function for existing accordions
@@ -117,35 +108,46 @@ export class UpdatePrescriptionComponent implements OnInit, OnDestroy {
     this.openIndex = this.openIndex === index ? null : index;
   }
 
-  ngOnInit(): void {
-    // Load JSON files
-    this.http.get<any[]>('assets/when-code.json').subscribe(data => this.whenCode = data);
-    this.http.get<any[]>('assets/period-unit.json').subscribe(data => this.periodUnit = data);
-    // this.subscribeReasonValueChanges(0);
-    // this.subscribeMedicineValueChanges(0);
-    // this.subscribeRouteValueChanges(0);
-    // this.subscribeAmountValueChanges(0);
-    const medData = sessionStorage.getItem('medication');
+ngOnInit(): void {
+  // Load JSON files
+  this.http.get<any[]>('assets/when-code.json').subscribe(data => {
+    this.whenCode = data;
+  });
 
-    if (medData) {
-      this.receivedData = JSON.parse(medData);
-      console.log("Received medication:", this.receivedData);
+  this.http.get<any[]>('assets/period-unit.json').subscribe(data => {
+    this.periodUnit = data;
+  });
 
-      // Clear it so it doesn't persist unnecessarily
-      sessionStorage.removeItem('medication');
-    } else {
-      console.warn("No medication data received. Possibly a direct reload.");
+  // Get route param and load prescription
+  this.route.paramMap.subscribe((params: ParamMap) => {
+    this.prescriptionId = params.get('id');
+    console.log('Product ID:', this.prescriptionId);
+
+    if (this.prescriptionId) {
+      this.loadPrescription(this.prescriptionId);
     }
 
-    // Auto-fill the form if data exists
-    if (this.receivedData) {
-      this.patchFormWithReceivedData();
-    }
+  });
     this.prescriptions.controls.forEach((_, presIndex) => {
       this.initTimingDescriptions(presIndex);
     });
 
-  }
+}
+
+loadPrescription(id: string): void {
+  this.medicationService.getMedicationById(id).subscribe(
+    med => {
+      this.receivedData = med;
+      console.log('Medication Loaded:', this.receivedData);
+       this.patchFormWithReceivedData();
+    },
+    error => {
+      console.error('Error loading prescription:', error);
+    }
+  );
+}
+
+
 
   ngOnDestroy(): void {
     this.reasonSubscriptions.forEach(s => s.unsubscribe());
@@ -649,17 +651,11 @@ export class UpdatePrescriptionComponent implements OnInit, OnDestroy {
       }))
     };
 
-    console.log(payload);
-
-
-    console.log(payload);
-
-    console.log("🚀 FINAL UPDATE PAYLOAD:", payload);
-
     this.medicationService.updatePrescriptions(data.superPrescriptionId, payload).subscribe({
       next: res => {
         console.log("Saved!", res);
         this.goBack();
+        this.daileMeds.refreshMeds();
       },
       error: err => console.error("Save failed", err)
     });

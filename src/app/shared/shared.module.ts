@@ -11,7 +11,7 @@ import { UpdatePrescriptionComponent } from '../common/forms/update-prescription
 import { ExportFhirDataComponent } from '../common/export-fhir-data/export-fhir-data.component';
 import { SharePrescriptionComponent } from '../common/share-prescription/share-prescription.component';
 import { ViewSharedPrescriptionComponent } from '../common/view-shared-prescription/view-shared-prescription.component';
-
+import {ErrorTooltipDirective} from './Directives/form-error-tooltip.directive'
 @NgModule({
   declarations: [
     SidebarComponent,
@@ -21,6 +21,8 @@ import { ViewSharedPrescriptionComponent } from '../common/view-shared-prescript
     ExportFhirDataComponent,
     SharePrescriptionComponent,
     ViewSharedPrescriptionComponent,
+    ErrorTooltipDirective
+    
   ],
   imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
   exports: [
@@ -33,6 +35,7 @@ import { ViewSharedPrescriptionComponent } from '../common/view-shared-prescript
     FormsModule,
     ReactiveFormsModule,
     RouterModule,
+    ErrorTooltipDirective
   ],
 })
 export class SharedModule {}

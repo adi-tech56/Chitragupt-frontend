@@ -6,11 +6,15 @@
       <div class="row">
         <div class="col-md-6 mb-3">
           <label for="first-name" class="form-label text-primary fw-semibold">First Name
-
             <span *ngIf="isRequired('firstName')" class="text-danger">*</span>
           </label>
-          <input type="text" class="form-control" id="first-name" name="first-name" formControlName="firstName"
-            required />
+          <div class="input-group">
+            <input type="text" class="form-control" id="first-name" formControlName="firstName"
+              [appErrorTooltip]="form.get('firstName')" [customMessages]="{
+      required: 'First name is required.'
+    }" />
+          </div>
+
         </div>
 
         <div class="col-md-6 mb-3">
@@ -30,7 +34,15 @@
         <label for="contact" class="form-label text-primary fw-semibold">Contact No
           <span *ngIf="isRequired('contactNo')" class="text-danger">*</span>
         </label>
-        <input type="text" id="contact" class="form-control" name="Contact" formControlName="contactNo" />
+        <div class="input-group">
+          <input type="text" class="form-control" formControlName="contactNo" [appErrorTooltip]="form.get('contactNo')"
+            [customMessages]="{
+      required: 'Contact number is required.',
+      minlength: 'Must be at least 10 digits.',
+      maxlength: 'Cannot exceed 15 digits.',
+      pattern: 'Only digits allowed.'
+    }" />
+        </div>
       </div>
 
     </div>
@@ -40,12 +52,26 @@
         <label for="email" class="form-label text-primary fw-semibold">Email
           <span *ngIf="isRequired('emailId')" class="text-danger">*</span>
         </label>
-        <input id="email" type="email" name="email" class="form-control" formControlName="emailId" />
+     <div class="input-group">
+  <input
+    type="email"
+    class="form-control"
+    formControlName="emailId"
+    [appErrorTooltip]="form.get('emailId')"
+    [customMessages]="{
+      required: 'Email is required.',
+      email: 'Please enter a valid email address.'
+    }"
+  />
+    
+</div>
+
+        <!-- <p *ngIf="emailIsInvalid" class="text-danger">Enter a valid email</p> -->
       </div>
     </div>
     <hr />
-    <div class="row" formGroupName="passwords">
-      <div class="col-md-6 mb-3">
+    <div class="row mb-2" formGroupName="passwords">
+      <div class="col-md-6 ">
         <label for="password" class="form-label text-primary fw-semibold">Password
           <span *ngIf="isRequired('passwords.password')" class="text-danger">*</span>
         </label>
@@ -53,25 +79,37 @@
           <input id="password" [type]="showPassword ? 'text' : 'password'" class="form-control mb-1"
             formControlName="password" name="password" required>
 
-          <i [ngClass]="showPassword ? 'fa fa-eye' : 'fa fa-eye-slash'"
-            (click)="togglePasswordVisibility('password')" class="password-toggle-icon"></i>
+          <i [ngClass]="showPassword ? 'fa fa-eye' : 'fa fa-eye-slash'" (click)="togglePasswordVisibility('password')"
+            class="password-toggle-icon"></i>
         </div>
+
       </div>
 
-      <div class="col-md-6 mb-3">
-        <label for="confirm-password" class="form-label text-primary fw-semibold">Confirm Password</label>
+      <div class="col-md-6 ">
+        <label for="confirm-password" class="form-label text-primary fw-semibold">Confirm Password
+          <span *ngIf="isRequired('passwords.confirmPassword')" class="text-danger">*</span>
+        </label>
         <div class="position-relative">
           <input id="confirm-password" class="form-control mb-1" [type]="showConfirmPassword ? 'text' : 'password'"
             name="confirm-password" formControlName="confirmPassword" required />
-        <i [ngClass]="showConfirmPassword ? 'fa fa-eye' : 'fa fa-eye-slash'" 
-   (click)="togglePasswordVisibility('confirm')" class="password-toggle-icon"></i>
+          <i [ngClass]="showConfirmPassword ? 'fa fa-eye' : 'fa fa-eye-slash'"
+            (click)="togglePasswordVisibility('confirm')" class="password-toggle-icon"></i>
         </div>
 
+
       </div>
+      <small class="text-danger"
+        *ngIf="form.get('passwords.password')?.touched && form.get('passwords.password')?.hasError('required')">
+        Password is required.
+      </small>
+      <small class="text-danger"
+        *ngIf="form.get('passwords.password')?.touched && form.get('passwords.password')?.hasError('minlength')">
+        Password must be at least 6 characters.
+      </small>
     </div>
-    <p *ngIf="passwordCheck?.errors?.['valuesNotEqual'] && passwordCheck.touched" class="text-danger">
+    <small *ngIf="passwordCheck?.errors?.['valuesNotEqual'] && passwordCheck.touched" class="text-danger">
       Passwords do not match.
-    </p>
+    </small>
     <div class="row">
       <div class="col-md-9 mb-3">
         <button type="submit" class="btn btn-primary w-100 fw-bold col-md-6">Sign up</button>
@@ -90,9 +128,6 @@
       Sign in with Google
     </button>
 
-    <p *ngIf="form.invalid && form.touched" class="text-danger">
-      Form is Invalid
-    </p>
 
     <div class="text-center mt-3">
       <button type="button" class="btn btn-link text-primary fw-semibold" (click)="cancel()">

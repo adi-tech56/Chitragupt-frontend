@@ -46,15 +46,16 @@ export class RegisterComponent {
     }),
 
     contactNo: new FormControl('', {
-      validators: [Validators.minLength(10),
-      Validators.required,
-      Validators.maxLength(15)]
+      validators: [Validators.required,
+      Validators.minLength(10),
+      Validators.maxLength(15),
+      Validators.pattern(/^\d+$/)]
     }),
+
+
     emailId: new FormControl('', {
       validators: [Validators.email, Validators.required]
     }),
-
-
 
   });
 
@@ -66,28 +67,20 @@ export class RegisterComponent {
     return !!(validatorResult && validatorResult['required']); // force boolean
   }
 
-
- togglePasswordVisibility(field: 'password' | 'confirm'): void {
-  console.log(field);
-  if (field === 'password') {
-    this.showPassword = !this.showPassword;
-  } else if (field === 'confirm') {
-    this.showConfirmPassword = !this.showConfirmPassword;
+  togglePasswordVisibility(field: 'password' | 'confirm'): void {
+    console.log(field);
+    if (field === 'password') {
+      this.showPassword = !this.showPassword;
+    } else if (field === 'confirm') {
+      this.showConfirmPassword = !this.showConfirmPassword;
+    }
   }
-}
   passwordCheck = this.form.get('passwords') as FormGroup;
   response: any;
   googleSignIn() {
     window.location.href = "http://localhost:8089/oauth2/authorization/google";
   }
-  onCountryChange(event: any) {
-    const selectedCode = event.target.value;
-    console.log('Selected Country Code:', selectedCode);
 
-    // Set the dial code in contactNo if country is changed
-    const currentContact = this.form.get('contactNo')?.value;
-    this.form.get('contactNo')?.setValue(selectedCode + currentContact);
-  }
 
   onSignup() {
     if (this.form.invalid) {
