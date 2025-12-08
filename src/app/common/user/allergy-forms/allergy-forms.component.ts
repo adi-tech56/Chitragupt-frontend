@@ -1,38 +1,36 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import {
+  AbstractControl,
   FormArray,
   FormBuilder,
   FormGroup,
   Validators,
 } from '@angular/forms';
 
-import {
-  debounceTime,
-  switchMap,
-  Observable,
-  forkJoin,
-  of,
-} from 'rxjs';
+import { debounceTime, switchMap, Observable, forkJoin, of } from 'rxjs';
 import { PatientAllergyService } from 'src/app/core/Services/PatientServices/patient-allergy.service';
 import { AuthService } from 'src/app/core/Services/auth-service.service';
 import { Location } from '@angular/common';
+import { ToastService } from 'src/app/core/Services/toast.service';
 @Component({
   selector: 'app-allergy-forms',
   templateUrl: './allergy-forms.component.html',
-  styleUrls: ['./allergy-forms.component.css']
+  styleUrls: ['./allergy-forms.component.css'],
 })
 export class AllergyFormsComponent implements OnInit {
   @Output() allergySubmitted = new EventEmitter<void>();
 
   allergyForm: FormGroup;
   suggestions: any[][] = [];
+  today = new Date().toISOString().split('T')[0];
   private skipConditionFetch = false;
 
   constructor(
     private fb: FormBuilder,
     private allergyService: PatientAllergyService,
     private auth: AuthService,
-    private location:Location
+    private location: Location,
+    private toaster: ToastService
   ) {
     this.allergyForm = this.fb.group({
       allergies: this.fb.array([]),
@@ -42,6 +40,8 @@ export class AllergyFormsComponent implements OnInit {
     this.location.back();
   }
   ngOnInit() {
+    this.addAllergy();
+    this.setupAutocomplete();
     if (this.allergies.length === 0) {
       this.addAllergy();
     }
@@ -51,6 +51,35 @@ export class AllergyFormsComponent implements OnInit {
     });
   }
 
+  private setupAutocomplete() {
+    this.allergies.controls.forEach((group, index) => {
+      const control = group.get('allergyName');
+
+      if (!control) return;
+
+      control.valueChanges
+        .pipe(
+          debounceTime(300),
+          switchMap((value) => {
+            if (!value || value.length < 2) return of([]);
+            return this.allergyService.conditionSearch(value);
+          })
+        )
+        .subscribe((list) => {
+          this.suggestions[index] = list;
+        });
+    });
+  }
+
+  resetForm() {
+    while (this.allergies.length !== 0) {
+      this.allergies.removeAt(0);
+    }
+
+    this.suggestions = [];
+
+    this.addAllergy();
+  }
 
   private registerAutocompleteListeners() {
     this.allergies.controls.forEach((group, index) => {
@@ -78,9 +107,13 @@ export class AllergyFormsComponent implements OnInit {
   }
 
   selectAllergy(value: string, index: number) {
-    this.allergies.at(index).get('allergyName')?.setValue(value);
-    this.suggestions[index] = [];
-    this.skipConditionFetch = true;
+    const control = this.allergies.at(index).get('allergyName');
+
+    control?.setValue(value, { emitEvent: false }); // <-- IMPORTANT
+
+    this.suggestions[index] = []; // hide dropdown
+
+    this.skipConditionFetch = true; // block next fetch
   }
 
   get allergies(): FormArray {
@@ -95,17 +128,24 @@ export class AllergyFormsComponent implements OnInit {
       allergyType: ['', Validators.required],
       category: ['', Validators.required],
       criticality: ['', Validators.required],
-      onsetDate: ['', Validators.required],
+      onsetDate: ['', [Validators.required, this.noFutureDateValidator()]],
     });
   }
+  noFutureDateValidator() {
+    return (control: AbstractControl) => {
+      if (!control.value) return null;
 
+      const selected = new Date(control.value);
+      const today = new Date();
 
+      return selected > today ? { maxDate: true } : null;
+    };
+  }
   addAllergy() {
     this.allergies.push(this.createAllergyGroup());
     this.suggestions.push([]);
-    this.registerAutocompleteListeners();
+    this.setupAutocomplete();
   }
-
   removeAllergy(index: number) {
     if (this.allergies.length > 1) {
       this.allergies.removeAt(index);
@@ -117,10 +157,9 @@ export class AllergyFormsComponent implements OnInit {
     }
   }
 
-
   onSubmit() {
-    if (this.allergies.invalid) {
-      this.allergies.markAllAsTouched();
+    if (this.allergyForm.invalid) {
+      this.allergyForm.markAllAsTouched();
       alert('Please fill all required fields.');
       return;
     }
@@ -138,12 +177,14 @@ export class AllergyFormsComponent implements OnInit {
     );
 
     forkJoin(calls).subscribe({
-      next: () => this.allergySubmitted.emit(),
+      next: () => {
+        this.toaster.show('Your allergy has been saved!', 'success');
+        this.resetForm();
+        this.allergySubmitted.emit();
+      },
       error: (err) => {
-        console.error('Failed to save allergy:', err);
-        alert('Error saving allergy. Check console.');
+        this.toaster.show('Error in saving allergy', 'error');
       },
     });
   }
 }
-
