@@ -7,6 +7,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { ExportPrescriptionService } from 'src/app/core/Services/PrescriptionServices/export-prescription.service';
 import { debounceTime } from 'rxjs/operators';
+import { ToastService } from 'src/app/core/Services/toast.service';
 
 declare var bootstrap: any;
 
@@ -71,7 +72,8 @@ export class ProfilePageComponent implements OnInit {
     private auth: AuthService,
     private http: HttpClient,
     private router: Router,
-    private fhirService: ExportPrescriptionService
+    private fhirService: ExportPrescriptionService,
+    private toaster: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -260,13 +262,13 @@ export class ProfilePageComponent implements OnInit {
   saveBasicField() {
     const error = this.validateBasicField(this.editingField, this.editingValue);
     if (error) {
-      alert(error);
+      this.toaster.show('Error!', 'error');
       return;
     }
 
     const patientId = this.auth.getUserId();
     if (!patientId) {
-      alert('User not identified');
+      this.toaster.show('User not identified', 'error');
       return;
     }
 
@@ -284,7 +286,7 @@ export class ProfilePageComponent implements OnInit {
       },
       error: (err) => {
         console.error('Failed to save basic field', err);
-        alert('Could not save. See console.');
+        this.toaster.show('Failed to save field', 'error');
       },
     });
   }
@@ -382,7 +384,7 @@ export class ProfilePageComponent implements OnInit {
   saveAddress() {
     const patientId = this.auth.getUserId();
     if (!patientId) {
-      alert('User not identified');
+      this.toaster.show('User not identified', 'error');
       return;
     }
 
@@ -394,7 +396,7 @@ export class ProfilePageComponent implements OnInit {
       this.isAddressInvalid('postalCode') ||
       this.isAddressInvalid('country')
     ) {
-      alert('Please fill required address fields.');
+      this.toaster.show('Please fill required address fields.', 'error');
       return;
     }
 
@@ -426,14 +428,14 @@ export class ProfilePageComponent implements OnInit {
       },
       error: (err) => {
         console.error('Failed to save address', err);
-        alert('Could not save address. See console.');
+        this.toaster.show('Failed to save address', 'error');
       },
     });
   }
 
   deleteAddress(index: number, address: any) {
     if (!address?.id) {
-      alert('Address id missing');
+      this.toaster.show('Address id missing!', 'error');
       return;
     }
     if (!confirm('Delete this address?')) return;
@@ -442,7 +444,7 @@ export class ProfilePageComponent implements OnInit {
       next: () => this.addresses.splice(index, 1),
       error: (err) => {
         console.error('Delete address failed', err);
-        alert('Could not delete address.');
+        this.toaster.show('Delete address failed', 'error');
       },
     });
   }
@@ -487,13 +489,13 @@ export class ProfilePageComponent implements OnInit {
   saveTelecom() {
     const patientId = this.auth.getUserId();
     if (!patientId) {
-      alert('User not identified');
+      this.toaster.show('User not identified', 'error');
       return;
     }
 
     this.validateTelecom();
     if (this.telecomErrors.system || this.telecomErrors.value) {
-      alert('Please fix telecom errors.');
+      this.toaster.show('Please fix telecom errors.', 'error');
       return;
     }
 
@@ -522,14 +524,14 @@ export class ProfilePageComponent implements OnInit {
       },
       error: (err) => {
         console.error('Failed to save telecom', err);
-        alert('Could not save telecom. See console.');
+        this.toaster.show('Failed to save telecom', 'error');
       },
     });
   }
 
   deleteTelecom(index: number, telecom: any) {
     if (!telecom?.id) {
-      alert('Telecom id missing');
+      this.toaster.show('Telecom id missing', 'error');
       return;
     }
     if (!confirm('Delete this telecom?')) return;
@@ -538,15 +540,14 @@ export class ProfilePageComponent implements OnInit {
       next: () => this.telecoms.splice(index, 1),
       error: (err) => {
         console.error('Delete telecom failed', err);
-        alert('Could not delete telecom.');
+        this.toaster.show('Could not delete telecom.', 'error');
       },
     });
   }
 
-
   deleteAllergy(index: number, allergy: any) {
     if (!allergy?.id) {
-      alert('Allergy id missing');
+      this.toaster.show('Allergy id missing!', 'error');
       return;
     }
     if (!confirm('Delete this allergy?')) return;
@@ -555,7 +556,7 @@ export class ProfilePageComponent implements OnInit {
       next: () => this.allergies.splice(index, 1),
       error: (err) => {
         console.error('Failed to delete allergy', err);
-        alert('Could not delete allergy.');
+        this.toaster.show('Could not delete allergy!', 'error');
       },
     });
   }
