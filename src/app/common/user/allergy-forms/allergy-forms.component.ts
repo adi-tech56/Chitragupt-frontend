@@ -12,6 +12,7 @@ import { PatientAllergyService } from 'src/app/core/Services/PatientServices/pat
 import { AuthService } from 'src/app/core/Services/auth-service.service';
 import { Location } from '@angular/common';
 import { ToastService } from 'src/app/core/Services/toast.service';
+import { ActivatedRoute } from '@angular/router';
 @Component({
   selector: 'app-allergy-forms',
   templateUrl: './allergy-forms.component.html',
@@ -23,11 +24,13 @@ export class AllergyFormsComponent implements OnInit {
   allergyForm: FormGroup;
   suggestions: any[][] = [];
   today = new Date().toISOString().split('T')[0];
+  allergyId: number | null = null;
   private skipConditionFetch = false;
 
   constructor(
     private fb: FormBuilder,
     private allergyService: PatientAllergyService,
+    private route: ActivatedRoute,
     private auth: AuthService,
     private location: Location,
     private toaster: ToastService
@@ -36,18 +39,49 @@ export class AllergyFormsComponent implements OnInit {
       allergies: this.fb.array([]),
     });
   }
+
   goBack() {
     this.location.back();
   }
+
   ngOnInit() {
-    this.addAllergy();
-    this.setupAutocomplete();
-    if (this.allergies.length === 0) {
+    this.allergyId = Number(this.route.snapshot.paramMap.get('id'));
+
+    if (this.allergyId) {
+      this.addAllergy();
+      this.loadExistingAllergy(this.allergyId);
+    } else {
+      // ADD MODE
       this.addAllergy();
     }
 
+    this.setupAutocomplete();
+
     this.allergies.valueChanges.subscribe(() => {
       this.registerAutocompleteListeners();
+    });
+  }
+
+  loadExistingAllergy(id: number) {
+    this.allergyService.getAllergyById(id).subscribe((a) => {
+      this.skipConditionFetch = true;
+
+      const group = this.allergies.at(0);
+
+      group.patchValue(
+        {
+          allergyName: a.allergyName,
+          clinicalStatus: a.clinicalStatus,
+          verificationStatus: a.verificationStatus,
+          allergyType: a.allergyType,
+          category: a.category,
+          criticality: a.criticality,
+          onsetDate: a.onsetDate,
+        },
+        { emitEvent: false }
+      );
+      this.suggestions[0] = [];
+      setTimeout(() => (this.skipConditionFetch = false), 300);
     });
   }
 
@@ -144,7 +178,7 @@ export class AllergyFormsComponent implements OnInit {
   addAllergy() {
     this.allergies.push(this.createAllergyGroup());
     this.suggestions.push([]);
-    this.setupAutocomplete();
+    // this.setupAutocomplete();
   }
   removeAllergy(index: number) {
     if (this.allergies.length > 1) {
@@ -161,6 +195,24 @@ export class AllergyFormsComponent implements OnInit {
     if (this.allergyForm.invalid) {
       this.allergyForm.markAllAsTouched();
       alert('Please fill all required fields.');
+      return;
+    }
+
+    const firstAllergy = this.allergies.at(0).value;
+
+    if (this.allergyId) {
+      this.allergyService
+        .updateAllergy(this.allergyId, firstAllergy)
+        .subscribe({
+          next: () => {
+            this.toaster.show('Allergy updated successfully!', 'success');
+            this.allergySubmitted.emit(); // notify parent to refresh list
+          },
+          error: () => {
+            this.toaster.show('Error updating allergy.', 'error');
+          },
+        });
+
       return;
     }
 

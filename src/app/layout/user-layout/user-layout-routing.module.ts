@@ -12,6 +12,7 @@ import { UpdatePrescriptionComponent } from 'src/app/common/forms/update-prescri
 import { SharePrescriptionComponent } from 'src/app/common/share-prescription/share-prescription.component';
 import { ViewSharedPrescriptionComponent } from 'src/app/common/view-shared-prescription/view-shared-prescription.component';
 import { AddUpdatePrescriptionComponent } from 'src/app/common/forms/add-update-prescription/add-update-prescription.component';
+import { AllergyListComponent } from 'src/app/common/user/allergy-list/allergy-list.component';
 const routes: Routes = [
   {
     path: '',
@@ -26,6 +27,8 @@ const routes: Routes = [
       { path: 'profile', component: ProfilePageComponent },
       { path: 'emergencyContact', component: ContactPageComponent },
       { path: 'allergyForm', component: AllergyFormsComponent },
+      { path: 'allergyForm/:id', component: AllergyFormsComponent },
+      { path: 'allergyList', component: AllergyListComponent },
       {
         path: 'add-medication',
         component: AddMedicationComponent,
@@ -39,13 +42,13 @@ const routes: Routes = [
         children: [
           {
             path: 'add',
-            component: AddUpdatePrescriptionComponent
+            component: AddUpdatePrescriptionComponent,
           },
           {
             path: 'update/:id',
-            component: AddUpdatePrescriptionComponent
-          }
-        ]
+            component: AddUpdatePrescriptionComponent,
+          },
+        ],
       },
       {
         path: 'update-medication/:id',
@@ -85,4 +88,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class UserLayoutRoutingModule { }
+export class UserLayoutRoutingModule {}

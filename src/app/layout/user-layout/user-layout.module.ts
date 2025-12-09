@@ -17,6 +17,7 @@ import { ProfilePageComponent } from 'src/app/common/user/profile-page/profile-p
 import { ContactPageComponent } from 'src/app/common/user/contact-page/contact-page.component';
 import { AllergyFormsComponent } from 'src/app/common/user/allergy-forms/allergy-forms.component';
 import { DatePipe } from '@angular/common';
+import { AllergyListComponent } from 'src/app/common/user/allergy-list/allergy-list.component';
 
 @NgModule({
   declarations: [
@@ -29,6 +30,7 @@ import { DatePipe } from '@angular/common';
     ProfilePageComponent,
     ContactPageComponent,
     AllergyFormsComponent,
+    AllergyListComponent,
   ],
   imports: [
     CommonModule,

@@ -41,7 +41,7 @@ import { AddUpdatePrescriptionComponent } from './common/forms/add-update-prescr
     ReactiveFormsModule,
     HomeLayoutModule,
     UserLayoutModule,
-    SharedModule
+    SharedModule,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
