@@ -4,7 +4,7 @@ import { Observable, of } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class PatientAllergyService {
-  private baseUrl = 'http://localhost:8089/patient/allergy';
+  private baseUrl = 'patient/allergy';
 
   constructor(private http: HttpClient) {}
 
@@ -45,7 +45,7 @@ export class PatientAllergyService {
     if (!term || term.length < 2) return of([]);
 
     return this.http.get<string[]>(
-      `http://localhost:8089/patient/medication/conditions`,
+      `patient/medication/conditions`,
       {
         params: { term },
         withCredentials: true,

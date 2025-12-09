@@ -6,7 +6,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class DownloadPrescriptionService {
 
-  private apiUrl = 'http://localhost:8089/patient/prescriptions/download'; // backend URL
+  private apiUrl = 'patient/prescriptions/download'; // backend URL
 
   constructor(private http: HttpClient) {}
 

@@ -14,10 +14,10 @@ import {
   providedIn: 'root',
 })
 export class MedicationService {
-  private baseUrl = 'http://localhost:8089/patient/prescriptions'; // Backend endpoint
-  private logUrl = 'http://localhost:8089/patient/medication-logs';
+  private baseUrl = 'patient/prescriptions'; // Backend endpoint
+  private logUrl = 'patient/medication-logs';
   private reminderUrl =
-    'http://localhost:8089/patient/medication/send-reminder';
+    'patient/medication/send-reminder';
 
   constructor(private http: HttpClient) { }
 
@@ -59,11 +59,7 @@ export class MedicationService {
       prescription
     );
   }
-  // getTodaysLogs(): Observable<PatientMedicationLogs[]> {
-  //   return this.http.get<PatientMedicationLogs[]>(`${this.logUrl}/today`, {
-  //     withCredentials: true,
-  //   });
-  // }
+
   markMedication(
     superPrescriptionId: number,
     prescriptionId: number,

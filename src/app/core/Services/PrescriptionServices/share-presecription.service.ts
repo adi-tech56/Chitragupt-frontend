@@ -8,7 +8,7 @@ import { EmergencyContactPatientDto } from '../../Models/Medication';
   providedIn: 'root',
 })
 export class SharePrescriptionService {
-  private readonly API_BASE = 'http://localhost:8089/patient/sharedContact';
+  private readonly API_BASE = 'patient/sharedContact';
 
   constructor(private http: HttpClient) {}
 

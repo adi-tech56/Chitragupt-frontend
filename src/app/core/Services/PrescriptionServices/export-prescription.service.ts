@@ -7,7 +7,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class ExportPrescriptionService {
 
-  private apiUrl = 'http://localhost:8089/patient';
+  private apiUrl = 'patient';
 
   constructor(private http: HttpClient) { }
 

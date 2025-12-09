@@ -16,13 +16,13 @@ export class AuthService {
   verifyOtp(payload: { email: any; otp: any }) {
     throw new Error('Method not implemented.');
   }
-  private apiUrl = 'http://localhost:8089/auth';
+  private apiUrl = 'auth';
   private http = inject(HttpClient);
   private cookieService = inject(CookieService);
 
   getToken(): string | null {
     const token = this.cookieService.get('accessToken');
-
+    console.log(token)
     return token ? token : null;
   }
   getRefreshToken(): string | null {
@@ -66,11 +66,7 @@ export class AuthService {
     if (!roleMatches) return [];
     return roleMatches.map((r: string) => r.split('=')[1]);
   }
-  // refresh() {
-  //   return this.http.get(`${this.apiUrl}/refresh`, {
-  //     withCredentials: true
-  //   });
-  // }
+  
 
   isTokenExpired(token: string): boolean {
     const decoded = this.decodeToken(token);
@@ -154,15 +150,21 @@ export class AuthService {
   }
 
   /** Logout **/
-  logout(): void {
-    this.cookieService.delete('accessToken', '/');
-    this.cookieService.delete('refreshToken', '/');
- this.stateService.clearAll();
-    
-    localStorage.clear();
-    sessionStorage.clear();
+ logout(): void {
+  const cookieDomain = '.inc1.devtunnels.ms';
+  const cookiePath = '/';
 
-    // Navigate to login/auth page
-    this.router.navigate(['/auth']);
-  }
+  // Delete cookies with domain and path
+  this.cookieService.delete('accessToken', cookiePath, cookieDomain);
+  this.cookieService.delete('refreshToken', cookiePath, cookieDomain);
+
+  // Clear application state
+  this.stateService.clearAll();
+  localStorage.clear();
+  sessionStorage.clear();
+
+  // Redirect to login/auth page
+  this.router.navigate(['/auth']);
+}
+
 }

@@ -83,7 +83,8 @@ export class LoginComponent implements OnInit {
       this.loginForm.controls.email.invalid);
   }
   googleSignIn() {
-    window.location.href = "http://localhost:8089/oauth2/authorization/google";
+    window.location.href = "http://localhost8089:/oauth2/authorization/google";
+    
   }
   goToSignup() {
     this.signupRequest.emit();

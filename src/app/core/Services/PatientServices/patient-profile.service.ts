@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class PatientProfileService {
 
-  private BASE_URL = 'http://localhost:8089/patient/profile';
+  private BASE_URL = 'patient/profile';
 
   constructor(private http: HttpClient) {}
 
