@@ -117,146 +117,122 @@
 
 
                     <!-- Medications -->
-                    <div formArrayName="medications">
-                        <div class="d-flex justify-content-end mb-2">
-                            <button class="btn btn-outline-primary btn-sm" type="button"
-                                (click)="addMedication(stepIndex)">
-                                <i class="fa-solid fa-plus"></i> Add Medication
-                            </button>
-                        </div>
-                        <div *ngFor="let med of getMedications(stepIndex).controls; let mIndex = index"
-                            [formGroupName]="mIndex" class="rounded border bg p-2 mt-3">
+                <div formArrayName="medications">
+    <div class="d-flex justify-content-end mb-2">
+        <button class="btn btn-outline-primary btn-sm" type="button"
+            (click)="addMedication(stepIndex)">
+            <i class="fa-solid fa-plus"></i> Add Medication
+        </button>
+    </div>
 
-                            <!-- HEADER -->
-                            <div class="d-flex justify-content-between align-items-center mb-2">
+    <div *ngFor="let med of getMedications(stepIndex).controls; let mIndex = index"
+        [formGroupName]="mIndex" class="rounded border bg p-2 mt-3">
 
-                                <!-- ADD mode: simple title -->
-                                <!-- UPDATE mode: show accordion button -->
-                                <button *ngIf="mode === 'update'" class="accordion-button px-2 py-1" type="button"
-                                    style="background: none; box-shadow: none;" (click)="toggleAccordion(mIndex)">
-                                    <h5 class="small text-primary fw-semibold mb-0">
-                                        Medication {{ mIndex + 1 }}
-                                    </h5>
-                                </button>
+        <!-- HEADER -->
+        <div class="d-flex justify-content-between align-items-center mb-2">
 
-                                <h5 *ngIf="mode === 'add'" class="small text-primary fw-semibold mb-0">
-                                    Medication {{ mIndex + 1 }}
-                                </h5>
+            <!-- UPDATE mode: accordion button -->
+            <button *ngIf="mode === 'update'" class="accordion-button px-2 py-1" type="button"
+                style="background: none; box-shadow: none;" (click)="toggleAccordion(mIndex)">
+                <h5 class="small text-primary fw-semibold mb-0">
+                    Medication {{ mIndex + 1 }}
+                </h5>
+            </button>
 
-                                <!-- ACTION BUTTONS -->
-                                <ng-container *ngIf="mode === 'update'; else addModeButtons">
-                                    <!-- UPDATE MODE -->
-                                    <i class="fa-solid fa-chevron-down ms-2 transition"
-                                        [ngClass]="{ 'rotate-icon': openIndex === mIndex }"
-                                        (click)="toggleAccordion(mIndex)" style="cursor: pointer; font-size: 14px;">
-                                    </i>
-                                </ng-container>
+            <!-- ADD mode simple title -->
+            <h5 *ngIf="mode === 'add'" class="small text-primary fw-semibold mb-0">
+                Medication {{ mIndex + 1 }}
+            </h5>
 
-                                <ng-template #addModeButtons>
-                                    <!-- ADD MODE -->
-                                    <button type="button" class="btn btn-danger btn-sm"
-                                        (click)="removeMedication(stepIndex, mIndex)">
-                                        <i class="fa-solid fa-trash me-1"></i> Remove
-                                    </button>
-                                </ng-template>
-                            </div>
+            <!-- Chevron icon for UPDATE mode -->
+            <i *ngIf="mode === 'update'" class="fa-solid fa-chevron-down ms-2 transition"
+               [ngClass]="{ 'rotate-icon': openIndex === mIndex }"
+               (click)="toggleAccordion(mIndex)"
+               style="cursor: pointer; font-size: 14px;">
+            </i>
+        </div>
 
-                            <!-- BODY (collapsible ONLY in update mode) -->
-                            <div [ngClass]="{ 'show': mode === 'add' || openIndex === mIndex }"
-                                class="accordion-collapse collapse">
+        <!-- BODY -->
+        <div [ngClass]="{ 'show': mode === 'add' || openIndex === mIndex }"
+            class="accordion-collapse collapse">
 
-                                <div class="accordion-body px-1">
+            <div class="accordion-body px-1">
 
-                                    <!-- MEDICINE AUTOCOMPLETE -->
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label fw-semibold">
-                                                Medicine
-                                                <span
-                                                    *ngIf="isRequired(['prescription', currentStep, 'medications', mIndex, 'medicationId'])"
-                                                    class="text-danger">*</span>
-                                            </label>
+                <!-- MEDICINE AUTOCOMPLETE -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">
+                            Medicine
+                            <span *ngIf="isRequired(['prescription', currentStep, 'medications', mIndex, 'medicationId'])"
+                                  class="text-danger">*</span>
+                        </label>
 
-                                            <input type="text" class="form-control" formControlName="medicationName"
-                                                placeholder="Search medicine">
-
-                                            <ul class="dropdown-menu show w-100" *ngIf="medicines.length > 0">
-                                                <li *ngFor="let m of medicines" class="dropdown-item"
-                                                    (click)="selectMedicine(m, stepIndex, mIndex)">
-                                                    {{ m.brandName }}
-                                                </li>
-                                            </ul>
-                                        </div>
-
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label fw-semibold">Status
-                                                <span
-                                                    *ngIf="isRequired(['prescription', currentStep, 'medications', mIndex, 'status'])"
-                                                    class="text-danger">*</span>
-                                            </label>
-
-                                            <select class="form-control" formControlName="status">
-                                                <option value="ACTIVE">Active</option>
-                                                <option value="COMPLETED">Completed</option>
-                                                <option value="ONHOLD">On Hold</option>
-                                                <option value="NOTTAKEN">Not Taken</option>
-                                                <option value="INTENDED">Intended</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <!-- DATES -->
-                                    <div class="row">
-                                        <div class="col">
-                                            <label class="form-label fw-semibold">Start Date
-                                                <span
-                                                    *ngIf="isRequired(['prescription', currentStep, 'medications', mIndex, 'effectiveStartDate'])"
-                                                    class="text-danger">*</span>
-                                            </label>
-                                            <div class="input-group">
-                                                <input type="date" class="form-control"
-                                                    formControlName="effectiveStartDate"
-                                                    [appErrorTooltip]="getMedicationControl(currentStep, mIndex, 'effectiveStartDate')"
-                                                    [submitted]="isSubmitted" [customMessages]="{
-      required: 'Effective Start Date is required.',
-      invalidDate:'Enter a valid date.',
-      minDateExceeded:'Date cannot be earlier than 1700.',
-      maxDateExceeded:'Date cannot be later than 2040'
-    }">
-                                            </div>
+                   <div class="input-group">
+    <input type="text"
+           class="form-control"
+           formControlName="medicationName"
+           placeholder="Search medicine"
+           [appErrorTooltip]="getMedicationControl(currentStep, mIndex, 'medicationName')"
+           [submitted]="isSubmitted"
+           [customMessages]="{
+                required: 'Medicine is required.',
+                medicineInvalid: 'Please select a valid medicine from the dropdown.'
+           }">
+</div>
 
 
-                                        </div>
+                      
+                        <ul class="dropdown-menu show w-100" *ngIf="medicines.length > 0">
+                            <li *ngFor="let m of medicines" class="dropdown-item"
+                                (click)="selectMedicine(m, currentStep, mIndex)">
+                                {{ m.brandName }}
+                            </li>
+                        </ul>
+                    </div>
 
-                                        <div class="col">
-                                            <label class="form-label fw-semibold">End Date
-                                                <span
-                                                    *ngIf="isRequired(['prescription', currentStep, 'medications', mIndex, 'effectiveEndDate'])"
-                                                    class="text-danger">*</span>
-                                            </label>
-                                            <div class="input-group">
-                                                <input type="date" class="form-control"
-                                                    formControlName="effectiveEndDate"
-                                                    [appErrorTooltip]="getMedicationControl(currentStep, mIndex, 'effectiveEndDate')"
-                                                    [submitted]="isSubmitted" [customMessages]="{
-      required: 'Effective End Date is required.',
-      invalidDate:'Enter a valid date.',
-      minDateExceeded:'Date cannot be earlier than 1700.',
-      maxDateExceeded:'Date cannot be later than 2040'
-    }">
-                                            </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Status
+                            <span *ngIf="isRequired(['prescription', currentStep, 'medications', mIndex, 'status'])"
+                                  class="text-danger">*</span>
+                        </label>
 
-                                        </div>
-                                    </div>
+                        <select class="form-control" formControlName="status">
+                            <option value="ACTIVE">Active</option>
+                            <option value="COMPLETED">Completed</option>
+                            <option value="ONHOLD">On Hold</option>
+                            <option value="NOTTAKEN">Not Taken</option>
+                            <option value="INTENDED">Intended</option>
+                        </select>
+                    </div>
+                </div>
 
-                                    <hr>
+                <!-- DATES -->
+                <div class="row">
+                    <div class="col">
+                        <label class="form-label fw-semibold">Start Date of Medication
+                            <span *ngIf="isRequired(['prescription', currentStep, 'medications', mIndex, 'effectiveStartDate'])"
+                                  class="text-danger">*</span>
+                        </label>
+                        <input type="date" class="form-control" formControlName="effectiveStartDate">
+                    </div>
 
-                                    <!-- DOSAGE -->
-                                    <div formGroupName="dosage">
+                    <div class="col">
+                        <label class="form-label fw-semibold">End Date of Medication
+                            <span *ngIf="isRequired(['prescription', currentStep, 'medications', mIndex, 'effectiveEndDate'])"
+                                  class="text-danger">*</span>
+                        </label>
+                        <input type="date" class="form-control" formControlName="effectiveEndDate">
+                    </div>
+                </div>
+
+                <hr>
+
+                <!-- DOSAGE -->
+                 <div formGroupName="dosage">
                                         <h6 class="fw-bold">Dosage</h6>
 
-                                        <div class="row">
-                                            <div class="col">
+                                        <div class="row g-3">
+                                            <div class="col-12 col-lg-4">
                                                 <label>Amount
                                                     <span
                                                         *ngIf="isRequired(['prescription', currentStep, 'medications', mIndex, 'dosage', 'amount'])"
@@ -272,7 +248,7 @@
 
                                             </div>
 
-                                            <div class="col position-relative">
+                                            <div class="col-12 col-lg-4 ">
                                                 <label>Unit
                                                     <span
                                                         *ngIf="isRequired(['prescription', currentStep, 'medications', mIndex, 'dosage', 'amountUnitId'])"
@@ -288,7 +264,7 @@
                                                 </ul>
                                             </div>
 
-                                            <div class="col position-relative">
+                                            <div class="col-12 col-lg-4">
                                                 <label>Route
                                                     <span
                                                         *ngIf="isRequired(['prescription', currentStep, 'medications', mIndex, 'dosage', 'routeId'])"
@@ -315,57 +291,48 @@
                                     <div formGroupName="timing">
                                         <h6 class="fw-bold">Timing</h6>
 
-                                        <div class="row">
-                                            <div class="col">
-                                                <label>Frequency
-                                                    <span
-                                                        *ngIf="isRequired(['prescription', currentStep, 'medications', mIndex, 'timing', 'frequency'])"
-                                                        class="text-danger">*</span>
-                                                </label>
-                                                <div class="input-group">
-                                                    <input type="number" class="form-control"
-                                                        formControlName="frequency"
-                                                        [appErrorTooltip]="getMedicationControl(currentStep, mIndex, 'timing.frequency')"
-                                                        [submitted]="isSubmitted" [customMessages]="{
-      required: 'Frequency is required.',  
-    }">
+                                        <div class="row g-3">
+  <div class="col-12 col-lg-4">
+    <label>Frequency (Number of doses)
+      <span *ngIf="isRequired(['prescription', currentStep, 'medications', mIndex, 'timing', 'frequency'])" class="text-danger">*</span>
+    </label>
+    <div class="input-group">
+      <input type="number" class="form-control"
+             formControlName="frequency"
+             [appErrorTooltip]="getMedicationControl(currentStep, mIndex, 'timing.frequency')"
+             [submitted]="isSubmitted" 
+             [customMessages]="{ required: 'Frequency is required.' }">
+    </div>
+  </div>
 
-                                                </div>
+  <div class="col-12 col-lg-4">
+    <label>Period (Interval)
+      <span *ngIf="isRequired(['prescription', currentStep, 'medications', mIndex, 'timing', 'period'])" class="text-danger">*</span>
+    </label>
+    <div class="input-group">
+      <input type="number" class="form-control" formControlName="period"
+             [appErrorTooltip]="getMedicationControl(currentStep, mIndex, 'timing.period')"
+             [submitted]="isSubmitted" 
+             [customMessages]="{ required: 'Period is required.' }">
+    </div>
+  </div>
 
-                                            </div>
+  <div class="col-12 col-lg-4">
+    <label>Time unit
+      <span *ngIf="isRequired(['prescription', currentStep, 'medications', mIndex, 'timing', 'periodUnit'])" class="text-danger">*</span>
+    </label>
+    <div class="input-group">
+      <select class="form-control" formControlName="periodUnit" placeHolder= "Enter the unit of Time"
+              [appErrorTooltip]="getMedicationControl(currentStep, mIndex, 'timing.periodUnit')"
+              [submitted]="isSubmitted" 
+              [customMessages]="{ required: 'Period Unit is required.' }">
+              <option value="" disabled selected hidden>Enter the unit of time</option>
+        <option *ngFor="let p of periodUnit" [value]="p.value">{{ p.display }}</option>
+      </select>
+    </div>
+  </div>
+</div>
 
-                                            <div class="col">
-                                                <label>Period <span
-                                                        *ngIf="isRequired(['prescription', currentStep, 'medications', mIndex, 'timing', 'period'])"
-                                                        class="text-danger">*</span></label>
-                                                <div class="input-group">
-                                                    <input type="number" class="form-control" formControlName="period"
-                                                        [appErrorTooltip]="getMedicationControl(currentStep, mIndex, 'timing.period')"
-                                                        [submitted]="isSubmitted" [customMessages]="{
-      required: 'Period is required.',  
-    }">
-                                                </div>
-
-                                            </div>
-
-                                            <div class="col">
-                                                <label>Unit <span
-                                                        *ngIf="isRequired(['prescription', currentStep, 'medications', mIndex, 'timing', 'periodUnit'])"
-                                                        class="text-danger">*</span></label>
-                                                <div class="input-group">
-                                                    <select class="form-control" formControlName="periodUnit"
-                                                        [appErrorTooltip]="getMedicationControl(currentStep, mIndex, 'timing.periodUnit')"
-                                                        [submitted]="isSubmitted" [customMessages]="{
-      required: 'Period Unit is required.',  
-    }">
-                                                        <option *ngFor="let p of periodUnit" [value]="p.value">{{
-                                                            p.display
-                                                            }}</option>
-                                                    </select>
-                                                </div>
-
-                                            </div>
-                                        </div>
 
                                         <div class="row mt-2">
                                             <div class="col">
@@ -388,11 +355,31 @@
                                         </p>
                                     </div>
 
-                                </div>
-                            </div>
-                        </div>
+                <!-- REMOVE BUTTON (INSIDE ACCORDION BODY — FINAL FIX) -->
+                <div class="text-end mt-3">
 
-                    </div>
+                    <!-- UPDATE MODE → only for NEW meds -->
+                    <button *ngIf="mode === 'update' && !med.get('isExisting')?.value"
+                        type="button"
+                        class="btn btn-danger btn-sm"
+                        (click)="removeMedication(stepIndex, mIndex)">
+                        <i class="fa-solid fa-trash me-1"></i> Remove Medication
+                    </button>
+
+                    <!-- ADD MODE → always visible -->
+                    <button *ngIf="mode === 'add'"
+                        type="button"
+                        class="btn btn-danger btn-sm"
+                        (click)="removeMedication(stepIndex, mIndex)">
+                        <i class="fa-solid fa-trash me-1"></i> Remove Medication
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
                     <hr />
 
                 </div> <!-- END currentStep block -->
