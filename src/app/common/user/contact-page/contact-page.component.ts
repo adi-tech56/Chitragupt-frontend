@@ -13,6 +13,7 @@ import { PatientContactService } from 'src/app/core/Services/PatientServices/pat
 import { AuthService } from 'src/app/core/Services/auth-service.service';
 import { LocationService } from 'src/app/core/Services/PatientServices/locationService.service';
 import { Location } from '@angular/common';
+import { ToastService } from 'src/app/core/Services/toast.service';
 declare var bootstrap: any;
 
 @Component({
@@ -63,7 +64,8 @@ export class ContactPageComponent implements OnInit, OnDestroy {
     private locationService: LocationService,
     private http: HttpClient,
     private auth: AuthService,
-    private location: Location
+    private location: Location,
+    private toaster: ToastService
   ) {
     // build form with same shape as your backend expects
     this.contactForm = this.fb.group({
@@ -570,12 +572,15 @@ export class ContactPageComponent implements OnInit, OnDestroy {
 
     // ensure first telecom exists and is email
     if (this.contactTelecoms.length === 0) {
-      alert('Please add an email contact (first telecom).');
+      this.toaster.show(
+        'Please add an email contact (first telecom).',
+        'error'
+      );
       return;
     }
 
     if (this.getTelecomSystem(0) !== 'email') {
-      alert('The first telecom must be an Email.');
+      this.toaster.show('The first telecom must be an Email!', 'error');
       return;
     }
 
@@ -584,9 +589,9 @@ export class ContactPageComponent implements OnInit, OnDestroy {
       this.updateTelecomValidators(i);
 
     if (this.contactForm.invalid) {
-      console.log('❌ Form is invalid. Below are the invalid fields:');
+      console.log('Form is invalid. Below are the invalid fields:');
       this.logInvalidFields(this.contactForm);
-      alert('Please fill required fields correctly.');
+      this.toaster.show('Please fill required fields correctly!', 'error');
       return;
     }
 
@@ -612,7 +617,7 @@ export class ContactPageComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Failed to update contact', err);
-          alert('Could not update contact.');
+          this.toaster.show('Could not save contact.!', 'error');
         },
       });
     } else {
@@ -627,7 +632,7 @@ export class ContactPageComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Failed to save contact', err);
-          alert('Could not save contact.');
+          this.toaster.show('Could not save contact.!', 'error');
         },
       });
     }
@@ -635,7 +640,7 @@ export class ContactPageComponent implements OnInit, OnDestroy {
 
   confirmDelete(id: number) {
     if (!id) {
-      alert('Contact id missing');
+      this.toaster.show('Contact id missing!', 'error');
       return;
     }
     if (!confirm('Delete this emergency contact?')) return;
@@ -645,7 +650,7 @@ export class ContactPageComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Failed to delete contact', err);
-        alert('Could not delete contact.');
+        this.toaster.show('Could not delete contact!', 'error');
       },
     });
   }
