@@ -231,7 +231,7 @@ export class AllergyFormsComponent implements OnInit {
   onSubmit() {
     if (this.allergyForm.invalid) {
       this.allergyForm.markAllAsTouched();
-      alert('Please fill all required fields.');
+      this.toaster.show('Please fill all required fields..', 'error');
       return;
     }
 

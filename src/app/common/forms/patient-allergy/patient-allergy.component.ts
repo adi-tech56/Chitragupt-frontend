@@ -173,7 +173,7 @@ selectAllergy(value: string, index: number) {
 
     if (this.allergies.invalid) {
       this.allergies.markAllAsTouched();
-      alert('Please fill all required fields.');
+      this.toaster.show('Please fill all required fields.', 'error');
       return;
     }
 

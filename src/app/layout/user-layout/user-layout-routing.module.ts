@@ -45,7 +45,7 @@ const routes: Routes = [
           },
         ],
       },
-     
+
       // { path: "medications", component: MedicationPageComponent, canActivate: [AuthGuard, RoleGuard], data: { roles: ['PATIENT'] } },
       // { path: "view-prescription", component: ViewPrescriptionComponent, canActivate: [AuthGuard, RoleGuard], data: { roles: ['PATIENT'] } }
       {
