@@ -80,3 +80,125 @@
 .modal .modal-content {
   border-radius: 8px;
 }
+/* -------------------------
+   GLOBAL RESPONSIVE FIXES
+-------------------------- */
+
+/* Reduce padding, font size & gaps for mobile */
+@media (max-width: 576px) {
+  .profile-title {
+    font-size: 20px;
+    text-align: center;
+  }
+
+  .avatar-circle {
+    width: 46px;
+    height: 46px;
+    font-size: 24px;
+    margin-right: 10px;
+  }
+
+  .item-box {
+    padding: 12px;
+    margin-bottom: 30px;
+  }
+
+  .inner {
+    padding: 12px;
+  }
+
+  /* Buttons */
+  .btn-primary,
+  .btn-outline-primary,
+  .btn-danger {
+    padding: 6px 8px;
+    font-size: 14px;
+  }
+
+  /* Action buttons (edit/delete) stack on mobile */
+  .position-absolute.top-0.end-0.p-2.d-flex.gap-2 {
+    position: static !important;
+    justify-content: center;
+    margin-bottom: 10px;
+  }
+
+  /* Input fields stack better */
+  .row.g-3 .col-md-4,
+  .row.g-3 .col-md-6,
+  .row.g-3 .col-md-3 {
+    width: 100%;
+  }
+
+  /* Modal adjustments */
+  .modal-dialog {
+    width: 95% !important;
+    margin: auto;
+  }
+
+  .modal-content {
+    padding: 8px !important;
+  }
+}
+
+/* -------------------------
+   SMALL TABLETS (576px–768px)
+-------------------------- */
+@media (min-width: 576px) and (max-width: 768px) {
+  .profile-title {
+    font-size: 22px;
+  }
+
+  .avatar-circle {
+    width: 52px;
+    height: 52px;
+    font-size: 28px;
+  }
+
+  .row.g-3 .col-md-4,
+  .row.g-3 .col-md-6,
+  .row.g-3 .col-md-3 {
+    width: 50%;
+  }
+
+  .item-box {
+    margin-bottom: 40px;
+  }
+
+  /* Edit/Delete alignment */
+  .position-absolute.top-0.end-0.p-2 {
+    top: 5px;
+    right: 10px;
+  }
+}
+
+/* -------------------------
+   MEDIUM DEVICES (768px–992px)
+-------------------------- */
+@media (min-width: 768px) and (max-width: 992px) {
+  .profile-title {
+    font-size: 24px;
+  }
+
+  .avatar-circle {
+    width: 58px;
+    height: 58px;
+    font-size: 30px;
+  }
+
+  /* For tablets → 2-column layout instead of 3 */
+  .row.g-3 .col-md-4 {
+    width: 50%;
+  }
+}
+
+/* -------------------------
+   LARGE DEVICES (992px and up)
+-------------------------- */
+@media (min-width: 992px) {
+  /* Keep original desktop layout */
+  .avatar-circle {
+    width: 60px;
+    height: 60px;
+    font-size: 32px;
+  }
+}

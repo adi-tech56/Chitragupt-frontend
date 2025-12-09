@@ -1,17 +1,16 @@
 /* You can add global styles to this file, and also import other style files */
 :root {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f7f6;
+  color: #333;
+  display: flex;
+  background-image: var(--bg-gradient);
 
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f7f6;
-    color: #333;
-    display: flex;
-    background-image: var(--bg-gradient);
-
-    margin: 0 !important;
-      /* Primary Theme Colors */
-  --primary-color: #007bff;      
+  margin: 0 !important;
+  /* Primary Theme Colors */
+  --primary-color: #007bff;
   --primary-dark: #115293;
   --primary-light: #63a4ff;
   /* Accent / Secondary */
@@ -22,9 +21,9 @@
   --bg-light: #ffffff;
   --bg-gradient: linear-gradient(135deg, #e3f2fd, #bbdefb);
   --bg-dark: #0d47a1;
-  --bg-gradient-form:linear-gradient(135deg, #e3f2fd, #d4e3f0);
+  --bg-gradient-form: linear-gradient(135deg, #e3f2fd, #d4e3f0);
   /* Text Colors */
-  --text-heading:#003366;
+  --text-heading: #003366;
   --text-primary: #212121;
   --text-secondary: #757575;
   --text-on-primary: #ffffff;

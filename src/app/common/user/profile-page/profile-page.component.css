@@ -116,3 +116,130 @@ label {
 p {
   margin: 0;
 }
+
+/* -------------------------
+   MOBILE FIRST (DEFAULT)
+-------------------------- */
+
+@media (max-width: 576px) {
+  /* Profile title + avatar alignment */
+  .profile-title {
+    font-size: 20px;
+    text-align: center;
+  }
+
+  .avatar-circle {
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+    margin-right: 10px;
+  }
+
+  /* Action buttons stack */
+  .profile-card .d-flex.align-items-center.justify-content-between {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .profile-card .d-flex.align-items-center > div:last-child {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .profile-card button {
+    margin: 5px;
+  }
+
+  /* Reduce padding inside boxes */
+  .item-box {
+    padding: 12px !important;
+  }
+
+  .section {
+    padding: 15px;
+  }
+
+  /* Grid fixes */
+  .row.g-3 > div {
+    width: 100% !important;
+  }
+
+  /* Edit/Delete icons inside Address & Telecom */
+  .item-box .position-absolute.top-0.end-0 {
+    position: static !important;
+    margin-bottom: 10px;
+    display: flex !important;
+    justify-content: flex-end;
+  }
+
+  /* Modal responsive */
+  .modal-dialog {
+    width: 95% !important;
+    margin: auto !important;
+  }
+
+  .modal-content {
+    padding: 10px !important;
+  }
+
+  /* Autocomplete dropdown fix */
+  .list-group.position-absolute {
+    max-height: 150px !important;
+  }
+}
+
+/* -------------------------
+   SMALL TABLETS (576px–768px)
+-------------------------- */
+@media (min-width: 576px) and (max-width: 768px) {
+  .profile-title {
+    font-size: 22px;
+  }
+
+  .avatar-circle {
+    width: 52px;
+    height: 52px;
+    font-size: 28px;
+  }
+
+  .row.g-3 > div {
+    width: 48%;
+  }
+
+  /* Better spacing */
+  .item-box {
+    padding: 15px;
+  }
+}
+
+/* -------------------------
+   MEDIUM SCREENS (768px–992px)
+-------------------------- */
+@media (min-width: 768px) and (max-width: 992px) {
+  .profile-title {
+    font-size: 24px;
+  }
+
+  .row.g-3 > div.col-md-5,
+  .row.g-3 > div.col-md-6 {
+    width: 48%;
+  }
+
+  /* Address & Telecom rows */
+  .item-box .row.g-3 > div {
+    width: 48% !important;
+  }
+}
+
+/* -------------------------
+   LARGE SCREENS (DESKTOP)
+-------------------------- */
+@media (min-width: 992px) {
+  /* Desktop stays exactly as your design */
+  .avatar-circle {
+    width: 60px;
+    height: 60px;
+    font-size: 32px;
+  }
+}
