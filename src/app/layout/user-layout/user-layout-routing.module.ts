@@ -2,13 +2,13 @@ import { Component, NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { UserLayoutComponent } from './user-layout.component';
 import { HomePageComponent } from 'src/app/common/user/home-page/home-page.component';
-import { AddMedicationComponent } from 'src/app/common/forms/add-medication/add-medication.component';
+
 import { AuthGuard } from 'src/app/core/Gaurds/auth.guard';
 import { RoleGuard } from 'src/app/core/Gaurds/role.guard';
 import { ProfilePageComponent } from 'src/app/common/user/profile-page/profile-page.component';
 import { ContactPageComponent } from 'src/app/common/user/contact-page/contact-page.component';
 import { AllergyFormsComponent } from 'src/app/common/user/allergy-forms/allergy-forms.component';
-import { UpdatePrescriptionComponent } from 'src/app/common/forms/update-prescription/update-prescription.component';
+
 import { SharePrescriptionComponent } from 'src/app/common/share-prescription/share-prescription.component';
 import { ViewSharedPrescriptionComponent } from 'src/app/common/view-shared-prescription/view-shared-prescription.component';
 import { AddUpdatePrescriptionComponent } from 'src/app/common/forms/add-update-prescription/add-update-prescription.component';
@@ -50,12 +50,7 @@ const routes: Routes = [
           },
         ],
       },
-      {
-        path: 'update-medication/:id',
-        component: UpdatePrescriptionComponent,
-        canActivate: [AuthGuard, RoleGuard],
-        data: { roles: ['PATIENT'] },
-      },
+     
       // { path: "medications", component: MedicationPageComponent, canActivate: [AuthGuard, RoleGuard], data: { roles: ['PATIENT'] } },
       // { path: "view-prescription", component: ViewPrescriptionComponent, canActivate: [AuthGuard, RoleGuard], data: { roles: ['PATIENT'] } }
       {
