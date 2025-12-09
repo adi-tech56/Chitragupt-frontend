@@ -6,8 +6,8 @@ import { map, Observable, of } from 'rxjs';
   providedIn: 'root'
 })
 export class AutoCompleteService {
-  // private conditionUrl = 'https://clinicaltables.nlm.nih.gov/api/conditions/v3/search';
-  private baseUrl = 'http://localhost:8089/patient/medication';
+  
+  private baseUrl = 'patient/medication';
   constructor(private http: HttpClient) { }
 
   //Medical Conditons Search

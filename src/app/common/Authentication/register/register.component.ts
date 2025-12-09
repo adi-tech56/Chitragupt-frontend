@@ -80,7 +80,7 @@ export class RegisterComponent {
   passwordCheck = this.form.get('passwords') as FormGroup;
   response: any;
   googleSignIn() {
-    window.location.href = "http://localhost:8089/oauth2/authorization/google";
+    window.location.href = "oauth2/authorization/google";
   }
 
 

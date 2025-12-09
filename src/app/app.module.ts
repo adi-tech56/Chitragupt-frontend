@@ -22,6 +22,7 @@ import { AuthInterceptor } from './core/Interceptors/auth-interceptor';
 import { ToasterComponent } from './common/toaster/toaster.component';
 import { SharedModule } from './shared/shared.module';
 import { AddUpdatePrescriptionComponent } from './common/forms/add-update-prescription/add-update-prescription.component';
+import { ApiBaseUrlInterceptor } from './core/Interceptors/api-base-url.interceptor';
 @NgModule({
   declarations: [
     AppComponent,
@@ -45,6 +46,11 @@ import { AddUpdatePrescriptionComponent } from './common/forms/add-update-prescr
     SharedModule,
   ],
   providers: [
+     {
+      provide: HTTP_INTERCEPTORS,
+      useClass: ApiBaseUrlInterceptor,
+      multi: true
+    },
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
   ],
   bootstrap: [AppComponent],

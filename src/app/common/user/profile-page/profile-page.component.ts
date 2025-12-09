@@ -63,7 +63,7 @@ export class ProfilePageComponent implements OnInit {
 
   private phoneRegex = /^(?!.*^(\d)\1{9}$)\d{10}$/;
 
-  private profileBase = 'http://localhost:8089/patient/profile';
+  private profileBase = 'patient/profile';
 
   constructor(
     private profileService: PatientProfileService,
