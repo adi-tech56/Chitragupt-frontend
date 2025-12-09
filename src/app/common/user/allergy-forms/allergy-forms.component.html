@@ -8,64 +8,43 @@
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="text-primary mb-0 profile-title">Allergy Details</h2>
 
-        <button
-          type="button"
-          class="btn btn-outline-primary"
-          (click)="addAllergy()"
-        >
+        <button type="button" class="btn btn-outline-primary" (click)="addAllergy()">
           <i class="fa fa-plus"></i>
         </button>
       </div>
 
-      <div
-        formArrayName="allergies"
-        class="scroll-section"
-        style="background-color: #f8fbff; color: #236ad7"
-      >
-        <div
-          *ngFor="let grp of allergies.controls; let i = index"
-          [formGroupName]="i"
-          class="mb-3 border rounded p-3"
-        >
+      <div formArrayName="allergies" class="scroll-section" style="background-color: #f8fbff; color: #236ad7">
+        <div *ngFor="let grp of allergies.controls; let i = index" [formGroupName]="i" class="mb-3 border rounded p-3">
           <div class="row">
             <!-- ALLERGY NAME -->
             <div class="col-md-6 mb-3">
-              <label class="form-label"
-                >Allergy Name <span class="text-danger">*</span></label
-              >
+              <label class="form-label">Allergy Name <span class="text-danger">*</span></label>
 
               <div class="autocomplete-container position-relative">
-                <input
-                  type="text"
-                  class="form-control"
-                  formControlName="allergyName"
-                  placeholder="Search allergy name"
-                />
+                <div class="input-group">
+                  <input type="text" formControlName="allergyName" placeholder="Search allergy name"
+                    class="form-control" [appErrorTooltip]="allergies.at(i).get('allergyName')" [customMessages]="{
+    required: 'Allergy name is required.',
+    conditionInvalid: 'Please select a valid allergy from the dropdown.'
+  }" />
+
+                </div>
+
 
                 <!-- Autocomplete -->
-                <ul
-                  class="dropdown-menu w-100"
-                  [class.show]="suggestions[i] && suggestions[i].length > 0"
+                <ul class="dropdown-menu w-100" [class.show]="suggestions[i] && suggestions[i].length > 0"
                   *ngIf="suggestions[i] && suggestions[i].length > 0"
-                  style="width: 100%; max-height: 200px; overflow-y: auto"
-                >
-                  <li
-                    class="dropdown-item"
-                    *ngFor="let item of suggestions[i]"
-                    (click)="selectAllergy(item, i)"
-                  >
+                  style="width: 100%; max-height: 200px; overflow-y: auto">
+                  <li class="dropdown-item" *ngFor="let item of suggestions[i]" (click)="selectAllergy(item, i)">
                     {{ item }}
                   </li>
                 </ul>
 
                 <!-- Validation -->
-                <small
-                  class="text-danger"
-                  *ngIf="
+                <small class="text-danger" *ngIf="
                     grp.get('allergyName')?.touched &&
                     grp.get('allergyName')?.hasError('required')
-                  "
-                >
+                  ">
                   Allergy name is required.
                 </small>
               </div>
@@ -73,30 +52,23 @@
 
             <!-- CLINICAL STATUS -->
             <div class="col-md-6 mb-3">
-              <label class="form-label"
-                >Clinical Status <span class="text-danger">*</span></label
-              >
+              <label class="form-label">Clinical Status <span class="text-danger">*</span></label>
               <select class="form-select" formControlName="clinicalStatus">
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
                 <option value="resolved">Resolved</option>
               </select>
-              <small
-                class="text-danger"
-                *ngIf="
+              <small class="text-danger" *ngIf="
                   grp.get('clinicalStatus')?.touched &&
                   grp.get('clinicalStatus')?.hasError('required')
-                "
-              >
+                ">
                 Clinical status is required.
               </small>
             </div>
 
             <!-- VERIFICATION STATUS -->
             <div class="col-md-6 mb-3">
-              <label class="form-label"
-                >Verification Status <span class="text-danger">*</span></label
-              >
+              <label class="form-label">Verification Status <span class="text-danger">*</span></label>
               <select class="form-select" formControlName="verificationStatus">
                 <option value="unconfirmed">Unconfirmed</option>
                 <option value="presumed">Presumed</option>
@@ -104,122 +76,87 @@
                 <option value="refuted">Refuted</option>
                 <option value="entered-in-error">Entered in Error</option>
               </select>
-              <small
-                class="text-danger"
-                *ngIf="
+              <small class="text-danger" *ngIf="
                   grp.get('verificationStatus')?.touched &&
                   grp.get('verificationStatus')?.hasError('required')
-                "
-              >
+                ">
                 Verification status is required.
               </small>
             </div>
 
             <!-- ALLERGY TYPE -->
             <div class="col-md-6 mb-3">
-              <label class="form-label"
-                >Allergy Type <span class="text-danger">*</span></label
-              >
+              <label class="form-label">Allergy Type <span class="text-danger">*</span></label>
               <select class="form-select" formControlName="allergyType">
                 <option value="allergy">Allergy</option>
                 <option value="intolerance">Intolerance</option>
               </select>
-              <small
-                class="text-danger"
-                *ngIf="
+              <small class="text-danger" *ngIf="
                   grp.get('allergyType')?.touched &&
                   grp.get('allergyType')?.hasError('required')
-                "
-              >
+                ">
                 Allergy type is required.
               </small>
             </div>
 
             <!-- CATEGORY -->
             <div class="col-md-6 mb-3">
-              <label class="form-label"
-                >Category <span class="text-danger">*</span></label
-              >
+              <label class="form-label">Category <span class="text-danger">*</span></label>
               <select class="form-select" formControlName="category">
                 <option value="food">Food</option>
                 <option value="medication">Medication</option>
                 <option value="environment">Environment</option>
                 <option value="biologic">Biologic</option>
               </select>
-              <small
-                class="text-danger"
-                *ngIf="
+              <small class="text-danger" *ngIf="
                   grp.get('category')?.touched &&
                   grp.get('category')?.hasError('required')
-                "
-              >
+                ">
                 Category is required.
               </small>
             </div>
 
             <!-- CRITICALITY -->
             <div class="col-md-6 mb-3">
-              <label class="form-label"
-                >Criticality <span class="text-danger">*</span></label
-              >
+              <label class="form-label">Criticality <span class="text-danger">*</span></label>
               <select class="form-select" formControlName="criticality">
                 <option value="low">Low</option>
                 <option value="high">High</option>
                 <option value="unable-to-assess">Unable to assess</option>
               </select>
-              <small
-                class="text-danger"
-                *ngIf="
+              <small class="text-danger" *ngIf="
                   grp.get('criticality')?.touched &&
                   grp.get('criticality')?.hasError('required')
-                "
-              >
+                ">
                 Criticality is required.
               </small>
             </div>
 
             <!-- ONSET DATE -->
             <div class="col-md-6 mb-3">
-              <label class="form-label"
-                >Onset Date (When the allergy started)
-                <span class="text-danger">*</span></label
-              >
-              <input
-                type="date"
-                class="form-control"
-                formControlName="onsetDate"
-                [max]="today"
-              />
+              <label class="form-label">Onset Date (When the allergy started)
+                <span class="text-danger">*</span></label>
+              <input type="date" class="form-control" formControlName="onsetDate" [max]="today" />
 
-              <small
-                class="text-danger"
-                *ngIf="
+              <small class="text-danger" *ngIf="
                   grp.get('onsetDate')?.touched &&
                   grp.get('onsetDate')?.hasError('required')
-                "
-              >
+                ">
                 Onset date is required.
               </small>
 
-              <small
-                class="text-danger"
-                *ngIf="
+              <small class="text-danger" *ngIf="
                   grp.get('onsetDate')?.touched &&
                   grp.get('onsetDate')?.hasError('maxDate')
-                "
-              >
+                ">
                 Date cannot be in the future.
               </small>
             </div>
           </div>
 
           <div class="text-end">
-            <button
-              type="button"
-              class="btn btn-outline-danger btn-sm"
-              (click)="removeAllergy(i)"
-              *ngIf="allergies.length > 1"
-            >
+            <button type="button" class="btn btn-outline-danger btn-sm" (click)="removeAllergy(i)"
+              *ngIf="allergies.length > 1">
               Remove
             </button>
           </div>
@@ -227,11 +164,7 @@
       </div>
 
       <div class="d-flex justify-content-between mt-4 mb-4">
-        <button
-          type="submit"
-          class="btn btn-success"
-          [disabled]="allergyForm.invalid"
-        >
+        <button type="submit" class="btn btn-success" [disabled]="allergyForm.invalid">
           Submit
         </button>
       </div>

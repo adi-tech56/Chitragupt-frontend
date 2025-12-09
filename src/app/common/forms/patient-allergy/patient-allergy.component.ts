@@ -1,11 +1,22 @@
 // src/app/features/patient-allergy/patient-allergy.component.ts
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { debounceTime, switchMap, Observable, forkJoin, of } from 'rxjs';
 import { PatientAllergyService } from 'src/app/core/Services/PatientServices/patient-allergy.service';
 import { AuthService } from 'src/app/core/Services/auth-service.service';
 import { ToastService } from 'src/app/core/Services/toast.service';
+function allergySelectedValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const reasonValid = control.parent?.get('allergyValid')?.value;
+    const touched = control.touched;
+
+    if (touched && !reasonValid) {
+      return { conditionInvalid: true };
+    }
+    return null;
+  };
+}
 
 @Component({
   selector: 'app-patient-allergy',
@@ -51,31 +62,45 @@ export class PatientAllergyComponent implements OnInit {
   }
 
   private registerAutocompleteListeners() {
-    this.allergies.controls.forEach((group, index) => {
-      const control = group.get('allergyName');
-      if (control && !(control as any)._autocompleteBound) {
-        (control as any)._autocompleteBound = true;
 
-        control.valueChanges
-          .pipe(
-            debounceTime(200),
-            switchMap((text) => {
-              if (!text || text.length < 2 || this.skipConditionFetch) {
-                this.skipConditionFetch = false;
-                return of([]);
-              }
-              return this.allergyService.conditionSearch(text);
-            })
-          )
-          .subscribe((data) => {
-            this.suggestions[index] = data;
-          });
-      }
-    });
+  this.allergies.controls.forEach((group, index) => {
+  const control = group.get('allergyName');
+
+  if (control && !(control as any)._autocompleteBound) {
+    (control as any)._autocompleteBound = true;
+
+    control.valueChanges
+      .pipe(
+        debounceTime(200),
+        switchMap(text => {
+          group.get('allergyValid')?.setValue(false, { emitEvent: false });
+
+          if (!text || text.length < 2 || this.skipConditionFetch) {
+            this.skipConditionFetch = false;
+            return of([]);
+          }
+
+          return this.allergyService.conditionSearch(text);
+        })
+      )
+      .subscribe(data => {
+        this.suggestions[index] = data;
+      });
   }
+});
+}
 
-  selectAllergy(value: string, index: number) {
-    this.allergies.at(index).get('allergyName')?.setValue(value);
+selectAllergy(value: string, index: number) {
+  const group = this.allergies.at(index) as FormGroup;
+
+  group.get('allergyName')?.setValue(value, { emitEvent: false });
+  group.get('allergyValid')?.setValue(true, { emitEvent: false });
+  const ctrl = group.get('allergyName');
+  if (ctrl?.hasError('conditionInvalid')) {
+    const errors = { ...ctrl.errors };
+    delete errors['conditionInvalid'];
+    ctrl.setErrors(Object.keys(errors).length ? errors : null);
+  }
     this.suggestions[index] = [];
     this.skipConditionFetch = true;
   }
@@ -86,7 +111,8 @@ export class PatientAllergyComponent implements OnInit {
 
   private createAllergyGroup(): FormGroup {
     return this.fb.group({
-      allergyName: ['', Validators.required],
+      allergyName:  ['', [Validators.required, allergySelectedValidator()]],
+      allergyValid: [false],
       clinicalStatus: ['', Validators.required],
       verificationStatus: ['', Validators.required],
       allergyType: ['', Validators.required],

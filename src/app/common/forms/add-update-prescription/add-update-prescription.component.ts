@@ -19,10 +19,16 @@ function dateValidator(control: AbstractControl) {
 }
 function conditionSelectedValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
+    const reasonValid = control.parent?.get('reasonValid')?.value;
+    const touched = control.touched;
 
-    return control.parent && control.parent.get('reasonValid')?.value ? null : { conditionInvalid: true };
+    if (touched && !reasonValid) {
+      return { conditionInvalid: true };
+    }
+    return null;
   };
 }
+
 function medicineSelectedValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
 
@@ -196,14 +202,14 @@ export class AddUpdatePrescriptionComponent implements OnInit, OnDestroy {
       error: err => console.error(err)
     });
   }
-formatDateForInput(dateStr: string | null): string | null {
-  if (!dateStr) return null;
-  const d = new Date(dateStr);
-  const yyyy = d.getFullYear();
-  const mm = ('0' + (d.getMonth() + 1)).slice(-2);
-  const dd = ('0' + d.getDate()).slice(-2);
-  return `${yyyy}-${mm}-${dd}`;
-}
+  formatDateForInput(dateStr: string | null): string | null {
+    if (!dateStr) return null;
+    const d = new Date(dateStr);
+    const yyyy = d.getFullYear();
+    const mm = ('0' + (d.getMonth() + 1)).slice(-2);
+    const dd = ('0' + d.getDate()).slice(-2);
+    return `${yyyy}-${mm}-${dd}`;
+  }
 
   patchFormWithReceivedData() {
     const data = this.receivedData;
@@ -223,7 +229,7 @@ formatDateForInput(dateStr: string | null): string | null {
         reason: pres.conditionName,
         notes: pres.notes
       });
-
+      group.get('reasonValid')?.setValue(true, { emitEvent: false });
       const medsArray = group.get('medications') as FormArray;
       medsArray.clear();
 
@@ -232,8 +238,8 @@ formatDateForInput(dateStr: string | null): string | null {
         medGroup.patchValue({
           medicationId: med.medicationId,
           medicationName: med.medication,
-          effectiveStartDate:this.formatDateForInput( med.effectiveStartDate),
-          effectiveEndDate:this.formatDateForInput(med.effectiveEndDate),
+          effectiveStartDate: this.formatDateForInput(med.effectiveStartDate),
+          effectiveEndDate: this.formatDateForInput(med.effectiveEndDate),
           status: med.status,
           dosage: {
             amount: med.dosage.amount,
@@ -268,14 +274,24 @@ formatDateForInput(dateStr: string | null): string | null {
     return this.superPrescription.get('prescription') as FormArray;
   }
 
-  createPrescriptionGroup(): FormGroup {
-    return this.fb.group({
-      reason: ['', [Validators.required, conditionSelectedValidator()]],
-      reasonValid: [false],
-      notes: [''],
-      medications: this.fb.array([this.createMedicationGroup()])
-    });
+createPrescriptionGroup(): FormGroup {
+  const group = this.fb.group({
+    reason: ['', [Validators.required, conditionSelectedValidator()]],
+    reasonValid: [false],
+    notes: [''],
+    medications: this.fb.array([this.createMedicationGroup()])
+  });
+group.get('reason')!.valueChanges.subscribe(() => {
+  const ctrl = group.get('reason')!;
+  group.get('reasonValid')!.setValue(false, { emitEvent: false });
+  if (!ctrl.touched) {
+    ctrl.markAsTouched({ onlySelf: true });
   }
+});
+  return group;
+ 
+}
+
 
   createMedicationGroup(isExisting: boolean = false): FormGroup {
     return this.fb.group({
@@ -295,9 +311,9 @@ formatDateForInput(dateStr: string | null): string | null {
       isExisting: [isExisting],
       dosage: this.fb.group({
         amount: [null, Validators.required],
-        amountUnitName: ['',Validators.required],
+        amountUnitName: ['', Validators.required],
         amountUnitId: [null, Validators.required],
-        routeName: ['',Validators.required],
+        routeName: ['', Validators.required],
         routeId: [null, Validators.required],
         instruction: ['']
       }),
@@ -513,10 +529,10 @@ formatDateForInput(dateStr: string | null): string | null {
   onMedicineInput(event: Event, stepIndex: number, medIndex: number) {
     const value = (event.target as HTMLInputElement).value;
     const medGroup = this.getMedications(stepIndex).at(medIndex) as FormGroup;
-     
 
-  // Trigger validation
-  medGroup.get('medicationName')?.updateValueAndValidity();
+
+    // Trigger validation
+    medGroup.get('medicationName')?.updateValueAndValidity();
 
     // Reset medicineId whenever user types manually
     medGroup.get('medicationId')?.setValue(null);
@@ -537,18 +553,18 @@ formatDateForInput(dateStr: string | null): string | null {
     }
   }
 
-selectMedicine(med: Medicine, stepIndex: number, medIndex: number) {
-  const medGroup = this.getMedications(stepIndex).at(medIndex) as FormGroup;
+  selectMedicine(med: Medicine, stepIndex: number, medIndex: number) {
+    const medGroup = this.getMedications(stepIndex).at(medIndex) as FormGroup;
 
-  medGroup.get('medicationId')?.setValue(med.medicationId);
-  medGroup.get('medicationName')?.setValue(med.brandName);
+    medGroup.get('medicationId')?.setValue(med.medicationId);
+    medGroup.get('medicationName')?.setValue(med.brandName);
 
-  // Clear validator error
-  medGroup.get('medicationName')?.setErrors(null);
+    // Clear validator error
+    medGroup.get('medicationName')?.setErrors(null);
 
-  this.medicines = [];
-  this.skipMedicineFetch = true;
-}
+    this.medicines = [];
+    this.skipMedicineFetch = true;
+  }
 
 
   currentMedicineName(stepIndex: number, medIndex: number): string {
@@ -793,10 +809,14 @@ selectMedicine(med: Medicine, stepIndex: number, medIndex: number) {
       this.medicationService.savePrescription(payload).subscribe({
         next: res => {
           console.log("Saved!", res);
+          this.toast.show('Prescription Saved !', 'success');
           this.goBack();
           this.dailyMeds.refreshMeds();
         },
-        error: err => console.error("Save failed", err)
+        error: err => {console.error("Save failed", err);
+           this.toast.show('Adding Prescription Failed.', 'error');
+
+        }
       });
     }
 
@@ -844,10 +864,14 @@ selectMedicine(med: Medicine, stepIndex: number, medIndex: number) {
       this.medicationService.updatePrescriptions(this.receivedData.superPrescriptionId, payload).subscribe({
         next: res => {
           console.log("Saved!", res);
+          this.toast.show('Prescription Updated !', 'success');
           this.goBack();
           this.dailyMeds.refreshMeds();
         },
-        error: err => console.error("Save failed", err)
+        error: err => {console.error("Save failed", err);
+           this.toast.show('Update Failed.', 'error');
+
+        }
       });
     }
   }
