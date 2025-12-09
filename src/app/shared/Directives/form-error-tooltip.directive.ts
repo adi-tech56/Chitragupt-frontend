@@ -156,6 +156,9 @@ if (errors['email']) {
     if (errors['conditionInvalid']) {
       return this.customMessages['conditionInvalid'] || 'Invalid field';
     }
+     if (errors['medicineInvalid']) {
+      return this.customMessages['medicineInvalid'] || 'Invalid field';
+    }
    
      if (errors['maxDateExceeded']) {
       return this.customMessages['maxDateExceeded'] || 'Invalid field';

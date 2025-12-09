@@ -17,12 +17,24 @@ function dateValidator(control: AbstractControl) {
   const date = new Date(value);
   return isNaN(date.getTime()) ? { invalidDate: true } : null;
 }
- function conditionSelectedValidator(): ValidatorFn {
+function conditionSelectedValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
-    // You can store a separate flag in the form
+
     return control.parent && control.parent.get('reasonValid')?.value ? null : { conditionInvalid: true };
   };
 }
+function medicineSelectedValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+
+    const parent = control.parent;
+    if (!parent) return null;
+
+    const medId = parent.get('medicationId')?.value;
+
+    return medId ? null : { medicineInvalid: true };
+  };
+}
+
 function dateRangeValidator(minDate: Date, maxDate: Date) {
   return (control: AbstractControl) => {
     const value = control.value;
@@ -99,11 +111,11 @@ export class AddUpdatePrescriptionComponent implements OnInit, OnDestroy {
   ) {
     this.superPrescription = this.fb.group({
       doctorName: ['', Validators.required],
-       prescriptionDate: ['', [  
-            Validators.required,
-            dateValidator,
-            dateRangeValidator(new Date('1700-01-01'), new Date('2040-12-31'))
-          ]],
+      prescriptionDate: ['', [
+        Validators.required,
+        dateValidator,
+        dateRangeValidator(new Date('1700-01-01'), new Date('2040-12-31'))
+      ]],
       notes: [''],
       prescription: this.fb.array([])
     });
@@ -184,6 +196,14 @@ export class AddUpdatePrescriptionComponent implements OnInit, OnDestroy {
       error: err => console.error(err)
     });
   }
+formatDateForInput(dateStr: string | null): string | null {
+  if (!dateStr) return null;
+  const d = new Date(dateStr);
+  const yyyy = d.getFullYear();
+  const mm = ('0' + (d.getMonth() + 1)).slice(-2);
+  const dd = ('0' + d.getDate()).slice(-2);
+  return `${yyyy}-${mm}-${dd}`;
+}
 
   patchFormWithReceivedData() {
     const data = this.receivedData;
@@ -212,8 +232,8 @@ export class AddUpdatePrescriptionComponent implements OnInit, OnDestroy {
         medGroup.patchValue({
           medicationId: med.medicationId,
           medicationName: med.medication,
-          effectiveStartDate: med.effectiveStartDate,
-          effectiveEndDate: med.effectiveEndDate,
+          effectiveStartDate:this.formatDateForInput( med.effectiveStartDate),
+          effectiveEndDate:this.formatDateForInput(med.effectiveEndDate),
           status: med.status,
           dosage: {
             amount: med.dosage.amount,
@@ -251,7 +271,7 @@ export class AddUpdatePrescriptionComponent implements OnInit, OnDestroy {
   createPrescriptionGroup(): FormGroup {
     return this.fb.group({
       reason: ['', [Validators.required, conditionSelectedValidator()]],
-        reasonValid: [false],
+      reasonValid: [false],
       notes: [''],
       medications: this.fb.array([this.createMedicationGroup()])
     });
@@ -260,24 +280,24 @@ export class AddUpdatePrescriptionComponent implements OnInit, OnDestroy {
   createMedicationGroup(isExisting: boolean = false): FormGroup {
     return this.fb.group({
       medicationId: [null, Validators.required],
-      medicationName: [''],
-      effectiveStartDate: ['', [  
-            Validators.required,
-            dateValidator,
-            dateRangeValidator(new Date('1700-01-01'), new Date('2040-12-31'))
-          ]],
-      effectiveEndDate: ['', [  
-            Validators.required,
-            dateValidator,
-            dateRangeValidator(new Date('1700-01-01'), new Date('2040-12-31'))
-          ]],
+      medicationName: ['', [Validators.required, medicineSelectedValidator()]],
+      effectiveStartDate: ['', [
+        Validators.required,
+        dateValidator,
+        dateRangeValidator(new Date('1700-01-01'), new Date('2040-12-31'))
+      ]],
+      effectiveEndDate: ['', [
+        Validators.required,
+        dateValidator,
+        dateRangeValidator(new Date('1700-01-01'), new Date('2040-12-31'))
+      ]],
       status: ['ACTIVE', Validators.required],
       isExisting: [isExisting],
       dosage: this.fb.group({
         amount: [null, Validators.required],
-        amountUnitName: [''],
+        amountUnitName: ['',Validators.required],
         amountUnitId: [null, Validators.required],
-        routeName: [''],
+        routeName: ['',Validators.required],
         routeId: [null, Validators.required],
         instruction: ['']
       }),
@@ -356,6 +376,7 @@ export class AddUpdatePrescriptionComponent implements OnInit, OnDestroy {
   nextStep() {
     const currentPrescription = this.prescriptions.at(this.currentStep);
     currentPrescription.markAllAsTouched();
+    this.isSubmitted = true;
     if (currentPrescription.invalid) {
       this.toast.show('Please fill all required fields in the current prescription before moving to the next step.', 'error');
 
@@ -378,6 +399,7 @@ export class AddUpdatePrescriptionComponent implements OnInit, OnDestroy {
 
   addNewPrescription() {
     const currentPrescription = this.prescriptions.at(this.currentStep);
+    this.isSubmitted = true;
     currentPrescription.markAllAsTouched();
     if (currentPrescription.invalid) {
       this.toast.show('Please fill all required fields in the current prescription before adding a new one.', 'error');
@@ -441,26 +463,26 @@ export class AddUpdatePrescriptionComponent implements OnInit, OnDestroy {
   }
 
 
-selectCondition(cond: any) {
-  const group = this.prescriptions.at(this.currentStep) as FormGroup;
+  selectCondition(cond: any) {
+    const group = this.prescriptions.at(this.currentStep) as FormGroup;
 
-  group.get('reason')?.setValue(cond.name || cond, { emitEvent: false });
+    group.get('reason')?.setValue(cond.name || cond, { emitEvent: false });
 
-  group.get('reasonValid')?.setValue(true, { emitEvent: false });
+    group.get('reasonValid')?.setValue(true, { emitEvent: false });
 
-  const reasonControl = group.get('reason');
-  if (reasonControl?.hasError('conditionInvalid')) {
-    const errors = { ...reasonControl.errors };
-    delete errors['conditionInvalid'];
-    reasonControl.setErrors(Object.keys(errors).length ? errors : null);
+    const reasonControl = group.get('reason');
+    if (reasonControl?.hasError('conditionInvalid')) {
+      const errors = { ...reasonControl.errors };
+      delete errors['conditionInvalid'];
+      reasonControl.setErrors(Object.keys(errors).length ? errors : null);
+    }
+
+    this.conditions = [];
+    this.skipConditionFetch = true;
+
+    console.log('After selecting condition — reasonValid:', group.get('reasonValid')?.value);
+    console.log('reason control errors:', reasonControl?.errors);
   }
-
-  this.conditions = [];
-  this.skipConditionFetch = true;
-
-  console.log('After selecting condition — reasonValid:', group.get('reasonValid')?.value);
-  console.log('reason control errors:', reasonControl?.errors);
-}
 
 
   //Medicine
@@ -491,6 +513,10 @@ selectCondition(cond: any) {
   onMedicineInput(event: Event, stepIndex: number, medIndex: number) {
     const value = (event.target as HTMLInputElement).value;
     const medGroup = this.getMedications(stepIndex).at(medIndex) as FormGroup;
+     
+
+  // Trigger validation
+  medGroup.get('medicationName')?.updateValueAndValidity();
 
     // Reset medicineId whenever user types manually
     medGroup.get('medicationId')?.setValue(null);
@@ -511,15 +537,18 @@ selectCondition(cond: any) {
     }
   }
 
-  selectMedicine(med: Medicine, stepIndex: number, medIndex: number) {
-    const medGroup = this.getMedications(stepIndex).at(medIndex) as FormGroup;
+selectMedicine(med: Medicine, stepIndex: number, medIndex: number) {
+  const medGroup = this.getMedications(stepIndex).at(medIndex) as FormGroup;
 
-    medGroup.get('medicationId')?.setValue(med.medicationId);
-    medGroup.get('medicationName')?.setValue(med.brandName);
-    medGroup.get('medicationId')?.setErrors(null);
-    this.medicines = [];
-    this.skipMedicineFetch = true;
-  }
+  medGroup.get('medicationId')?.setValue(med.medicationId);
+  medGroup.get('medicationName')?.setValue(med.brandName);
+
+  // Clear validator error
+  medGroup.get('medicationName')?.setErrors(null);
+
+  this.medicines = [];
+  this.skipMedicineFetch = true;
+}
 
 
   currentMedicineName(stepIndex: number, medIndex: number): string {
@@ -709,7 +738,7 @@ selectCondition(cond: any) {
   // ============= SUBMIT ===================
 
   submit() {
-     this.isSubmitted = true;
+    this.isSubmitted = true;
     if (this.superPrescription.invalid) {
       this.superPrescription.markAllAsTouched();
       this.toast.show('Please fill all required fields.', 'error');
@@ -746,7 +775,6 @@ selectCondition(cond: any) {
               amount: med.dosage.amount,
               amountUnitId: med.dosage.amountUnitId,
               routeId: med.dosage.routeId,
-
               instruction: med.dosage.instruction
             },
 
