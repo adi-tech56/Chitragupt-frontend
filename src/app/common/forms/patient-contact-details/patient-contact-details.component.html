@@ -10,7 +10,7 @@
             <div class="col-md-6 mb-3">
               <label
                 for="first-name"
-                class="form-label text-primary fw-semibold"
+                class="form-label text-primary fw-semibold required"
                 >First Name</label
               >
               <input
@@ -19,6 +19,7 @@
                 id="first-name"
                 name="first-name"
                 formControlName="firstName"
+                [appErrorTooltip]="contactForm.get('firstName')"
               />
             </div>
 
@@ -53,10 +54,14 @@
             </div>
 
             <div class="col-md-6 mb-3">
-              <label class="form-label text-primary fw-semibold"
+              <label class="form-label text-primary fw-semibold required"
                 >Relation</label
               >
-              <select class="form-select" formControlName="relationshipType">
+              <select
+                class="form-select"
+                formControlName="relationshipType"
+                [appErrorTooltip]="contactForm.get('relationshipType')"
+              >
                 <option *ngFor="let r of relationshipTypes" [value]="r.code">
                   {{ r.display }}
                 </option>
@@ -86,9 +91,12 @@
               <div class="row">
                 <!-- useCode -->
                 <div class="col-md-6 mb-3">
-                  <label>Address Use</label>
-                  <select class="form-select" formControlName="useCode">
-                    <option value="">Select</option>
+                  <label class="required">Address Use</label>
+                  <select
+                    class="form-select"
+                    formControlName="useCode"
+                    [appErrorTooltip]="address.get('useCode')"
+                  >
                     <option value="home">Home</option>
                     <option value="work">Work</option>
                     <option value="temp">Temp</option>
@@ -99,9 +107,12 @@
 
                 <!-- addressType -->
                 <div class="col-md-6 mb-3">
-                  <label>Address Type</label>
-                  <select class="form-select" formControlName="addressType">
-                    <option value="">Select</option>
+                  <label class="required">Address Type</label>
+                  <select
+                    class="form-select"
+                    formControlName="addressType"
+                    [appErrorTooltip]="address.get('addressType')"
+                  >
                     <option value="postal">Postal</option>
                     <option value="physical">Physical</option>
                     <option value="both">Both</option>
@@ -110,16 +121,21 @@
 
                 <!-- text -->
                 <div class="col-md-6 mb-3">
-                  <label>Address Text</label>
-                  <input class="form-control" formControlName="text" />
+                  <label class="required">Address Text</label>
+                  <input
+                    class="form-control"
+                    formControlName="text"
+                    [appErrorTooltip]="address.get('text')"
+                  />
                 </div>
 
                 <!-- city -->
                 <div class="col-md-6 mb-3 position-relative">
-                  <label>City</label>
+                  <label class="required">City</label>
                   <input
                     class="form-control"
                     formControlName="city"
+                    [appErrorTooltip]="address.get('city')"
                     (focus)="showCity[i] = true"
                     (input)="showCity[i] = true"
                     (blur)="hideDropdownLater(i, 'city')"
@@ -148,10 +164,11 @@
 
                 <!-- state -->
                 <div class="col-md-6 mb-3 position-relative">
-                  <label>State</label>
+                  <label class="required">State</label>
                   <input
                     class="form-control"
                     formControlName="state"
+                    [appErrorTooltip]="address.get('state')"
                     (focus)="showState[i] = true"
                     (input)="showState[i] = true"
                     (blur)="hideDropdownLater(i, 'state')"
@@ -180,20 +197,22 @@
 
                 <!-- postalCode -->
                 <div class="col-md-6 mb-3">
-                  <label>Postal Code</label>
+                  <label class="required">Postal Code</label>
                   <input
                     class="form-control"
                     formControlName="postalCode"
+                    [appErrorTooltip]="address.get('postalCode')"
                     readonly
                   />
                 </div>
 
                 <!-- country -->
                 <div class="col-md-6 mb-3 position-relative">
-                  <label>Country</label>
+                  <label class="required">Country</label>
                   <input
                     class="form-control"
                     formControlName="country"
+                    [appErrorTooltip]="address.get('country')"
                     (focus)="showCountry[i] = true"
                     (input)="showCountry[i] = true"
                     (blur)="hideDropdownLater(i, 'country')"
@@ -256,7 +275,6 @@
                 <div class="col-md-6 mb-3">
                   <label class="form-label fw-semibold">Contact Use</label>
                   <select class="form-select" formControlName="useCode">
-                    <option value="">Select</option>
                     <option value="home">Home</option>
                     <option value="work">Work</option>
                     <option value="temp">Temp</option>
@@ -266,12 +284,13 @@
                 </div>
 
                 <div class="col-md-6 mb-3" *ngIf="i === 0">
-                  <label class="form-label fw-semibold">Email</label>
+                  <label class="form-label fw-semibold required">Email</label>
                   <input
                     type="email"
                     class="form-control"
                     formControlName="value"
                     placeholder="e.g. example@email.com"
+                    [appErrorTooltip]="telecom.get('value')"
                   />
 
                   <!-- EMAIL VALIDATION -->
@@ -292,11 +311,12 @@
                 </div>
 
                 <div class="col-md-6 mb-3" *ngIf="i > 0">
-                  <label class="form-label fw-semibold">Phone</label>
+                  <label class="form-label fw-semibold required">Phone</label>
                   <input
                     class="form-control"
                     formControlName="value"
-                    placeholder="e.g. +91 9999999999"
+                    placeholder="e.g. 9876543219"
+                    [appErrorTooltip]="telecom.get('value')"
                   />
 
                   <div
@@ -340,6 +360,7 @@
             type="button"
             class="btn btn-primary"
             *ngIf="currentStep < maxStep"
+            [disabled]="!getStepControls(currentStep).valid"
             (click)="nextStep()"
           >
             Next

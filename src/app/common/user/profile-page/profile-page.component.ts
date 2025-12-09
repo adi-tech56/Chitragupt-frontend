@@ -543,7 +543,7 @@ export class ProfilePageComponent implements OnInit {
     });
   }
 
-  // ============ ALLERGY ============
+
   deleteAllergy(index: number, allergy: any) {
     if (!allergy?.id) {
       alert('Allergy id missing');
@@ -564,6 +564,6 @@ export class ProfilePageComponent implements OnInit {
     this.router.navigate(['/user/emergencyContact']);
   }
   addAllergy() {
-    this.router.navigate(['/user/allergyForm']);
+    this.router.navigate(['/user/allergyList']);
   }
 }

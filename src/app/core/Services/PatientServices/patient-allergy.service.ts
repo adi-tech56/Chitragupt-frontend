@@ -32,6 +32,14 @@ export class PatientAllergyService {
     return this.http.delete(`${this.baseUrl}/delete/${allergyId}`);
   }
 
+  updateAllergy(allergyId: number, payload: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/update/${allergyId}`, payload);
+  }
+
+  getAllergyById(id: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/${id}`);
+  }
+
   // AUTOCOMPLETE
   conditionSearch(term: string): Observable<string[]> {
     if (!term || term.length < 2) return of([]);

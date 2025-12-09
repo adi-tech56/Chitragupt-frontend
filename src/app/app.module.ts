@@ -43,7 +43,6 @@ import { AddUpdatePrescriptionComponent } from './common/forms/add-update-prescr
     HomeLayoutModule,
     UserLayoutModule,
     SharedModule,
-
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

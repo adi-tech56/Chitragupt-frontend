@@ -6,12 +6,19 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormArray,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { Router } from '@angular/router';
 import { debounceTime, distinctUntilChanged, Subscription } from 'rxjs';
 import { AuthService } from 'src/app/core/Services/auth-service.service';
 import { LocationService } from 'src/app/core/Services/PatientServices/locationService.service';
 import { PatientContactService } from 'src/app/core/Services/PatientServices/patient-contact.service';
+import { ToastService } from 'src/app/core/Services/toast.service';
 
 @Component({
   selector: 'app-patient-contact-details',
@@ -53,7 +60,8 @@ export class PatientContactDetailsComponent implements OnInit, OnDestroy {
     private http: HttpClient,
     private locationService: LocationService, // optional, still available if used elsewhere
     private patientContactService: PatientContactService,
-    private auth: AuthService
+    private auth: AuthService,
+    private toaster: ToastService
   ) {
     this.contactForm = this.fb.group({
       relationshipType: ['', Validators.required],
@@ -123,11 +131,29 @@ export class PatientContactDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
+  phoneValidator(control: any) {
+    const value = control.value;
+
+    if (!value) return null;
+
+    // Must be 10 digits
+    if (!/^[0-9]{10}$/.test(value)) {
+      return { invalidPhone: true };
+    }
+
+    // Reject numbers like 0000000000, 1111111111, ...
+    if (/^(\d)\1{9}$/.test(value)) {
+      return { sameDigit: true };
+    }
+
+    return null;
+  }
+
   createTelecomGroup(): FormGroup {
     return this.fb.group({
       system: ['Phone', Validators.required],
       useCode: [''],
-      value: ['', Validators.required],
+      value: ['',[Validators.required, this.phoneValidator]],
     });
   }
 
@@ -252,9 +278,33 @@ export class PatientContactDetailsComponent implements OnInit, OnDestroy {
       if (type === 'country') this.showCountry[i] = false;
     }, 180);
   }
-
   nextStep() {
-    if (this.currentStep < this.maxStep) this.currentStep++;
+    const currentStepControls = this.getStepControls(this.currentStep);
+
+    if (currentStepControls.invalid) {
+      currentStepControls.markAllAsTouched();
+      return;
+    }
+
+    this.currentStep++;
+  }
+  getStepControls(step: number): AbstractControl {
+    switch (step) {
+      case 1:
+        return this.fb.group({
+          firstName: this.contactForm.get('firstName')!,
+          relationshipType: this.contactForm.get('relationshipType')!,
+        });
+
+      case 2:
+        return this.contactForm.get('contactAddresses')!;
+
+      case 3:
+        return this.contactForm.get('contactTelecoms')!;
+
+      default:
+        return this.contactForm;
+    }
   }
 
   previousStep() {
@@ -276,13 +326,13 @@ export class PatientContactDetailsComponent implements OnInit, OnDestroy {
 
     this.patientContactService.saveContact(payload).subscribe({
       next: (res) => {
-        alert('Contact saved successfully!');
+        this.toaster.show('Emergency contact saved successfully!', 'success');
         localStorage.setItem('contactCompleted', 'true');
         this.contactSubmitted.emit();
       },
       error: (err) => {
         console.error(err);
-        alert('Failed to save contact');
+        this.toaster.show('Something went wrong. Try again.', 'error');
       },
     });
   }

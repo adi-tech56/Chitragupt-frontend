@@ -1,56 +1,119 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import {
+  AbstractControl,
   FormArray,
   FormBuilder,
   FormGroup,
   Validators,
 } from '@angular/forms';
 
-import {
-  debounceTime,
-  switchMap,
-  Observable,
-  forkJoin,
-  of,
-} from 'rxjs';
+import { debounceTime, switchMap, Observable, forkJoin, of } from 'rxjs';
 import { PatientAllergyService } from 'src/app/core/Services/PatientServices/patient-allergy.service';
 import { AuthService } from 'src/app/core/Services/auth-service.service';
 import { Location } from '@angular/common';
+import { ToastService } from 'src/app/core/Services/toast.service';
+import { ActivatedRoute } from '@angular/router';
 @Component({
   selector: 'app-allergy-forms',
   templateUrl: './allergy-forms.component.html',
-  styleUrls: ['./allergy-forms.component.css']
+  styleUrls: ['./allergy-forms.component.css'],
 })
 export class AllergyFormsComponent implements OnInit {
   @Output() allergySubmitted = new EventEmitter<void>();
 
   allergyForm: FormGroup;
   suggestions: any[][] = [];
+  today = new Date().toISOString().split('T')[0];
+  allergyId: number | null = null;
   private skipConditionFetch = false;
 
   constructor(
     private fb: FormBuilder,
     private allergyService: PatientAllergyService,
+    private route: ActivatedRoute,
     private auth: AuthService,
-    private location:Location
+    private location: Location,
+    private toaster: ToastService
   ) {
     this.allergyForm = this.fb.group({
       allergies: this.fb.array([]),
     });
   }
+
   goBack() {
     this.location.back();
   }
+
   ngOnInit() {
-    if (this.allergies.length === 0) {
+    this.allergyId = Number(this.route.snapshot.paramMap.get('id'));
+
+    if (this.allergyId) {
+      this.addAllergy();
+      this.loadExistingAllergy(this.allergyId);
+    } else {
+      // ADD MODE
       this.addAllergy();
     }
+
+    this.setupAutocomplete();
 
     this.allergies.valueChanges.subscribe(() => {
       this.registerAutocompleteListeners();
     });
   }
 
+  loadExistingAllergy(id: number) {
+    this.allergyService.getAllergyById(id).subscribe((a) => {
+      this.skipConditionFetch = true;
+
+      const group = this.allergies.at(0);
+
+      group.patchValue(
+        {
+          allergyName: a.allergyName,
+          clinicalStatus: a.clinicalStatus,
+          verificationStatus: a.verificationStatus,
+          allergyType: a.allergyType,
+          category: a.category,
+          criticality: a.criticality,
+          onsetDate: a.onsetDate,
+        },
+        { emitEvent: false }
+      );
+      this.suggestions[0] = [];
+      setTimeout(() => (this.skipConditionFetch = false), 300);
+    });
+  }
+
+  private setupAutocomplete() {
+    this.allergies.controls.forEach((group, index) => {
+      const control = group.get('allergyName');
+
+      if (!control) return;
+
+      control.valueChanges
+        .pipe(
+          debounceTime(300),
+          switchMap((value) => {
+            if (!value || value.length < 2) return of([]);
+            return this.allergyService.conditionSearch(value);
+          })
+        )
+        .subscribe((list) => {
+          this.suggestions[index] = list;
+        });
+    });
+  }
+
+  resetForm() {
+    while (this.allergies.length !== 0) {
+      this.allergies.removeAt(0);
+    }
+
+    this.suggestions = [];
+
+    this.addAllergy();
+  }
 
   private registerAutocompleteListeners() {
     this.allergies.controls.forEach((group, index) => {
@@ -78,9 +141,13 @@ export class AllergyFormsComponent implements OnInit {
   }
 
   selectAllergy(value: string, index: number) {
-    this.allergies.at(index).get('allergyName')?.setValue(value);
-    this.suggestions[index] = [];
-    this.skipConditionFetch = true;
+    const control = this.allergies.at(index).get('allergyName');
+
+    control?.setValue(value, { emitEvent: false }); // <-- IMPORTANT
+
+    this.suggestions[index] = []; // hide dropdown
+
+    this.skipConditionFetch = true; // block next fetch
   }
 
   get allergies(): FormArray {
@@ -95,17 +162,24 @@ export class AllergyFormsComponent implements OnInit {
       allergyType: ['', Validators.required],
       category: ['', Validators.required],
       criticality: ['', Validators.required],
-      onsetDate: ['', Validators.required],
+      onsetDate: ['', [Validators.required, this.noFutureDateValidator()]],
     });
   }
+  noFutureDateValidator() {
+    return (control: AbstractControl) => {
+      if (!control.value) return null;
 
+      const selected = new Date(control.value);
+      const today = new Date();
 
+      return selected > today ? { maxDate: true } : null;
+    };
+  }
   addAllergy() {
     this.allergies.push(this.createAllergyGroup());
     this.suggestions.push([]);
-    this.registerAutocompleteListeners();
+    // this.setupAutocomplete();
   }
-
   removeAllergy(index: number) {
     if (this.allergies.length > 1) {
       this.allergies.removeAt(index);
@@ -117,11 +191,28 @@ export class AllergyFormsComponent implements OnInit {
     }
   }
 
-
   onSubmit() {
-    if (this.allergies.invalid) {
-      this.allergies.markAllAsTouched();
+    if (this.allergyForm.invalid) {
+      this.allergyForm.markAllAsTouched();
       alert('Please fill all required fields.');
+      return;
+    }
+
+    const firstAllergy = this.allergies.at(0).value;
+
+    if (this.allergyId) {
+      this.allergyService
+        .updateAllergy(this.allergyId, firstAllergy)
+        .subscribe({
+          next: () => {
+            this.toaster.show('Allergy updated successfully!', 'success');
+            this.allergySubmitted.emit(); // notify parent to refresh list
+          },
+          error: () => {
+            this.toaster.show('Error updating allergy.', 'error');
+          },
+        });
+
       return;
     }
 
@@ -138,12 +229,14 @@ export class AllergyFormsComponent implements OnInit {
     );
 
     forkJoin(calls).subscribe({
-      next: () => this.allergySubmitted.emit(),
+      next: () => {
+        this.toaster.show('Your allergy has been saved!', 'success');
+        this.resetForm();
+        this.allergySubmitted.emit();
+      },
       error: (err) => {
-        console.error('Failed to save allergy:', err);
-        alert('Error saving allergy. Check console.');
+        this.toaster.show('Error in saving allergy', 'error');
       },
     });
   }
 }
-

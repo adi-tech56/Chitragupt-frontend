@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { catchError, forkJoin, of } from 'rxjs';
 import { AuthService } from 'src/app/core/Services/auth-service.service';
 import { PatientContactService } from 'src/app/core/Services/PatientServices/patient-contact.service';
 import { PatientProfileService } from 'src/app/core/Services/PatientServices/patient-profile.service';
@@ -13,7 +14,7 @@ export class UserLayoutComponent {
   patientDetailsComplete: boolean = false;
   patientContactsComplete: boolean = false;
   patientAllergyComplete: boolean = false;
-    loading: boolean = true;
+  loading: boolean = true;
   private auth = inject(AuthService);
   private patientContactService = inject(PatientContactService);
   private patientProfileService = inject(PatientProfileService);
@@ -51,49 +52,34 @@ export class UserLayoutComponent {
   }
 
   ngOnInit(): void {
-    this.checkPatientDetails();
     this.setGreeting();
     this.userName = this.auth.getUserName();
-    console.log(this.userName);
-    this.loading = true; 
-    Promise.all([
-      this.patientContactService.getContact().toPromise(),
-      this.patientProfileService.getProfile().toPromise()
-    ])
-    .then(([contactRes, profileRes]) => {
+    this.loading = true;
+
+    forkJoin({
+      contactRes: this.patientContactService.getContact().pipe(
+        catchError((err) => {
+          console.error(
+            'Contact API failed because no patient contact exist for this patient:',
+            err
+          );
+          return of({ hasContact: false }); // default when contact missing
+        })
+      ),
+      profileRes: this.patientProfileService.getProfile().pipe(
+        catchError((err) => {
+          console.error(
+            'Profile API failed because no patient profile exist for this patient:',
+            err
+          );
+          return of({ hasProfile: false }); // default when profile missing
+        })
+      ),
+    }).subscribe(({ contactRes, profileRes }) => {
       this.patientContactsComplete = contactRes.hasContact ?? false;
       this.patientDetailsComplete = profileRes.hasProfile ?? false;
-    })
-    .catch((err) => {
-      console.error('Error fetching data:', err);
-    })
-    .finally(() => {
-      this.loading = false; // hide loader after data is loaded
+      this.loading = false;
     });
-    // this.patientContactService.getContact().subscribe({
-    //   next: (res) => {
-    //     if (res.hasContact) {
-    //       this.patientContactsComplete = true;
-    //     } else {
-    //       this.patientContactsComplete = false;
-    //     }
-    //   },
-    //   error: (err) => {
-    //     console.error('Error fetching contact:', err);
-    //   },
-    // });
-    // this.patientProfileService.getProfile().subscribe({
-    //   next: (res) => {
-    //     if (res.hasProfile) {
-    //       this.patientDetailsComplete = true;
-    //     } else {
-    //       this.patientDetailsComplete = false;
-    //     }
-    //   },
-    //   error: (err) => {
-    //     console.error('Error fetching profile:', err);
-    //   },
-    // });
   }
 
   checkPatientDetails() {
