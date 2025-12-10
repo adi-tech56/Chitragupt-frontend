@@ -52,3 +52,9 @@
   background-color: #0d6efd;
   color: white;
 }
+@media (min-width: 1340px) {
+  .custom-col-lg {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+}

@@ -12,7 +12,9 @@ export class DownloadPrescriptionService {
 
   downloadSuperPrescriptionPdf(superPrescriptionId: number) {
     return this.http.get(`${this.apiUrl}/${superPrescriptionId}/pdf`, {
-      responseType: 'blob' 
-    });
+      responseType: 'blob' ,
+      headers: { skipLoader: 'true' } 
+    },
+  );
   }
 }

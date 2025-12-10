@@ -1,7 +1,8 @@
 import { Component, inject } from '@angular/core';
-import { Router } from '@angular/router';
-import { catchError, forkJoin, of } from 'rxjs';
+import { NavigationEnd, Router } from '@angular/router';
+import { catchError, forkJoin, of, filter, finalize } from 'rxjs';
 import { AuthService } from 'src/app/core/Services/auth-service.service';
+import { LoaderService } from 'src/app/core/Services/loader.service';
 import { PatientContactService } from 'src/app/core/Services/PatientServices/patient-contact.service';
 import { PatientProfileService } from 'src/app/core/Services/PatientServices/patient-profile.service';
 
@@ -11,30 +12,26 @@ import { PatientProfileService } from 'src/app/core/Services/PatientServices/pat
   styleUrls: ['./user-layout.component.css'],
 })
 export class UserLayoutComponent {
-  patientDetailsComplete: boolean = false;
-  patientContactsComplete: boolean = false;
-  patientAllergyComplete: boolean = false;
-  loading: boolean = true;
+  patientDetailsComplete = false;
+  patientContactsComplete = false;
+  patientAllergyComplete = false;
+  showStepper = false;
+
   private auth = inject(AuthService);
   private patientContactService = inject(PatientContactService);
   private patientProfileService = inject(PatientProfileService);
-  userName: any;
+  private loaderService = inject(LoaderService);
+  private router = inject(Router);
+
+  userName: string = '';
   greetingMessage: string = '';
-  openAllergyFormFromProfile: boolean = false;
-  forceAddAllergy: boolean = false;
 
   setGreeting() {
     const hour = new Date().getHours();
-
-    if (hour >= 5 && hour < 12) {
-      this.greetingMessage = 'Good Morning';
-    } else if (hour >= 12 && hour < 17) {
-      this.greetingMessage = 'Good Afternoon';
-    } else if (hour >= 17 && hour < 21) {
-      this.greetingMessage = 'Good Evening';
-    } else {
-      this.greetingMessage = 'Good Night';
-    }
+    if (hour >= 5 && hour < 12) this.greetingMessage = 'Good Morning';
+    else if (hour >= 12 && hour < 17) this.greetingMessage = 'Good Afternoon';
+    else if (hour >= 17 && hour < 21) this.greetingMessage = 'Good Evening';
+    else this.greetingMessage = 'Good Night';
   }
 
   onDetailsSubmitted() {
@@ -51,38 +48,44 @@ export class UserLayoutComponent {
     this.patientAllergyComplete = true;
   }
 
-  ngOnInit(): void {
-    this.setGreeting();
-    this.userName = this.auth.getUserName();
-    this.loading = true;
+ngOnInit(): void {
+  this.setGreeting();
+  this.userName = this.auth.getUserName();
 
-    forkJoin({
-      contactRes: this.patientContactService.getContact().pipe(
-        catchError((err) => {
-          console.error(
-            'Contact API failed because no patient contact exist for this patient:',
-            err
-          );
-          return of({ hasContact: false }); // default when contact missing
-        })
-      ),
-      profileRes: this.patientProfileService.getProfile().pipe(
-        catchError((err) => {
-          console.error(
-            'Profile API failed because no patient profile exist for this patient:',
-            err
-          );
-          return of({ hasProfile: false }); // default when profile missing
-        })
-      ),
-    }).subscribe(({ contactRes, profileRes }) => {
-      this.patientContactsComplete = contactRes.hasContact ?? false;
-      this.patientDetailsComplete = profileRes.hasProfile ?? false;
-      this.loading = false;
+  // Fix #1 → prevent ExpressionChanged error
+  this.router.events
+    .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+    .subscribe((event: NavigationEnd) => {
+      setTimeout(() => {
+        this.showStepper = event.urlAfterRedirects === '/';
+      }, 0);
     });
-  }
 
-  checkPatientDetails() {
-    // this.patientDetailsComplete = this.patientService.isPatientDetailsComplete();
-  }
+  // Show loader
+  this.loaderService.show();
+
+  // Fix #2 → wrap async updates
+  forkJoin({
+    contactRes: this.patientContactService.getContact().pipe(
+      catchError((err) => {
+        console.error('Contact API failed:', err);
+        return of({ hasContact: false });
+      })
+    ),
+    profileRes: this.patientProfileService.getProfile().pipe(
+      catchError((err) => {
+        console.error('Profile API failed:', err);
+        return of({ hasProfile: false });
+      })
+    ),
+  })
+    .pipe(finalize(() => this.loaderService.hide()))
+    .subscribe(({ contactRes, profileRes }) => {
+      setTimeout(() => {
+        this.patientContactsComplete = contactRes.hasContact ?? false;
+        this.patientDetailsComplete = profileRes.hasProfile ?? false;
+      }, 0);
+    });
+}
+
 }

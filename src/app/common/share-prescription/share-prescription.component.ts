@@ -13,7 +13,7 @@ import {
 })
 export class SharePrescriptionComponent implements OnInit {
   sharedPatients: EmergencyContactPatientDto[] = [];
-  loading = false;
+
   error: string | null = null;
 
   // modal state
@@ -34,7 +34,7 @@ export class SharePrescriptionComponent implements OnInit {
   }
 
   loadSharedPatients() {
-    this.loading = true;
+  
     this.error = null;
     this.service.getSharedPatients().subscribe({
       next: (list) => {
@@ -47,12 +47,12 @@ export class SharePrescriptionComponent implements OnInit {
           return true;
         });
         console.log(this.sharedPatients);
-        this.loading = false;
+
       },
       error: (err) => {
         console.error('Failed to load shared patients', err);
         this.error = 'Failed to load patients. Please try again later.';
-        this.loading = false;
+     
       },
     });
   }

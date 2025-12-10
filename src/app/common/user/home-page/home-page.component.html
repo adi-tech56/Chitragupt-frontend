@@ -1,6 +1,5 @@
-<div *ngIf="loading">Loading...</div>
-<div *ngIf="!loading">
-  <div
+<ng-container *ngIf="!isHomeLoading">
+    <div
     *ngIf="!hasPrescriptions"
     class="d-flex align-items-center justify-content-center"
   >
@@ -48,9 +47,10 @@
   </div>
   <div *ngIf="hasPrescriptions">
     <app-daily-medicines [pageContext]="'HOME'"></app-daily-medicines>
-    <div class="row d-flex">
-      <div
-        class="col card m-3 shadow-sm text-center"
+  <div class="row g-3 mt-4">
+     <div class="col-12 custom-col-lg">
+<div
+        class=" card m-3 shadow-sm text-center"
         style="border-radius: 12px"
       >
         <div
@@ -66,6 +66,8 @@
           </a>
         </div>
       </div>
+     </div>
+      <div class="col-12 custom-col-lg">
       <div
         class="col card m-3 shadow-sm text-center"
         style="border-radius: 12px"
@@ -88,6 +90,12 @@
           </a>
         </div>
       </div>
+      </div>
+      
+
     </div>
   </div>
-</div>
+
+</ng-container>
+
+

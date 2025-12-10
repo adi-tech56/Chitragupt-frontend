@@ -144,7 +144,7 @@ refreshMeds() {
       const now = new Date();
 
       meds.forEach((med) => {
-        if (!med.doseTime || med.status !== 'PENDING') return;
+        if (!med.doseTime || med.takenStatus !== 'PENDING') return;
 
         const cutoff = new Date(med.doseTime.getTime() + 3600000);
 
@@ -160,7 +160,7 @@ refreshMeds() {
               dose
             )
             .subscribe(() => {
-              med.status = 'SKIPPED';
+              med.takenStatus= 'SKIPPED';
               med.taken = false;
               med.logCreatedAt = new Date();
               this.updateState();

@@ -1,44 +1,31 @@
-
 <div style="position: fixed; top: 0; left: 0; width: 100%; z-index: 1000">
-   <app-header 
-    [showProfileButton]="patientContactsComplete && patientDetailsComplete && patientAllergyComplete" ></app-header>
+ <app-header [showProfileButton]="!showStepper || (patientContactsComplete && patientDetailsComplete && patientAllergyComplete)"></app-header>
+
 </div>
 
+<div style="margin-top: 60px;">
+  <!-- Stepper: only show on home page -->
+  <ng-container *ngIf="showStepper">
+    <app-patient-contact-details
+      *ngIf="!patientContactsComplete"
+      (contactSubmitted)="onContactSubmitted()"
+    ></app-patient-contact-details>
 
-<div style="margin-top: 60px;"> 
+    <app-patient-details
+      *ngIf="patientContactsComplete && !patientDetailsComplete"
+      (detailsSubmitted)="onDetailsSubmitted()"
+    ></app-patient-details>
 
-  <!-- Loading Spinner -->
-  <div *ngIf="loading" class="d-flex justify-content-center align-items-center" style="height: 80vh;">
-    <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Loading...</span>
-    </div>
-  </div>
+    <app-patient-allergy
+      *ngIf="patientContactsComplete && patientDetailsComplete && !patientAllergyComplete"
+      (allergySubmitted)="onAllergySubmitted()"
+    ></app-patient-allergy>
+  </ng-container>
 
-  <!-- Step 1: Contact Details -->
-  <app-patient-contact-details
-    *ngIf="!patientContactsComplete && !loading"
-    (contactSubmitted)="onContactSubmitted()"
-  >
-  </app-patient-contact-details>
-
-  <!-- Step 2: Patient Details -->
-  <app-patient-details
-    *ngIf="patientContactsComplete && !patientDetailsComplete && !loading"
-    (detailsSubmitted)="onDetailsSubmitted()"
-  >
-  </app-patient-details>
-
-  <!-- Step 3: Allergies -->
-  <app-patient-allergy
-    *ngIf="patientContactsComplete && patientDetailsComplete && !patientAllergyComplete && !loading"
-    (allergySubmitted)="onAllergySubmitted()"
-  >
-  </app-patient-allergy>
-
-  <!-- Final Layout -->
+  <!-- Final Layout / main content -->
   <div
     class="user-layout"
-    *ngIf="patientContactsComplete && patientDetailsComplete && patientAllergyComplete && !loading"
+    *ngIf="patientContactsComplete && patientDetailsComplete && patientAllergyComplete || !showStepper"
   >
     <div style="display: flex;">
       <app-sidebar></app-sidebar>
@@ -49,5 +36,4 @@
       </div>
     </div>
   </div>
-
 </div>

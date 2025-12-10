@@ -111,7 +111,7 @@ export class LoginComponent implements OnInit {
       next: (res) => {
         this.response = res;
         console.log('Post created successfully:', res);
-        
+        this.toast.show('Login Succesful.',  'success');
         this.tokenRefresh.startAutoRefresh();
         this.loginSuccess.emit();
         this.loginError = '';

@@ -22,7 +22,7 @@ export class AuthService {
 
   getToken(): string | null {
     const token = this.cookieService.get('accessToken');
-    console.log(token)
+  
     return token ? token : null;
   }
   getRefreshToken(): string | null {
@@ -81,7 +81,7 @@ export class AuthService {
     return !!token && !this.isTokenExpired(token);
   }
   login(userLogin: UserLoginDetails): Observable<any> {
-    console.log(userLogin);
+   
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
     return this.http.post(
@@ -94,7 +94,7 @@ export class AuthService {
     );
   }
   signup(userRegister: UserRegisterDetails): Observable<any> {
-    console.log(userRegister);
+
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
     return this.http.post(
@@ -112,14 +112,14 @@ export class AuthService {
     );
   }
   verifyOTP(data: { email: string; otp: string }): Observable<any> {
-    console.log(data);
+
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
     return this.http.post(`${this.apiUrl}/verify-otp`, data, { headers });
   }
 
   resetPassword(data: string): Observable<any> {
-    console.log(data);
+   
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
     return this.http.post(`${this.apiUrl}/send-password-link`, data, {
@@ -131,7 +131,7 @@ export class AuthService {
     confirmPassword: string;
     token: string;
   }): Observable<any> {
-    console.log(data);
+
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
     return this.http.post(`${this.apiUrl}/update-password`, data, { headers });
@@ -150,13 +150,28 @@ export class AuthService {
   }
 
   /** Logout **/
- logout(): void {
-  const cookieDomain = '.inc1.devtunnels.ms';
+//  logout(): void {
+//   const cookieDomain = '.inc1.devtunnels.ms';
+//   const cookiePath = '/';
+
+//   // Delete cookies with domain and path
+//   this.cookieService.delete('accessToken', cookiePath, cookieDomain);
+//   this.cookieService.delete('refreshToken', cookiePath, cookieDomain);
+
+//   // Clear application state
+//   this.stateService.clearAll();
+//   localStorage.clear();
+//   sessionStorage.clear();
+
+//   // Redirect to login/auth page
+//   this.router.navigate(['/auth']);
+// }
+logout(): void {
   const cookiePath = '/';
 
-  // Delete cookies with domain and path
-  this.cookieService.delete('accessToken', cookiePath, cookieDomain);
-  this.cookieService.delete('refreshToken', cookiePath, cookieDomain);
+  // Delete cookies (no domain needed on localhost)
+  this.cookieService.delete('accessToken', cookiePath);
+  this.cookieService.delete('refreshToken', cookiePath);
 
   // Clear application state
   this.stateService.clearAll();

@@ -23,6 +23,8 @@ import { ToasterComponent } from './common/toaster/toaster.component';
 import { SharedModule } from './shared/shared.module';
 import { AddUpdatePrescriptionComponent } from './common/forms/add-update-prescription/add-update-prescription.component';
 import { ApiBaseUrlInterceptor } from './core/Interceptors/api-base-url.interceptor';
+import { LoaderInterceptor } from './core/Interceptors/loader.interceptor';
+import { SpinnerComponent } from './common/spinner/spinner.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -34,6 +36,7 @@ import { ApiBaseUrlInterceptor } from './core/Interceptors/api-base-url.intercep
     SendEmailComponent,
     ToasterComponent,
     AddUpdatePrescriptionComponent,
+    SpinnerComponent,
   ],
   imports: [
     BrowserModule,
@@ -52,6 +55,11 @@ import { ApiBaseUrlInterceptor } from './core/Interceptors/api-base-url.intercep
       multi: true
     },
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+     { 
+    provide: HTTP_INTERCEPTORS, 
+    useClass: LoaderInterceptor, 
+    multi: true 
+  }
   ],
   bootstrap: [AppComponent],
 })

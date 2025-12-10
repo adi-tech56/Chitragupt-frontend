@@ -13,14 +13,13 @@
     can view their prescriptions and basic medical information.
   </p>
 
-  <!-- LOADING -->
-  <div *ngIf="loading" class="loading">Loading patients...</div>
+
 
   <!-- ERROR -->
   <div *ngIf="error" class="error">{{ error }}</div>
 
   <!-- EMPTY STATE -->
-  <div *ngIf="!loading && sharedPatients.length === 0" class="no-data">
+  <div *ngIf="sharedPatients.length === 0" class="no-data">
     No one has shared their medical data with you yet.
   </div>
 
