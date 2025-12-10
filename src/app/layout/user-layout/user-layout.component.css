@@ -30,6 +30,7 @@
   .content-area {
     margin-left: 0;
     margin-bottom: 60px;
+    width: 100vw;
     /* height of bottom sidebar */
     padding: 1rem;
   }

@@ -1,24 +1,29 @@
-<div class="position-relative mb-3">
+<div class="row position-relative mb-3">
+  <!-- Column for Button (top left corner) -->
+  <div class="col-12 col-sm-1 d-flex justify-content-start mb-2">
+    <button (click)="goBack()" class="btn btn-outline-primary btn-sm">
+      <i class="fa-solid fa-angle-left"></i>
+    </button>
+  </div>
 
-  <button (click)="goBack()" class="btn btn-outline-primary btn-sm position-absolute">
-    <i class="fa-solid fa-angle-left"></i>
-  </button>
-
-  <h2 class="text-primary fw-semibold text-center">
-    Export Your Data in FHIR Format
-  </h2>
-
+  <!-- Column for Heading -->
+  <div class="col-12 col-sm-11 d-flex justify-content-center align-items-center">
+    <h2 class="text-primary fw-semibold">
+      Export Your Data in FHIR Format
+    </h2>
+  </div>
 </div>
+
 
 <div class="card shadow-sm prescription-card">
 
   <div class="card-body">
     <h3 class="card-title mb-3">Prescriptions</h3>
- <div *ngIf="prescriptions.length > 0 && selectedIds.length === 0"
-     class="alert alert-info d-flex align-items-center mb-4" role="alert">
-  <i class="fa-solid fa-info-circle me-2"></i>
-  Select the prescriptions you want to download in <strong>FHIR format</strong>.
-</div>
+    <div *ngIf="prescriptions.length > 0 && selectedIds.length === 0"
+      class="alert alert-info d-flex align-items-center mb-4" role="alert">
+      <i class="fa-solid fa-info-circle me-2"></i>
+      Select the prescriptions you want to download in <strong>FHIR format</strong>.
+    </div>
 
     <!-- No prescriptions -->
     <div *ngIf="prescriptions.length === 0" class="text-muted">
@@ -35,8 +40,7 @@
             (click)="toggleAccordion(i)">
 
             <input type="checkbox" class="form-check-input m-2"
-              [checked]="selectedIds.includes(prescription.superPrescriptionId)"
-              (click)="$event.stopPropagation()"
+              [checked]="selectedIds.includes(prescription.superPrescriptionId)" (click)="$event.stopPropagation()"
               (change)="toggleSelection(prescription.superPrescriptionId, $event)" />
 
             <span class="prescription-title d-flex flex-column">
@@ -109,10 +113,15 @@
 
     </div>
 
-    <button class="btn btn-primary w-100 mt-4" (click)="downloadSelected()">
+    <button *ngIf="prescriptions.length !== 0" class="btn btn-primary w-100 mt-4" (click)="downloadSelected()">
       Download Selected
     </button>
+<div *ngIf="prescriptions.length === 0" class="mt-2">
+  <a [routerLink]="['/medication/add']" class="btn btn-outline-primary btn-sm">
 
+      <i class="fa-solid fa-plus"></i> Add Prescription
+    </a>
+</div>
+  
   </div>
 </div>
-
