@@ -21,6 +21,8 @@ export class AuthService {
   private cookieService = inject(CookieService);
 
   getToken(): string | null {
+    console.log(document.cookie);
+
     const token = this.cookieService.get('accessToken');
   console.log(token)
     return token ? token : null;
@@ -92,6 +94,7 @@ export class AuthService {
       },
       { withCredentials: true, headers }
     );
+    
   }
   signup(userRegister: UserRegisterDetails): Observable<any> {
 
