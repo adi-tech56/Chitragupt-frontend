@@ -22,7 +22,7 @@ export class AuthService {
 
   getToken(): string | null {
     const token = this.cookieService.get('accessToken');
-  
+  console.log(token)
     return token ? token : null;
   }
   getRefreshToken(): string | null {
