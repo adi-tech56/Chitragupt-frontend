@@ -3,29 +3,45 @@ import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './common/Authentication/login/login.component';
 import { AuthLayoutComponent } from './common/Authentication/auth-layout/auth-layout.component';
 import { UserLayoutComponent } from './layout/user-layout/user-layout.component';
+import { ResetPasswordComponent } from './common/Authentication/reset-password/reset-password.component';
+import { AuthGuard } from './core/Gaurds/auth.guard';
+import { RoleGuard } from './core/Gaurds/role.guard';
+import { GuestGaurd } from './core/Gaurds/guest-gaurd';
 
 const routes: Routes = [
   {
-    path: "",
-    redirectTo: "home",
-    pathMatch: "full",
+    path: '',
+    redirectTo: 'home',
+    pathMatch: 'full',
+    // canActivate: [GuestGaurd],
   },
   {
-    path: "**",
-    redirectTo: "home",
+    path: '**',
+    redirectTo: 'home',
   },
   {
-    path: "auth",
-    component:AuthLayoutComponent,
+    path: 'auth',
+    component: AuthLayoutComponent,
+    canActivate: [GuestGaurd],
   },
   {
-    path:"user",
-    component:UserLayoutComponent
-  }
+    path: 'reset-password',
+    component: ResetPasswordComponent,
+  },
+  {
+    path: 'user',
+    loadChildren: () =>
+      import('./layout/user-layout/user-layout.module').then(
+        (m) => m.UserLayoutModule
+      ),
+    canActivate: [AuthGuard, RoleGuard],
+
+    data: { roles: ['PATIENT'] },
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

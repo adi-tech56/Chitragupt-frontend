@@ -1,0 +1,30 @@
+[
+    {
+        "value": "second",
+        "display": "Second"
+    },
+    {
+        "value": "minute",
+        "display": "Minute"
+    },
+    {
+        "value": "hour",
+        "display": "Hour"
+    },
+    {
+        "value": "day",
+        "display": "Day"
+    },
+    {
+        "value": "week",
+        "display": "Week"
+    },
+    {
+        "value": "month",
+        "display": "Month"
+    },
+    {
+        "value": "year",
+        "display": "Year"
+    }
+]

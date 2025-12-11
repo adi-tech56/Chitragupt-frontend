@@ -1,43 +1,66 @@
+// src/app/app.module.ts
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+
 import { LoginComponent } from './common/Authentication/login/login.component';
 import { RegisterComponent } from './common/Authentication/register/register.component';
-
-import { RouterOutlet } from '@angular/router';
-import { HomeLayoutModule } from './layout/home-layout/home-layout.module';
 import { AuthLayoutComponent } from './common/Authentication/auth-layout/auth-layout.component';
-import { PatientDetailsComponent } from './common/Authentication/patient-details/patient-details.component';
 import { VerificationComponent } from './common/Authentication/verification/verification.component';
+import { ResetPasswordComponent } from './common/Authentication/reset-password/reset-password.component';
+import { SendEmailComponent } from './common/Authentication/send-email/send-email.component';
+
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { SidebarComponent } from './common/sidebar/sidebar.component';
+import { HomeLayoutModule } from './layout/home-layout/home-layout.module';
 import { UserLayoutModule } from './layout/user-layout/user-layout.module';
 
+
+import { AuthInterceptor } from './core/Interceptors/auth-interceptor';
+import { ToasterComponent } from './common/toaster/toaster.component';
+import { SharedModule } from './shared/shared.module';
+import { AddUpdatePrescriptionComponent } from './common/forms/add-update-prescription/add-update-prescription.component';
+import { ApiBaseUrlInterceptor } from './core/Interceptors/api-base-url.interceptor';
+import { LoaderInterceptor } from './core/Interceptors/loader.interceptor';
+import { SpinnerComponent } from './common/spinner/spinner.component';
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     RegisterComponent,
     AuthLayoutComponent,
-    PatientDetailsComponent,
     VerificationComponent,
-   
-  
+    ResetPasswordComponent,
+    SendEmailComponent,
+    ToasterComponent,
+    AddUpdatePrescriptionComponent,
+    SpinnerComponent,
   ],
   imports: [
     BrowserModule,
+    HttpClientModule,
     AppRoutingModule,
-    RouterOutlet,
-    HomeLayoutModule,
-    ReactiveFormsModule,
-    CommonModule,
     FormsModule,
-    UserLayoutModule
+    ReactiveFormsModule,
+    HomeLayoutModule,
+    UserLayoutModule,
+    SharedModule,
   ],
-  providers: [],
-  bootstrap: [AppComponent]
+  providers: [
+     {
+      provide: HTTP_INTERCEPTORS,
+      useClass: ApiBaseUrlInterceptor,
+      multi: true
+    },
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+     { 
+    provide: HTTP_INTERCEPTORS, 
+    useClass: LoaderInterceptor, 
+    multi: true 
+  }
+  ],
+  bootstrap: [AppComponent],
 })
 export class AppModule { }

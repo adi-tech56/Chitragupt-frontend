@@ -1,18 +1,27 @@
 .user-layout {
   display: flex;
   flex-direction: row;
+  overflow-x: hidden;
+    background-color: #f8f9fa;
+  /* position: absolute; */
+
+
 }
+
 .content-area {
   flex: 1;
-  margin-left: 221px; 
+  margin-left: 221px;
   padding: 2rem;
   background-color: #f8f9fa;
   min-height: 100vh;
-  min-width: 100vw;
+  position: relative;
+  min-width: calc(99vw - 221px);
+
   transition: all 0.3s ease-in-out;
+
+
 }
 
-/* Responsive: when sidebar moves to bottom */
 @media (max-width: 768px) {
   .user-layout {
     flex-direction: column;
@@ -20,7 +29,9 @@
 
   .content-area {
     margin-left: 0;
-    margin-bottom: 60px; /* height of bottom sidebar */
+    margin-bottom: 60px;
+    width: 100vw;
+    /* height of bottom sidebar */
     padding: 1rem;
   }
 }

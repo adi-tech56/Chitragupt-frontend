@@ -2,26 +2,20 @@
   <div class="auth-card shadow-lg">
     <ng-container [ngSwitch]="currentStep">
       <!-- Login -->
-      <app-login
-        *ngSwitchCase="'login'"
-        (signupRequest)="goToStep('signup')"
-        (loginSuccess)="onLoginSuccess($event)">
+      <app-login *ngSwitchCase="'login'" (signupRequest)="goToStep('signup')" (loginSuccess)="onLoginSuccess()"
+        (passwordReset)="goToStep('send-mail')">
+
       </app-login>
       <!-- Signup -->
-      <app-register
-        *ngSwitchCase="'signup'"
-        (signupSuccess)="goToStep('otp')"
+      <app-register *ngSwitchCase="'signup'" (signupSuccess)="onSignupSuccess($event)"
         (cancelSignup)="goToStep('login')">
       </app-register>
       <!-- OTP -->
-      <app-verification
-        *ngSwitchCase="'otp'"
-        (otpVerified)="goToStep('login')">
+      <app-verification *ngSwitchCase="'otp'" [signupData]="signupResponse" (otpVerified)="goToStep('login')">
       </app-verification>
-      <!-- Personal Details -->
-      <app-patient-details
-        *ngSwitchCase="'details'">
-      </app-patient-details>
+      <app-send-email *ngSwitchCase="'send-mail'">
+      </app-send-email>
+
     </ng-container>
   </div>
 </div>

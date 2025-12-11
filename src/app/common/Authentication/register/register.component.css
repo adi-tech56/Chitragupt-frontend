@@ -1,0 +1,44 @@
+/* styles.css or component-specific CSS */
+.google-btn {
+  background-color: #ffffff; /* keep white */
+  color: #000000; /* text color */
+  border: 1px solid #dcdcdc;
+  transition: none; /* disable transitions */
+}
+
+.google-btn:hover,
+.google-btn:focus,
+.google-btn:active {
+  background-color: #ffffff !important; /* same as default */
+  color: #000000 !important; /* same as default */
+  border-color: #dcdcdc !important;
+  box-shadow: none !important; /* remove any bootstrap shadow on focus/active */
+}
+.password-toggle-icon {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #6c757d; 
+}
+
+.form-control {
+  padding-right: 2.5rem; /* space for the icon */
+}
+/* Position the tooltip icon outside the input group on the right */
+.app-error-tooltip-icon {
+  position: absolute;
+  right: 40px; /* adjust based on your eye icon width */
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  display: none; /* initially hidden */
+  color: red; /* or any style you prefer */
+  z-index: 10;
+}
+
+/* Optional: give spacing between input and eye icon */
+.password-toggle-icon {
+  cursor: pointer;
+}

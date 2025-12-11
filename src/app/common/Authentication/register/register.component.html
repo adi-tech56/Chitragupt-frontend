@@ -1,71 +1,171 @@
 <div class="p-4">
-<form [formGroup]="form" (ngSubmit)="onSignup()" class="m-2">
-  <h3 class="text-primary text-center mb-4 fw-bold">Sign Up</h3>
+  <form [formGroup]="form" (ngSubmit)="onSignup()" class="m-2">
+    <h3 class="text-primary text-center mb-4 fw-bold">Sign Up</h3>
 
-  <div>
+    <div>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="first-name" class="form-label text-primary fw-semibold">First Name
+            <span *ngIf="isRequired('firstName')" class="text-danger">*</span>
+          </label>
+          <div class="input-group">
+            <input type="text" class="form-control" id="first-name" formControlName="firstName"
+              [appErrorTooltip]="form.get('firstName')" [submitted]="isSubmitted" [customMessages]="{
+      required: 'First name is required.'
+    }" />
+          </div>
+
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label for="middle-name" class="form-label text-primary fw-semibold">Middle Name</label>
+          <input type="text" id="middle-name" class="form-control" name="middle-name" formControlName="middleName" />
+        </div>
+      </div>
+    </div>
     <div class="row">
       <div class="col-md-6 mb-3">
-        <label for="first-name" class="form-label text-primary fw-semibold">First Name</label>
-        <input type="text" class="form-control" id="first-name" name="first-name" formControlName="firstName" />
-      </div>
+        <label for="last-name" class="form-label text-primary fw-semibold">Last Name
 
+        </label>
+        <input type="text" id="last-name" name="last-name" class="form-control" formControlName="lastName" />
+      </div>
       <div class="col-md-6 mb-3">
-        <label for="middle-name"  class="form-label text-primary fw-semibold">Middle Name</label>
-        <input type="text" id="middle-name" class="form-control" name="middle-name" formControlName="middleName" />
+        <label for="contact" class="form-label text-primary fw-semibold">Contact No
+          <span *ngIf="isRequired('contactNo')" class="text-danger">*</span>
+        </label>
+        <div class="input-group">
+          <input type="text" class="form-control" formControlName="contactNo" [appErrorTooltip]="form.get('contactNo')"
+           [submitted]="isSubmitted"  [customMessages]="{
+      required: 'Contact number is required.',
+      minlength: 'Must be at least 10 digits.',
+      maxlength: 'Cannot exceed 15 digits.',
+      pattern: 'Only digits allowed.'
+    }" />
+        </div>
       </div>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-md-6 mb-3">
-      <label for="last-name" class="form-label text-primary fw-semibold">Last Name</label>
-      <input type="text" id="last-name" name="last-name" class="form-control" formControlName="lastName" />
-    </div>
-   <div class="col-md-6 mb-3">
-        <label for="contact" class="form-label text-primary fw-semibold">Contact No</label>
-        <input type="text" id="contact" class="form-control" name="Contact" formControlName="contactNo" />
-      </div>
-   
-  </div>
-<hr />
-  <div>
-    <div class="mb-3">
-      <label for="email" class="form-label text-primary fw-semibold">Email</label>
-      <input id="email" type="email" name="email" class="form-control" formControlName="emailId" />
-    </div> 
-  </div>
-  <hr/>
-  <div class="row" formGroupName="passwords">
-    <div class="col-md-6 mb-3">
-      <label for="password"  class="form-label text-primary fw-semibold">Password</label>
-      <input id="password" type="password" name="password" class="form-control" formControlName="password" />
-    </div>
 
-    <div class="col-md-6 mb-3">
-      <label for="confirm-password" class="form-label text-primary fw-semibold">Confirm Password</label>
-      <input id="confirm-password" class="form-control" type="password" name="confirm-password" formControlName="confirmPassword" />
     </div>
-  </div>
-<p *ngIf="passwordCheck?.errors?.['valuesNotEqual'] && passwordCheck.touched" class="text-danger">
-  Passwords do not match.
-</p>
-<div class="row">
-  <div class="col-md-6 mb-3">
-     <button type="reset" class="btn btn-primary w-100 fw-bold " (click)="onReset()">Reset</button>
-  </div>
-    <div class="col-md-6 mb-3">
-       <button type="submit" class="btn btn-primary w-100 fw-bold col-md-6">Sign up</button>
-    </div>
-
+    <hr />
+    <div>
+      <div class="mb-3">
+        <label for="email" class="form-label text-primary fw-semibold">Email
+          <span *ngIf="isRequired('emailId')" class="text-danger">*</span>
+        </label>
+     <div class="input-group">
+  <input
+    type="email"
+    class="form-control"
+    formControlName="emailId"
+    [appErrorTooltip]="form.get('emailId')"
+    [submitted]="isSubmitted" 
+    [customMessages]="{
+      required: 'Email is required.',
+      email: 'Please enter a valid email address.'
+    }"
+  />
+    
 </div>
- <p *ngIf="form.invalid && form.touched" class="text-danger">
-  Form is Invalid
-</p>
 
-  <div class="text-center mt-3">
-    <button type="button" class="btn btn-link text-primary fw-semibold" (click)="cancel()">
-      Already have an account? Login
-    </button>
+        <!-- <p *ngIf="emailIsInvalid" class="text-danger">Enter a valid email</p> -->
+      </div>
+    </div>
+    <hr />
+   <div class="row mb-2" formGroupName="passwords">
+  <div class="col-md-6">
+    <label for="password" class="form-label text-primary fw-semibold">
+      Password
+      <span *ngIf="isRequired('passwords.password')" class="text-danger">*</span>
+    </label>
+    <div class="position-relative">
+      <input id="password"
+             [type]="showPassword ? 'text' : 'password'"
+             class="form-control mb-1"
+             formControlName="password"
+             name="password"
+             [ngClass]="{
+               'is-invalid': form.get('passwords.password')?.invalid &&
+                             (form.get('passwords.password')?.touched ||
+                              form.get('passwords.password')?.dirty ||
+                              isSubmitted)
+             }">
+
+      <i [ngClass]="showPassword ? 'fa fa-eye' : 'fa fa-eye-slash'"
+         (click)="togglePasswordVisibility('password')"
+         class="password-toggle-icon"></i>
+    </div>
+
+    <!-- Error messages -->
+    <small class="text-danger"
+           *ngIf="form.get('passwords.password')?.touched &&
+                  form.get('passwords.password')?.hasError('required')">
+      Password is required.
+    </small>
+    <small class="text-danger"
+           *ngIf="form.get('passwords.password')?.touched &&
+                  form.get('passwords.password')?.hasError('minlength')">
+      Password must be at least 6 characters.
+    </small>
   </div>
 
-</form>
+  <div class="col-md-6">
+    <label for="confirm-password" class="form-label text-primary fw-semibold">
+      Confirm Password
+      <span *ngIf="isRequired('passwords.confirmPassword')" class="text-danger">*</span>
+    </label>
+    <div class="position-relative">
+      <input id="confirm-password"
+             [type]="showConfirmPassword ? 'text' : 'password'"
+             class="form-control mb-1"
+             formControlName="confirmPassword"
+             name="confirm-password"
+             [ngClass]="{
+               'is-invalid': form.get('passwords.confirmPassword')?.invalid &&
+                             (form.get('passwords.confirmPassword')?.touched ||
+                              form.get('passwords.confirmPassword')?.dirty ||
+                              isSubmitted)
+             }">
+      <i [ngClass]="showConfirmPassword ? 'fa fa-eye' : 'fa fa-eye-slash'"
+         (click)="togglePasswordVisibility('confirm')"
+         class="password-toggle-icon"></i>
+    </div>
+
+    <!-- Error messages -->
+    <small class="text-danger"
+           *ngIf="form.get('passwords.confirmPassword')?.touched &&
+                  form.get('passwords.confirmPassword')?.hasError('required')">
+      Confirm Password is required.
+    </small>
+  </div>
+</div>
+
+    <small *ngIf="passwordCheck?.errors?.['valuesNotEqual'] && passwordCheck.touched" class="text-danger">
+      Passwords do not match.
+    </small>
+    <div class="row">
+      <div class="col-md-9 mb-3">
+        <button type="submit" class="btn btn-primary w-100 fw-bold col-md-6">Sign up</button>
+      </div>
+
+      <div class="col-md-3 mb-3">
+        <button type="reset" class="btn btn-primary w-100 fw-bold " (click)="onReset()"><i class="fa fa-refresh"
+            aria-hidden="true"></i></button>
+      </div>
+
+    </div>
+    <hr />
+    <button class="btn google-btn w-100 fw-bold d-flex align-items-center justify-content-center gap-2" type="submit"
+      (click)="googleSignIn()">
+      <img src="assets/google-icon.svg" width="20" height="20" alt="Google">
+      Sign in with Google
+    </button>
+
+
+    <div class="text-center mt-3">
+      <button type="button" class="btn btn-link text-primary fw-semibold" (click)="cancel()">
+        Already have an account? Login
+      </button>
+    </div>
+
+  </form>
 </div>

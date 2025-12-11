@@ -1,0 +1,381 @@
+<div class="display-root">
+  <div class="display-card shadow-lg">
+    <div class="p-2">
+      <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="m-4">
+        <h3 class="text-primary text-center mb-4 fw-bold">
+          Add Your Emergency Contact
+        </h3>
+        <div *ngIf="currentStep === 1">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label
+                for="first-name"
+                class="form-label text-primary fw-semibold required"
+                >First Name</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="first-name"
+                name="first-name"
+                formControlName="firstName"
+                [appErrorTooltip]="contactForm.get('firstName')"
+              />
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label
+                for="middle-name"
+                class="form-label text-primary fw-semibold"
+                >Middle Name</label
+              >
+              <input
+                type="text"
+                id="middle-name"
+                class="form-control"
+                name="middle-name"
+                formControlName="middleName"
+              />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="last-name" class="form-label text-primary fw-semibold"
+                >Last Name</label
+              >
+              <input
+                type="text"
+                id="last-name"
+                name="last-name"
+                class="form-control"
+                formControlName="lastName"
+              />
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label text-primary fw-semibold required"
+                >Relation</label
+              >
+              <select
+                class="form-select"
+                formControlName="relationshipType"
+                [appErrorTooltip]="contactForm.get('relationshipType')"
+              >
+                <option *ngFor="let r of relationshipTypes" [value]="r.code">
+                  {{ r.display }}
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="currentStep === 2" formArrayName="contactAddresses">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="text-primary mb-0">Addresses</h4>
+            <button
+              type="button"
+              class="btn btn-outline-primary"
+              (click)="addAddress()"
+            >
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
+
+          <div class="scroll-section">
+            <div
+              *ngFor="let address of contactAddresses.controls; let i = index"
+              [formGroupName]="i"
+              class="mb-3 border rounded p-3 position-relative"
+            >
+              <div class="row">
+                <!-- useCode -->
+                <div class="col-md-6 mb-3">
+                  <label class="required">Address Use</label>
+                  <select
+                    class="form-select"
+                    formControlName="useCode"
+                    [appErrorTooltip]="address.get('useCode')"
+                  >
+                    <option value="home">Home</option>
+                    <option value="work">Work</option>
+                    <option value="temp">Temp</option>
+                    <option value="old">Old</option>
+                    <option value="billing">Billing</option>
+                  </select>
+                </div>
+
+                <!-- addressType -->
+                <div class="col-md-6 mb-3">
+                  <label class="required">Address Type</label>
+                  <select
+                    class="form-select"
+                    formControlName="addressType"
+                    [appErrorTooltip]="address.get('addressType')"
+                  >
+                    <option value="postal">Postal</option>
+                    <option value="physical">Physical</option>
+                    <option value="both">Both</option>
+                  </select>
+                </div>
+
+                <!-- text -->
+                <div class="col-md-6 mb-3">
+                  <label class="required">Address Text</label>
+                  <input
+                    class="form-control"
+                    formControlName="text"
+                    [appErrorTooltip]="address.get('text')"
+                  />
+                </div>
+
+                <!-- city -->
+                <div class="col-md-6 mb-3 position-relative">
+                  <label class="required">City</label>
+                  <input
+                    class="form-control"
+                    formControlName="city"
+                    [appErrorTooltip]="address.get('city')"
+                    (focus)="showCity[i] = true"
+                    (input)="showCity[i] = true"
+                    (blur)="hideDropdownLater(i, 'city')"
+                  />
+
+                  <ul
+                    *ngIf="showCity[i]"
+                    class="list-group position-absolute w-100"
+                    style="z-index: 1100; max-height: 200px; overflow-y: auto"
+                  >
+                    <li
+                      class="list-group-item"
+                      *ngFor="let c of filteredCities[i]"
+                      (mousedown)="selectCity(i, c)"
+                    >
+                      {{ c }}
+                    </li>
+                    <li
+                      class="list-group-item text-muted"
+                      *ngIf="!filteredCities[i]?.length"
+                    >
+                      No results
+                    </li>
+                  </ul>
+                </div>
+
+                <!-- state -->
+                <div class="col-md-6 mb-3 position-relative">
+                  <label class="required">State</label>
+                  <input
+                    class="form-control"
+                    formControlName="state"
+                    [appErrorTooltip]="address.get('state')"
+                    (focus)="showState[i] = true"
+                    (input)="showState[i] = true"
+                    (blur)="hideDropdownLater(i, 'state')"
+                  />
+
+                  <ul
+                    *ngIf="showState[i]"
+                    class="list-group position-absolute w-100"
+                    style="z-index: 1100; max-height: 200px; overflow-y: auto"
+                  >
+                    <li
+                      class="list-group-item"
+                      *ngFor="let s of filteredStates[i]"
+                      (mousedown)="selectState(i, s)"
+                    >
+                      {{ s }}
+                    </li>
+                    <li
+                      class="list-group-item text-muted"
+                      *ngIf="!filteredStates[i]?.length"
+                    >
+                      No results
+                    </li>
+                  </ul>
+                </div>
+
+                <!-- postalCode -->
+                <div class="col-md-6 mb-3">
+                  <label class="required">Postal Code</label>
+                  <input
+                    class="form-control"
+                    formControlName="postalCode"
+                    [appErrorTooltip]="address.get('postalCode')"
+                    readonly
+                  />
+                </div>
+
+                <!-- country -->
+                <div class="col-md-6 mb-3 position-relative">
+                  <label class="required">Country</label>
+                  <input
+                    class="form-control"
+                    formControlName="country"
+                    [appErrorTooltip]="address.get('country')"
+                    (focus)="showCountry[i] = true"
+                    (input)="showCountry[i] = true"
+                    (blur)="hideDropdownLater(i, 'country')"
+                  />
+
+                  <ul
+                    *ngIf="showCountry[i]"
+                    class="list-group position-absolute w-100"
+                    style="z-index: 1100; max-height: 200px; overflow-y: auto"
+                  >
+                    <li
+                      class="list-group-item"
+                      *ngFor="let c of filteredCountries[i]"
+                      (mousedown)="selectCountry(i, c)"
+                    >
+                      {{ c }}
+                    </li>
+                    <li
+                      class="list-group-item text-muted"
+                      *ngIf="!filteredCountries[i]?.length"
+                    >
+                      No results
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                class="btn btn-outline-danger btn-sm"
+                (click)="removeAddress(i)"
+                *ngIf="contactAddresses.length > 1"
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="currentStep === 3" formArrayName="contactTelecoms">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="text-primary mb-0">Telecom</h4>
+            <button
+              type="button"
+              class="btn btn-outline-primary"
+              (click)="addTelecom()"
+            >
+              <i class="fa fa-plus" aria-hidden="true"></i>
+            </button>
+          </div>
+
+          <div class="scroll-section">
+            <div
+              *ngFor="let telecom of contactTelecoms.controls; let i = index"
+              [formGroupName]="i"
+              class="mb-3 border rounded p-3"
+            >
+              <div class="row">
+                <!-- CONTACT USE -->
+                <div class="col-md-6 mb-3">
+                  <label class="form-label fw-semibold">Contact Use</label>
+                  <select class="form-select" formControlName="useCode">
+                    <option value="home">Home</option>
+                    <option value="work">Work</option>
+                    <option value="temp">Temp</option>
+                    <option value="old">Old</option>
+                    <option value="mobile">Mobile</option>
+                  </select>
+                </div>
+
+                <div class="col-md-6 mb-3" *ngIf="i === 0">
+                  <label class="form-label fw-semibold required">Email</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    formControlName="value"
+                    placeholder="e.g. example@email.com"
+                    [appErrorTooltip]="telecom.get('value')"
+                  />
+
+                  <!-- EMAIL VALIDATION -->
+                  <div
+                    class="text-danger"
+                    *ngIf="
+                      telecom.get('value')?.touched &&
+                      telecom.get('value')?.invalid
+                    "
+                  >
+                    <small *ngIf="telecom.get('value')?.errors?.['required']"
+                      >Email is required.</small
+                    >
+                    <small *ngIf="telecom.get('value')?.errors?.['email']"
+                      >Invalid email format.</small
+                    >
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-3" *ngIf="i > 0">
+                  <label class="form-label fw-semibold required">Phone</label>
+                  <input
+                    class="form-control"
+                    formControlName="value"
+                    placeholder="e.g. 9876543219"
+                    [appErrorTooltip]="telecom.get('value')"
+                  />
+
+                  <div
+                    class="text-danger"
+                    *ngIf="
+                      telecom.get('value')?.touched &&
+                      telecom.get('value')?.invalid
+                    "
+                  >
+                    <small>Phone number is required.</small>
+                  </div>
+                </div>
+              </div>
+
+              <div class="text-end">
+                <button
+                  type="button"
+                  class="btn btn-outline-danger btn-sm"
+                  (click)="removeTelecom(i)"
+                  *ngIf="i > 0"
+                >
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="previousStep()"
+            *ngIf="!(currentStep === 1)"
+            [disabled]="currentStep === 1"
+          >
+            Previous
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-primary"
+            *ngIf="currentStep < maxStep"
+            [disabled]="!getStepControls(currentStep).valid"
+            (click)="nextStep()"
+          >
+            Next
+          </button>
+
+          <button
+            type="submit"
+            class="btn btn-success"
+            *ngIf="currentStep === maxStep"
+            [disabled]="!contactForm.valid"
+          >
+            Submit
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

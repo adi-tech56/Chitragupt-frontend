@@ -1,0 +1,5 @@
+<div class="toast-container justify-content-center">
+  <div *ngFor="let toast of toasts" class="toast-item" [ngClass]="toast.type">
+    {{ toast.message }}
+  </div>
+</div>

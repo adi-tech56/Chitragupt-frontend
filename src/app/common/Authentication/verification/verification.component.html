@@ -3,14 +3,9 @@
     <h3 class="text-primary text-center mb-4 fw-bold">Verify OTP</h3>
     <div class="mb-3">
         <label class="form-label text-primary fw-semibold">Enter OTP</label>
-        <!-- <input type="text" class="form-control text-center" [(ngModel)]="otp" name="otp" maxlength="6" required> -->
+
         <div formArrayName="otp"  class="d-flex justify-content-center gap-2">
-            <!-- <input type="text" maxlength="1" class="form-control otp-input-bs" required>
-            <input type="text" maxlength="1" class="form-control otp-input-bs" required>
-            <input type="text" maxlength="1" class="form-control otp-input-bs" required>
-            <input type="text" maxlength="1" class="form-control otp-input-bs" required>
-            <input type="text" maxlength="1" class="form-control otp-input-bs" required>
-            <input type="text" maxlength="1" class="form-control otp-input-bs" required> -->
+         
             <input *ngFor="let c of otpControls;let i = index"
            
             type="text"

@@ -1,0 +1,662 @@
+<div class="profile-page container" >
+  <div class="card profile-card">
+    <div class="card-body">
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <div class="d-flex align-items-center">
+          <div class="avatar-circle me-3">{{ firstLetter }}</div>
+          <h3 class="mb-0 text-primary profile-title text-center">
+            User Profile
+          </h3>
+        </div>
+
+        <div>
+          <button class="btn btn-primary m-3" (click)="addEmergencyContact()">
+            Emergency Contacts
+          </button>
+          <button class="btn btn-primary" (click)="addAllergy()">
+            View Allergy
+          </button>
+          <button class="btn btn-primary m-3" (click)="downloadSelected()">
+            Download Fhir Doc
+          </button>
+        </div>
+      </div>
+
+      <!-- Basic Info -->
+      <div class="section mb-4">
+        <div
+          class="section-header d-flex justify-content-between align-items-center mb-3"
+        >
+          <h5 class="text-primary mb-0">Basic Information</h5>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-md-5">
+            <label class="form-label small text-primary">FIRST NAME</label>
+            <div class="input-group">
+              <input
+                class="form-control readonly-input"
+                [value]="basicInfo.firstName"
+                readonly
+              />
+              <button
+                class="btn btn-sm btn-outline-primary"
+                (click)="openEditBasicModal('firstName')"
+              >
+                Edit
+              </button>
+            </div>
+          </div>
+
+          <div class="col-md-5">
+            <label class="form-label small text-primary">MIDDLE NAME</label>
+            <div class="input-group">
+              <input
+                class="form-control readonly-input"
+                [value]="basicInfo.middleName || ''"
+                readonly
+              />
+              <button
+                class="btn btn-sm btn-outline-primary"
+                (click)="openEditBasicModal('middleName')"
+              >
+                Edit
+              </button>
+            </div>
+          </div>
+
+          <div class="col-md-5">
+            <label class="form-label small text-primary">LAST NAME</label>
+            <div class="input-group">
+              <input
+                class="form-control readonly-input"
+                [value]="basicInfo.lastName || ''"
+                readonly
+              />
+              <button
+                class="btn btn-sm btn-outline-primary"
+                (click)="openEditBasicModal('lastName')"
+              >
+                Edit
+              </button>
+            </div>
+          </div>
+
+          <div class="col-md-5">
+            <label class="form-label small text-primary">BIRTH DATE</label>
+            <div class="input-group">
+              <input
+                class="form-control readonly-input"
+                [value]="basicInfo.birthDate | date : 'yyyy-MM-dd'"
+                readonly
+              />
+              <button
+                class="btn btn-sm btn-outline-primary"
+                (click)="openEditBasicModal('birthDate')"
+              >
+                Edit
+              </button>
+            </div>
+          </div>
+
+          <div class="col-md-5">
+            <label class="form-label small text-primary">GENDER</label>
+            <div class="input-group">
+              <input
+                class="form-control readonly-input"
+                [value]="basicInfo.gender || ''"
+                readonly
+              />
+              <button
+                class="btn btn-sm btn-outline-primary"
+                (click)="openEditBasicModal('gender')"
+              >
+                Edit
+              </button>
+            </div>
+          </div>
+
+          <div class="col-md-5">
+            <label class="form-label small text-primary">MARITAL STATUS</label>
+            <div class="input-group">
+              <input
+                class="form-control readonly-input"
+                [value]="basicInfo.maritalStatus || ''"
+                readonly
+              />
+              <button
+                class="btn btn-sm btn-outline-primary"
+                (click)="openEditBasicModal('maritalStatus')"
+              >
+                Edit
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Address Section -->
+      <div class="section mb-4" *ngIf="addresses.length > 0">
+        <h5 class="text-primary mb-3">Address</h5>
+
+        <div
+          *ngFor="let ad of addresses; let i = index"
+          class="item-box p-3 mb-3 position-relative"
+        >
+          <div class="position-absolute top-0 end-0 p-2 d-flex gap-2">
+            <button
+              class="btn btn-sm btn-outline-primary"
+              (click)="openEditAddressModal(ad)"
+            >
+              Edit
+            </button>
+            <button
+              class="btn btn-sm btn-danger"
+              (click)="deleteAddress(i, ad)"
+            >
+              Delete
+            </button>
+          </div>
+
+          <div class="row g-3 mt-4">
+            <div class="col-md-6">
+              <label class="form-label small text-primary">ADDRESS</label>
+              <input
+                class="form-control readonly-input"
+                [value]="ad.text || combinedAddress(ad)"
+                readonly
+              />
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label small text-primary">CITY</label>
+              <input
+                class="form-control readonly-input"
+                [value]="ad.city || '-'"
+                readonly
+              />
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label small text-primary">STATE</label>
+              <input
+                class="form-control readonly-input"
+                [value]="ad.state || '-'"
+                readonly
+              />
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label small text-primary">COUNTRY</label>
+              <input
+                class="form-control readonly-input"
+                [value]="ad.country || '-'"
+                readonly
+              />
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label small text-primary">PINCODE</label>
+              <input
+                class="form-control readonly-input"
+                [value]="ad.postalCode || '-'"
+                readonly
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Telecoms -->
+      <div class="section mb-4" *ngIf="telecoms.length > 0">
+        <h5 class="text-primary mb-3">Telecom</h5>
+
+        <div
+          *ngFor="let tel of telecoms; let i = index"
+          class="item-box p-3 mb-2 position-relative"
+        >
+          <div class="position-absolute top-0 end-0 p-2 d-flex gap-2">
+            <button
+              class="btn btn-sm btn-outline-primary"
+              (click)="openEditTelecomModal(tel)"
+            >
+              Edit
+            </button>
+            <button
+              class="btn btn-sm btn-danger"
+              (click)="deleteTelecom(i, tel)"
+            >
+              Delete
+            </button>
+          </div>
+
+          <div class="row g-3 mt-4">
+            <div class="col-md-4">
+              <label class="form-label small text-primary">SYSTEM</label>
+              <input
+                class="form-control readonly-input"
+                [value]="tel.system || '-'"
+                readonly
+              />
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label small text-primary">VALUE</label>
+              <input
+                class="form-control readonly-input"
+                [value]="tel.value || '-'"
+                readonly
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Allergies
+      <div class="section mb-4" *ngIf="allergies.length > 0">
+        <h5 class="text-primary mb-3">Allergies</h5>
+
+        <div
+          *ngFor="let al of allergies; let i = index"
+          class="item-box p-3 mb-3 position-relative"
+        >
+          <div class="position-absolute top-0 end-0 p-2">
+            <button
+              class="btn btn-sm btn-danger"
+              (click)="deleteAllergy(i, al)"
+            >
+              Delete
+            </button>
+          </div>
+
+          <div class="row g-3 mt-4">
+            <div class="col-md-5">
+              <label class="form-label small text-primary">ALLERGY NAME</label>
+              <input
+                class="form-control readonly-input"
+                [value]="al.allergyName || '-'"
+                readonly
+              />
+            </div>
+
+            <div class="col-md-5">
+              <label class="form-label small text-primary"
+                >CLINICAL STATUS</label
+              >
+              <input
+                class="form-control readonly-input"
+                [value]="al.clinicalStatus || '-'"
+                readonly
+              />
+            </div>
+
+            <div class="col-md-5">
+              <label class="form-label small text-primary"
+                >VERIFICATION STATUS</label
+              >
+              <input
+                class="form-control readonly-input"
+                [value]="al.verificationStatus || '-'"
+                readonly
+              />
+            </div>
+
+            <div class="col-md-5">
+              <label class="form-label small text-primary">ALLERGY TYPE</label>
+              <input
+                class="form-control readonly-input"
+                [value]="al.allergyType || '-'"
+                readonly
+              />
+            </div>
+
+            <div class="col-md-5">
+              <label class="form-label small text-primary">CATEGORY</label>
+              <input
+                class="form-control readonly-input"
+                [value]="al.category || '-'"
+                readonly
+              />
+            </div>
+
+            <div class="col-md-5">
+              <label class="form-label small text-primary">CRITICALITY</label>
+              <input
+                class="form-control readonly-input"
+                [value]="al.criticality || '-'"
+                readonly
+              />
+            </div>
+
+            <div class="col-md-5">
+              <label class="form-label small text-primary">ONSET DATE</label>
+              <input
+                class="form-control readonly-input"
+                [value]="al.onsetDate | date : 'yyyy-MM-dd'"
+                readonly
+              />
+            </div>
+          </div>
+        </div>
+      </div> -->
+
+      <!-- <div *ngIf="loading" class="text-center p-5">Loading...</div> -->
+
+      <!-- Basic edit modal -->
+      <div
+        class="modal fade"
+        id="editBasicModal"
+        tabindex="-1"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Edit {{ editingFieldLabel }}</h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <ng-container [ngSwitch]="editingField">
+                <input
+                  *ngSwitchCase="'birthDate'"
+                  class="form-control"
+                  type="date"
+                  [(ngModel)]="editingValue"
+                />
+                <select
+                  *ngSwitchCase="'gender'"
+                  class="form-select"
+                  [(ngModel)]="editingValue"
+                >
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+                <div *ngIf="editingField === 'maritalStatus'">
+                  <label class="form-label">Select Marital Status</label>
+                  <select class="form-select" [(ngModel)]="editingValue">
+                    <option *ngFor="let m of maritalTypes" [value]="m">
+                      {{ m }}
+                    </option>
+                  </select>
+                </div>
+              </ng-container>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-secondary" data-bs-dismiss="modal">
+                Cancel
+              </button>
+              <button class="btn btn-primary" (click)="saveBasicField()">
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit Address Modal -->
+      <div
+        class="modal fade"
+        id="editAddressModal"
+        tabindex="-1"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-md modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Edit Address</h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+
+            <div class="modal-body">
+              <div class="mb-3">
+                <label class="form-label"
+                  >Address <span class="text-danger">*</span></label
+                >
+                <textarea
+                  class="form-control"
+                  rows="3"
+                  [(ngModel)]="addressForm.text"
+                  [class.is-invalid]="isAddressInvalid('text')"
+                ></textarea>
+                <div *ngIf="isAddressInvalid('text')" class="invalid-feedback">
+                  Address is required.
+                </div>
+              </div>
+
+              <div class="row g-3">
+                <div class="col-md-6 position-relative">
+                  <label class="form-label"
+                    >City <span class="text-danger">*</span></label
+                  >
+                  <input
+                    class="form-control"
+                    [(ngModel)]="addressForm.city"
+                    (focus)="showCity = true"
+                    (input)="onAddressInput('city')"
+                    (blur)="hideAddressDropdownLater('city')"
+                    [class.is-invalid]="isAddressInvalid('city')"
+                  />
+                  <ul
+                    *ngIf="showCity"
+                    class="list-group position-absolute w-100"
+                    style="z-index: 1100; max-height: 200px; overflow: auto"
+                  >
+                    <li
+                      class="list-group-item"
+                      *ngFor="let c of filteredCities"
+                      (mousedown)="selectAddressCity(c)"
+                    >
+                      {{ c }}
+                    </li>
+                    <li
+                      class="list-group-item text-muted"
+                      *ngIf="!filteredCities || filteredCities.length === 0"
+                    >
+                      No results
+                    </li>
+                  </ul>
+                  <div
+                    *ngIf="isAddressInvalid('city')"
+                    class="invalid-feedback"
+                  >
+                    City is required.
+                  </div>
+                </div>
+
+                <div class="col-md-6 position-relative">
+                  <label class="form-label"
+                    >State <span class="text-danger">*</span></label
+                  >
+                  <input
+                    class="form-control"
+                    [(ngModel)]="addressForm.state"
+                    (focus)="showState = true"
+                    (input)="onAddressInput('state')"
+                    (blur)="hideAddressDropdownLater('state')"
+                    [class.is-invalid]="isAddressInvalid('state')"
+                  />
+                  <ul
+                    *ngIf="showState"
+                    class="list-group position-absolute w-100"
+                    style="z-index: 1100; max-height: 200px; overflow: auto"
+                  >
+                    <li
+                      class="list-group-item"
+                      *ngFor="let s of filteredStates"
+                      (mousedown)="selectAddressState(s)"
+                    >
+                      {{ s }}
+                    </li>
+                    <li
+                      class="list-group-item text-muted"
+                      *ngIf="!filteredStates || filteredStates.length === 0"
+                    >
+                      No results
+                    </li>
+                  </ul>
+                  <div
+                    *ngIf="isAddressInvalid('state')"
+                    class="invalid-feedback"
+                  >
+                    State is required.
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label"
+                    >Postal Code <span class="text-danger">*</span></label
+                  >
+                  <input
+                    class="form-control"
+                    [(ngModel)]="addressForm.postalCode"
+                    readonly
+                    [class.is-invalid]="isAddressInvalid('postalCode')"
+                  />
+                  <div
+                    *ngIf="isAddressInvalid('postalCode')"
+                    class="invalid-feedback"
+                  >
+                    Postal code is required.
+                  </div>
+                </div>
+
+                <div class="col-md-6 position-relative">
+                  <label class="form-label"
+                    >Country <span class="text-danger">*</span></label
+                  >
+                  <input
+                    class="form-control"
+                    [(ngModel)]="addressForm.country"
+                    (focus)="showCountry = true"
+                    (input)="onAddressInput('country')"
+                    (blur)="hideAddressDropdownLater('country')"
+                    [class.is-invalid]="isAddressInvalid('country')"
+                  />
+                  <ul
+                    *ngIf="showCountry"
+                    class="list-group position-absolute w-100"
+                    style="z-index: 1100; max-height: 200px; overflow: auto"
+                  >
+                    <li
+                      class="list-group-item"
+                      *ngFor="let c of filteredCountries"
+                      (mousedown)="selectAddressCountry(c)"
+                    >
+                      {{ c }}
+                    </li>
+                    <li
+                      class="list-group-item text-muted"
+                      *ngIf="
+                        !filteredCountries || filteredCountries.length === 0
+                      "
+                    >
+                      No results
+                    </li>
+                  </ul>
+                  <div
+                    *ngIf="isAddressInvalid('country')"
+                    class="invalid-feedback"
+                  >
+                    Country is required.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button class="btn btn-secondary" data-bs-dismiss="modal">
+                Cancel
+              </button>
+              <button class="btn btn-primary" (click)="saveAddress()">
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit Telecom Modal -->
+      <div
+        class="modal fade"
+        id="editTelecomModal"
+        tabindex="-1"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Edit Telecom</h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+
+            <div class="modal-body">
+              <div class="mb-3">
+                <label class="form-label"
+                  >System <span class="text-danger">*</span></label
+                >
+                <select
+                  class="form-select"
+                  [(ngModel)]="telecomForm.system"
+                  (change)="validateTelecom()"
+                  [class.is-invalid]="telecomErrors.system"
+                >
+                  <option value="">Select</option>
+                  <option value="phone">Phone</option>
+                  <option value="email">Email</option>
+                </select>
+                <div *ngIf="telecomErrors.system" class="invalid-feedback">
+                  {{ telecomErrors.system }}
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label"
+                  >Value <span class="text-danger">*</span></label
+                >
+                <input
+                  class="form-control"
+                  [(ngModel)]="telecomForm.value"
+                  (input)="validateTelecom()"
+                  [placeholder]="
+                    telecomForm.system === 'email'
+                      ? 'user@example.com'
+                      : '10 digit phone'
+                  "
+                  [class.is-invalid]="telecomErrors.value"
+                />
+                <div *ngIf="telecomErrors.value" class="invalid-feedback">
+                  {{ telecomErrors.value }}
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button class="btn btn-secondary" data-bs-dismiss="modal">
+                Cancel
+              </button>
+              <button class="btn btn-primary" (click)="saveTelecom()">
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
