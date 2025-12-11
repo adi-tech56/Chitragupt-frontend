@@ -17,7 +17,7 @@ declare var bootstrap: any;
   styleUrls: ['./profile-page.component.css'],
 })
 export class ProfilePageComponent implements OnInit {
-  loading = false;
+  
   firstLetter = '';
   basicInfo: any = {};
   addresses: any[] = [];
@@ -109,7 +109,7 @@ export class ProfilePageComponent implements OnInit {
   }
 
   loadAll() {
-    this.loading = true;
+    
     this.profileService.getProfile().subscribe({
       next: (res: any) => {
         if (res && res.hasProfile && res.profile) {
@@ -124,7 +124,7 @@ export class ProfilePageComponent implements OnInit {
       },
       complete: () => {
         this.loadAllergies();
-        this.loading = false;
+      
       },
     });
   }

@@ -1,36 +1,39 @@
+<div *ngIf="pageContext === 'MEDICATION'" class="my-3 px-2">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+    
+    <!-- Header -->
+    <h4 class="m-0 mb-2 mb-md-0">
+      {{
+        viewMode === 'TODAY' ? "Today's Medications" :
+        viewMode === 'SKIPPED' ? "Skipped Medications" :
+        "Completed Medications"
+      }}
+    </h4>
 
-<div *ngIf="pageContext === 'HOME'" class="my-3 px-2">
-  <h4 class="m-0">Today's Medications</h4>
-</div>
-<div *ngIf="pageContext === 'MEDICATION'" class="d-flex justify-content-between align-items-center my-3 px-2">
-  <h4 class="m-0">
-    {{
-    viewMode === 'TODAY' ? "Today's Medications" :
-    viewMode === 'SKIPPED' ? "Skipped Medications" :
-    "Completed Medications"
-    }}
-  </h4>
-  <div class="btn-group" role="group">
-
-    <button class="btn" [ngClass]="viewMode === 'TODAY' ? 'btn-primary' : 'btn-outline-primary'"
-      (click)="setView('TODAY')">
-      <i class="fa-solid fa-list-check me-1"></i>
-      Today
-    </button>
-    <button class="btn" [ngClass]="viewMode === 'SKIPPED' ? 'btn-primary' : 'btn-outline-primary'"
-      (click)="setView('SKIPPED')">
-      <i class="fa-solid fa-ban me-1"></i>
-      Skipped
-    </button>
-    <button class="btn" [ngClass]="viewMode === 'COMPLETED' ? 'btn-primary' : 'btn-outline-primary'"
-      (click)="setView('COMPLETED')">
-      <i class="fa-solid fa-check-circle me-1"></i>
-      Completed
-    </button>
+    <!-- Button group -->
+    <div class="btn-group" role="group">
+      <button class="btn" [ngClass]="viewMode === 'TODAY' ? 'btn-primary' : 'btn-outline-primary'"
+        (click)="setView('TODAY')">
+        <i class="fa-solid fa-list-check me-1"></i>
+        Today
+      </button>
+      <button class="btn" [ngClass]="viewMode === 'SKIPPED' ? 'btn-primary' : 'btn-outline-primary'"
+        (click)="setView('SKIPPED')">
+        <i class="fa-solid fa-ban me-1"></i>
+        Skipped
+      </button>
+      <button class="btn" [ngClass]="viewMode === 'COMPLETED' ? 'btn-primary' : 'btn-outline-primary'"
+        (click)="setView('COMPLETED')">
+        <i class="fa-solid fa-check-circle me-1"></i>
+        Completed
+      </button>
+    </div>
 
   </div>
-
 </div>
+
+
+
 
 <div *ngIf="viewMode === 'TODAY'">
 

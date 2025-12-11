@@ -88,8 +88,8 @@ export class RegisterComponent {
     this.isSubmitted = true;
     if (this.form.invalid) {
       this.formSubmit = false;
-       this.form.markAllAsTouched();
-       this.toast.show('Please fill all required fields.', 'error');
+      this.form.markAllAsTouched();
+      this.toast.show('Please fill all required fields.', 'error');
       return;
     }
     const { firstName, lastName, middleName, emailId, contactNo } = this.form.value;
@@ -109,12 +109,21 @@ export class RegisterComponent {
       next: (res) => {
         this.response = res;
         console.log('Post created successfully:', res);
-
+        this.toast.show('User registered success', 'success');
         this.signupSuccess.emit(res);
       },
-      error: (err) => {
-        console.error('Error creating post:', err);
-      }
+   error: (err) => {
+  console.error('Error creating post:', err);
+
+  // Extract the backend error message safely
+  const backendMessage =
+    err?.error?.error.replace(/^.*?:\s*/, '')  ||     // Your backend passes the message in "error"
+    err?.message ||          // Fallback
+    'Something went wrong';  // Default
+
+  this.toast.show(backendMessage, 'error');
+}
+
     });
 
   }

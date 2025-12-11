@@ -7,29 +7,32 @@ import { MedicationService } from 'src/app/core/Services/PrescriptionServices/me
   templateUrl: './home-page.component.html',
   styleUrls: ['./home-page.component.css']
 })
-export class HomePageComponent implements OnInit,OnDestroy {
-  hasPrescriptions: boolean = false;
-  loading: boolean = true;
-  constructor(private medicationService :MedicationService){}
- 
-   private destroy$ = new Subject<void>();
-  ngOnInit(): void {
-    this.medicationService.checkPrescriptionExists()
+export class HomePageComponent implements OnInit, OnDestroy {
+
+  hasPrescriptions = false;
+  private destroy$ = new Subject<void>();
+  isHomeLoading: boolean = true;
+
+  constructor(private medicationService: MedicationService) {}
+
+ngOnInit(): void {
+  this.isHomeLoading = true;
+
+  this.medicationService.checkPrescriptionExists()
     .pipe(takeUntil(this.destroy$))
     .subscribe({
-      next: (exists) => {
+      next: exists => {
         this.hasPrescriptions = exists;
-        this.loading = false;
+        this.isHomeLoading = false;
       },
-      error: (err) => {
-        console.error(err);
+      error: () => {
         this.hasPrescriptions = false;
-        this.loading = false;
+        this.isHomeLoading = false;
       }
     });
-  }
+}
 
-   ngOnDestroy(): void {
+  ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
   }

@@ -22,7 +22,7 @@ declare var bootstrap: any;
   styleUrls: ['./contact-page.component.css'],
 })
 export class ContactPageComponent implements OnInit, OnDestroy {
-  loading = false;
+
   contacts: any[] = [];
   firstLetter = '';
 
@@ -377,13 +377,13 @@ export class ContactPageComponent implements OnInit, OnDestroy {
 
   /** Load contacts from backend */
   loadContacts() {
-    this.loading = true;
+  
     this.contactService.getContact().subscribe({
       next: (res: any) => {
         this.contacts = res?.contacts ?? [];
       },
       error: (err) => console.error('Failed to load contacts', err),
-      complete: () => (this.loading = false),
+     
     });
   }
 

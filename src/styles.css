@@ -6,7 +6,7 @@
   background-color: #f4f7f6;
   color: #333;
   display: flex;
-  background-image: var(--bg-gradient);
+  background-image: white;
 
   margin: 0 !important;
   /* Primary Theme Colors */

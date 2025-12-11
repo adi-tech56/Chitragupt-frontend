@@ -15,12 +15,12 @@ export class ExportPrescriptionService {
     const body = Array.isArray(prescriptionId) ? prescriptionId : [prescriptionId];
 
     return this.http.post(`${this.apiUrl}/fhir/bundle-medication`, body, {
-      responseType: 'blob'
+      responseType: 'blob',  headers: { skipLoader: 'true' } 
     });
   }
   downloadPatientBundle() {
     return this.http.post(`${this.apiUrl}/fhir/bundle-patient`,{}, {
-      responseType: 'blob'
+      responseType: 'blob',  headers: { skipLoader: 'true' } 
     });
   }
 }
