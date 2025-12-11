@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://sxlvw3f9-8089.inc1.devtunnels.ms'  
+  apiUrl: 'https://chitragupt-production.up.railway.app'  
 };
