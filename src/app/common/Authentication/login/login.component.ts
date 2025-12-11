@@ -6,7 +6,7 @@ import { UserLoginDetails } from 'src/app/core/Models/Authentication';
 import { AuthService } from 'src/app/core/Services/auth-service.service';
 import { ToastService } from 'src/app/core/Services/toast.service';
 import { TokenRefreshService } from 'src/app/core/Services/token-refresh.service';
-
+import { environment } from '../../../../environments/environment';
 
 let initialEmail = '';
 // const savedForm = window.localStorage.getItem('saved-login-form');
@@ -83,7 +83,7 @@ export class LoginComponent implements OnInit {
       this.loginForm.controls.email.invalid);
   }
   googleSignIn() {
-    window.location.href = "http://localhost8089:/oauth2/authorization/google";
+    window.location.href = `${environment.apiUrl}/oauth2/authorization/google`;
     
   }
   goToSignup() {
