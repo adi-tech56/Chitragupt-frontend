@@ -48,44 +48,50 @@ export class UserLayoutComponent {
     this.patientAllergyComplete = true;
   }
 
-ngOnInit(): void {
-  this.setGreeting();
- 
- this.userName = this.auth.getUserName();
-  // Fix #1 → prevent ExpressionChanged error
-  this.router.events
-    .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
-    .subscribe((event: NavigationEnd) => {
-      setTimeout(() => {
-        this.showStepper = event.urlAfterRedirects === '/';
-      }, 0);
-    });
+  ngOnInit(): void {
+    this.setGreeting();
 
-  // Show loader
-  this.loaderService.show();
+    this.userName = this.auth.getUserName();
+    // Fix #1 → prevent ExpressionChanged error
+    this.router.events
+      .pipe(
+        filter(
+          (event): event is NavigationEnd => event instanceof NavigationEnd
+        )
+      )
+      .subscribe((event: NavigationEnd) => {
+        setTimeout(() => {
+          this.showStepper =
+            event.urlAfterRedirects === '/' ||
+            event.urlAfterRedirects === '/user' ||
+            event.urlAfterRedirects.startsWith('/user');
+        }, 0);
+      });
 
-  // Fix #2 → wrap async updates
-  forkJoin({
-    contactRes: this.patientContactService.getContact().pipe(
-      catchError((err) => {
-        console.error('Contact API failed:', err);
-        return of({ hasContact: false });
-      })
-    ),
-    profileRes: this.patientProfileService.getProfile().pipe(
-      catchError((err) => {
-        console.error('Profile API failed:', err);
-        return of({ hasProfile: false });
-      })
-    ),
-  })
-    .pipe(finalize(() => this.loaderService.hide()))
-    .subscribe(({ contactRes, profileRes }) => {
-      setTimeout(() => {
-        this.patientContactsComplete = contactRes.hasContact ?? false;
-        this.patientDetailsComplete = profileRes.hasProfile ?? false;
-      }, 0);
-    });
-}
+    // Show loader
+    this.loaderService.show();
 
+    // Fix #2 → wrap async updates
+    forkJoin({
+      contactRes: this.patientContactService.getContact().pipe(
+        catchError((err) => {
+          console.error('Contact API failed:', err);
+          return of({ hasContact: false });
+        })
+      ),
+      profileRes: this.patientProfileService.getProfile().pipe(
+        catchError((err) => {
+          console.error('Profile API failed:', err);
+          return of({ hasProfile: false });
+        })
+      ),
+    })
+      .pipe(finalize(() => this.loaderService.hide()))
+      .subscribe(({ contactRes, profileRes }) => {
+        setTimeout(() => {
+          this.patientContactsComplete = contactRes.hasContact ?? false;
+          this.patientDetailsComplete = profileRes.hasProfile ?? false;
+        }, 0);
+      });
+  }
 }
