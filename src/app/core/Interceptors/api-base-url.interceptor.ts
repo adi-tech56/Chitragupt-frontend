@@ -10,9 +10,9 @@ export class ApiBaseUrlInterceptor implements HttpInterceptor {
       return next.handle(req);
     }
 
-    // if (req.url.startsWith('http://') || req.url.startsWith('https://')) {
-    //   return next.handle(req);
-    // }
+    if (req.url.startsWith('http://') || req.url.startsWith('https://')) {
+      return next.handle(req);
+    }
     const apiReq = req.clone({ url: `${environment.apiUrl}/${req.url}` });
     return next.handle(apiReq);
   }
