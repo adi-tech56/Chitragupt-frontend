@@ -50,8 +50,8 @@ export class UserLayoutComponent {
 
 ngOnInit(): void {
   this.setGreeting();
-  this.userName = this.auth.getUserName();
-
+ 
+ this.userName = this.auth.getUserName();
   // Fix #1 → prevent ExpressionChanged error
   this.router.events
     .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))

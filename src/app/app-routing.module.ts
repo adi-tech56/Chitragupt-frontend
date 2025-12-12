@@ -6,7 +6,7 @@ import { UserLayoutComponent } from './layout/user-layout/user-layout.component'
 import { ResetPasswordComponent } from './common/Authentication/reset-password/reset-password.component';
 import { AuthGuard } from './core/Gaurds/auth.guard';
 import { RoleGuard } from './core/Gaurds/role.guard';
-import { GuestGaurd } from './core/Gaurds/guest-gaurd';
+import { GuestGuard } from './core/Gaurds/guest-guard';
 
 const routes: Routes = [
   {
@@ -22,7 +22,7 @@ const routes: Routes = [
   {
     path: 'auth',
     component: AuthLayoutComponent,
-    canActivate: [GuestGaurd],
+    canActivate: [GuestGuard],
   },
   {
     path: 'reset-password',

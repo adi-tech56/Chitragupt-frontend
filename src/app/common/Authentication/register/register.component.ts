@@ -3,6 +3,7 @@ import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/fo
 import { UserRegisterDetails } from 'src/app/core/Models/Authentication';
 import { AuthService } from 'src/app/core/Services/auth-service.service';
 import { ToastService } from 'src/app/core/Services/toast.service';
+import { environment } from 'src/environments/environment';
 
 function valuesCheck(controlName1: string, controlName2: string) {
   return (control: AbstractControl) => {
@@ -80,7 +81,7 @@ export class RegisterComponent {
   passwordCheck = this.form.get('passwords') as FormGroup;
   response: any;
   googleSignIn() {
-    window.location.href = "oauth2/authorization/google";
+    window.location.href = `${environment.apiUrl}/oauth2/authorization/google`;
   }
 
 
