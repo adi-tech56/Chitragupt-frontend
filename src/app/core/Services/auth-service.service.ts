@@ -1,89 +1,33 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { UserLoginDetails, UserRegisterDetails } from '../Models/Authentication';
-import { catchError, map, Observable, of } from 'rxjs';
+import { catchError, map, Observable, of, BehaviorSubject } from 'rxjs';
 import { Router } from '@angular/router';
-import { CookieService } from 'ngx-cookie-service';
 import { StateService } from './state-service.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  constructor(private router: Router,
-    private stateService:StateService
-  ) {}
-  verifyOtp(payload: { email: any; otp: any }) {
-    throw new Error('Method not implemented.');
-  }
+
   private apiUrl = 'auth';
   private http = inject(HttpClient);
-  private cookieService = inject(CookieService);
+  // BehaviorSubject to store current user info
+  private currentUserSubject = new BehaviorSubject<{
+    userId?: number;
+    userName?: string;
+    role?: string[];
+  }>({});
 
-  getToken(): string | null {
-    console.log(document.cookie);
-
-    const token = this.cookieService.get('accessToken');
-  console.log(token)
-    return token ? token : null;
-  }
-  getRefreshToken(): string | null {
-    const token = this.cookieService.get('refreshToken');
-
-    return token ? token : null;
-  }
-
-  decodeToken(token: string): any {
-    try {
-      const payload = token.split('.')[1];
-      return JSON.parse(atob(payload));
-    } catch (e) {
-      return null;
-    }
-  }
-  getUserName(): string {
-    const token = this.getToken();
-    if (!token) return '';
-    const decoded = this.decodeToken(token);
-    if (!decoded) return '';
-    const userName = decoded.userName;
-    return userName;
-  }
-  getUserId(): number {
-    let token = this.getToken() ?? ''; // ensures token is always string
-
-    const decoded = this.decodeToken(token) ?? '';
-
-    return Number(decoded.userId);
+  constructor(
+    private router: Router,
+    private stateService: StateService
+  ) {
+    this.stateService.register(this.currentUserSubject);
   }
 
-  getUserRoles(): string[] {
-    const token = this.getToken();
-    if (!token) return [];
-
-    const decoded = this.decodeToken(token);
-    if (!decoded) return [];
-
-    const roleMatches = decoded.role.match(/name=(\w+)/g);
-    if (!roleMatches) return [];
-    return roleMatches.map((r: string) => r.split('=')[1]);
-  }
-  
-
-  isTokenExpired(token: string): boolean {
-    const decoded = this.decodeToken(token);
-    if (!decoded || !decoded.exp) return true;
-
-    const expiryDate = decoded.exp * 1000;
-    return Date.now() > expiryDate;
-  }
-
-  isLoggedIn(): boolean {
-    const token = this.getToken();
-    return !!token && !this.isTokenExpired(token);
-  }
+  /** Login **/
   login(userLogin: UserLoginDetails): Observable<any> {
-   
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
     return this.http.post(
@@ -94,10 +38,56 @@ export class AuthService {
       },
       { withCredentials: true, headers }
     );
-    
   }
-  signup(userRegister: UserRegisterDetails): Observable<any> {
 
+  /** Check auth status and update current user info **/
+  checkAuthStatus(): Observable<{ authenticated: boolean; userId?: string; userName?: string; role?: string[] }> {
+    return this.http.get<{ authenticated: boolean; userId?: string; userName?: string; role?: string[] }>(
+      `${this.apiUrl}/status`,
+      { withCredentials: true }
+    ).pipe(
+      map(res => {
+        if (res.authenticated) {
+          this.currentUserSubject.next({
+            userId: res.userId ? Number(res.userId) : undefined,
+            userName: res.userName,
+            role: res.role
+          });
+        } else {
+          this.currentUserSubject.next({});
+        }
+        return res;
+      }),
+      catchError(() => {
+        this.currentUserSubject.next({});
+        return of({ authenticated: false });
+      })
+    );
+  }
+
+  /** Refresh access token **/
+  refresh(): Observable<boolean> {
+    return this.http.get(`${this.apiUrl}/refresh`, { withCredentials: true }).pipe(
+      map(() => true),
+      catchError(() => {
+        this.logout();
+        return of(false);
+      })
+    );
+  }
+
+  /** Logout **/
+  logout(): void {
+    this.http.post(`${this.apiUrl}/logout`, {}, { withCredentials: true }).subscribe(() => {});
+    this.currentUserSubject.next({});
+    this.stateService.clearAll();
+    localStorage.clear();
+    sessionStorage.clear();
+    this.router.navigate(['/auth']);
+  }
+
+  /** Signup **/
+  signup(userRegister: UserRegisterDetails): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
     return this.http.post(
@@ -114,75 +104,36 @@ export class AuthService {
       { headers }
     );
   }
+
+  /** Verify OTP **/
   verifyOTP(data: { email: string; otp: string }): Observable<any> {
-
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-
-    return this.http.post(`${this.apiUrl}/verify-otp`, data, { headers });
+    return this.http.post(`${this.apiUrl}/verify-otp`, data);
   }
 
+  /** Reset password **/
   resetPassword(data: string): Observable<any> {
-   
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-
-    return this.http.post(`${this.apiUrl}/send-password-link`, data, {
-      headers,
-    });
-  }
-  updatePassword(data: {
-    password: string;
-    confirmPassword: string;
-    token: string;
-  }): Observable<any> {
-
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-
-    return this.http.post(`${this.apiUrl}/update-password`, data, { headers });
+    return this.http.post(`${this.apiUrl}/send-password-link`, data);
   }
 
- refresh(): Observable<boolean> {
-    return this.http.get(`${this.apiUrl}/refresh`, { withCredentials: true }).pipe(
-      map((res: any) => {
-        return true;
-      }),
-      catchError(() => {
-        this.logout();
-        return of(false);
-      })
-    );
+  /** Update password **/
+  updatePassword(data: { password: string; confirmPassword: string; token: string }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/update-password`, data);
   }
 
-  /** Logout **/
-//  logout(): void {
-//   const cookieDomain = '.inc1.devtunnels.ms';
-//   const cookiePath = '/';
+  /** Get user info anywhere **/
+  getUserName(): string {
+    return this.currentUserSubject.value.userName || '';
+  }
 
-//   // Delete cookies with domain and path
-//   this.cookieService.delete('accessToken', cookiePath, cookieDomain);
-//   this.cookieService.delete('refreshToken', cookiePath, cookieDomain);
+  getUserId(): number {
+ return this.currentUserSubject.value.userId ?? 0;
+  }
 
-//   // Clear application state
-//   this.stateService.clearAll();
-//   localStorage.clear();
-//   sessionStorage.clear();
+  getUserRoles(): string[] {
+    return this.currentUserSubject.value.role || [];
+  }
 
-//   // Redirect to login/auth page
-//   this.router.navigate(['/auth']);
-// }
-logout(): void {
-  const cookiePath = '/';
-
-  // Delete cookies (no domain needed on localhost)
-  this.cookieService.delete('accessToken', cookiePath);
-  this.cookieService.delete('refreshToken', cookiePath);
-
-  // Clear application state
-  this.stateService.clearAll();
-  localStorage.clear();
-  sessionStorage.clear();
-
-  // Redirect to login/auth page
-  this.router.navigate(['/auth']);
-}
-
+  isAuthenticated(): boolean {
+    return !!this.currentUserSubject.value.userId;
+  }
 }
