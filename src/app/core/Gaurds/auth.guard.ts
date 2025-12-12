@@ -47,6 +47,7 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
 import { AuthService } from '../Services/auth-service.service';
+import { Observable, map } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -54,12 +55,16 @@ import { AuthService } from '../Services/auth-service.service';
 export class AuthGuard implements CanActivate {
   constructor(private auth: AuthService, private router: Router) {}
 
-  canActivate(): boolean {
-    const token = this.auth.getToken();
-    if (!token || this.auth.isTokenExpired(token)) {
-      this.router.navigate(['/auth']);
-      return false;
-    }
-    return true;
+  canActivate(): Observable<boolean> {
+    return this.auth.checkAuthStatus().pipe(
+      map(status => {
+        if (!status.authenticated) {
+          this.router.navigate(['/auth']);
+          return false;
+        }
+        return true;
+      })
+    );
   }
 }
+

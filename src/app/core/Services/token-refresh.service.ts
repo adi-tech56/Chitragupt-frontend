@@ -6,7 +6,7 @@ import { AuthService } from './auth-service.service';
 })
 export class TokenRefreshService {
   private intervalId: any;
-  private REFRESH_THRESHOLD_MS = 60 * 1000; // 1 min before expiry
+  private REFRESH_INTERVAL_MS = 30 * 1000; // Check every 30 seconds
 
   constructor(private auth: AuthService) { }
 
@@ -15,45 +15,29 @@ export class TokenRefreshService {
     console.log("Auto refresh started");
 
     this.intervalId = setInterval(() => {
-      const accessToken = this.auth.getToken();
-      const now = Date.now();
-
-      if (accessToken) {
-        const decoded = this.auth.decodeToken(accessToken);
-        const expiry = decoded?.exp ? decoded.exp * 1000 : 0;
-
-        if (now >= expiry) {
-          console.log('Access token expired → refreshing');
-          this.callRefresh();
-        } else if (expiry - now <= this.REFRESH_THRESHOLD_MS) {
-          console.log('Access token close to expiry → refreshing');
-          this.callRefresh();
-        } else {
-          console.log('Access token valid → no action needed');
+      // Call backend to refresh token if refresh cookie exists
+      this.auth.refresh().subscribe({
+        next: (success) => {
+          if (success) {
+            console.log('Token refreshed successfully');
+          } else {
+            console.warn('Refresh failed → logging out');
+            this.auth.logout();
+          }
+        },
+        error: (err) => {
+          console.error('Error during refresh → logging out', err);
+          this.auth.logout();
         }
-
-      } else {
-        console.log('No access token → refreshing (if refresh cookie exists)');
-        this.callRefresh();
-      }
-
-    },30 * 1000);
-  }
-
-  private callRefresh() {
-    this.auth.refresh().subscribe({
-      next: (res) => console.log('Token refreshed successfully'),
-      error: (err) => {
-        console.warn('Refresh failed → logging out', err);
-        this.auth.logout();
-      }
-    });
+      });
+    }, this.REFRESH_INTERVAL_MS);
   }
 
   stopAutoRefresh() {
     if (this.intervalId) {
       clearInterval(this.intervalId);
       this.intervalId = null;
+      console.log("Auto refresh stopped");
     }
   }
 }

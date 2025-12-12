@@ -15,37 +15,25 @@ export class AuthInterceptor implements HttpInterceptor {
 
   intercept(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
 
-    const token = this.authService.getToken();
 
-    if (
-      req.url.includes('/login') ||
-      req.url.includes('/signup') ||
-      req.url.includes('/verify-otp') ||
-      req.url.includes('/send-password-link') ||
-      req.url.includes('/update-password')
-    ) {
-      return next.handle(req);
+    const publicEndpoints = [
+      '/login',
+      '/signup',
+      '/verify-otp',
+      '/send-password-link',
+      '/update-password'
+    ];
+
+ 
+    if (publicEndpoints.some(url => req.url.includes(url))) {
+      return next.handle(req.clone({ withCredentials: true }));
     }
 
 
-    if (token) {
-      if (this.authService.isTokenExpired(token)) {
-        console.warn("Token expired, logging out");
-        this.authService.logout();
-        return next.handle(req);
-      }
+    const cloned = req.clone({
+      withCredentials: true
+    });
 
-      const cloned = req.clone({
-        setHeaders: {
-          Authorization: `Bearer ${token}`
-        },
-        
-        withCredentials: true
-      });
-
-      return next.handle(cloned);
-    }
-
-    return next.handle(req);
+    return next.handle(cloned);
   }
 }
