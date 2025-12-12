@@ -17,7 +17,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HomeLayoutModule } from './layout/home-layout/home-layout.module';
 import { UserLayoutModule } from './layout/user-layout/user-layout.module';
 
-
 import { AuthInterceptor } from './core/Interceptors/auth-interceptor';
 import { ToasterComponent } from './common/toaster/toaster.component';
 import { SharedModule } from './shared/shared.module';
@@ -25,6 +24,7 @@ import { AddUpdatePrescriptionComponent } from './common/forms/add-update-prescr
 import { ApiBaseUrlInterceptor } from './core/Interceptors/api-base-url.interceptor';
 import { LoaderInterceptor } from './core/Interceptors/loader.interceptor';
 import { SpinnerComponent } from './common/spinner/spinner.component';
+import { GoogleCallbackComponent } from './common/google-callback/google-callback.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -37,6 +37,7 @@ import { SpinnerComponent } from './common/spinner/spinner.component';
     ToasterComponent,
     AddUpdatePrescriptionComponent,
     SpinnerComponent,
+    GoogleCallbackComponent,
   ],
   imports: [
     BrowserModule,
@@ -49,18 +50,18 @@ import { SpinnerComponent } from './common/spinner/spinner.component';
     SharedModule,
   ],
   providers: [
-     {
+    {
       provide: HTTP_INTERCEPTORS,
       useClass: ApiBaseUrlInterceptor,
-      multi: true
+      multi: true,
     },
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
-     { 
-    provide: HTTP_INTERCEPTORS, 
-    useClass: LoaderInterceptor, 
-    multi: true 
-  }
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: LoaderInterceptor,
+      multi: true,
+    },
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

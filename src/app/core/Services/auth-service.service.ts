@@ -1,15 +1,18 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { UserLoginDetails, UserRegisterDetails } from '../Models/Authentication';
+import {
+  UserLoginDetails,
+  UserRegisterDetails,
+} from '../Models/Authentication';
 import { catchError, map, Observable, of, BehaviorSubject } from 'rxjs';
 import { Router } from '@angular/router';
 import { StateService } from './state-service.service';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-
   private apiUrl = 'auth';
   private http = inject(HttpClient);
   // BehaviorSubject to store current user info
@@ -19,11 +22,14 @@ export class AuthService {
     role?: string[];
   }>({});
 
-  constructor(
-    private router: Router,
-    private stateService: StateService
-  ) {
+  constructor(private router: Router, private stateService: StateService) {
     this.stateService.register(this.currentUserSubject);
+  }
+  getGoogleOAuthUrl(): string {
+    return `${environment.apiUrl}/oauth2/authorization/google`;
+  }
+  handleOAuthCallback(): Observable<any> {
+    return this.checkAuthStatus();
   }
 
   /** Login **/
@@ -41,44 +47,57 @@ export class AuthService {
   }
 
   /** Check auth status and update current user info **/
-  checkAuthStatus(): Observable<{ authenticated: boolean; userId?: string; userName?: string; role?: string[] }> {
-    return this.http.get<{ authenticated: boolean; userId?: string; userName?: string; role?: string[] }>(
-      `${this.apiUrl}/status`,
-      { withCredentials: true }
-    ).pipe(
-      map(res => {
-        if (res.authenticated) {
-          this.currentUserSubject.next({
-            userId: res.userId ? Number(res.userId) : undefined,
-            userName: res.userName,
-            role: res.role
-          });
-        } else {
+  checkAuthStatus(): Observable<{
+    authenticated: boolean;
+    userId?: string;
+    userName?: string;
+    role?: string[];
+  }> {
+    return this.http
+      .get<{
+        authenticated: boolean;
+        userId?: string;
+        userName?: string;
+        role?: string[];
+      }>(`${this.apiUrl}/status`, { withCredentials: true })
+      .pipe(
+        map((res) => {
+          if (res.authenticated) {
+            this.currentUserSubject.next({
+              userId: res.userId ? Number(res.userId) : undefined,
+              userName: res.userName,
+              role: res.role,
+            });
+          } else {
+            this.currentUserSubject.next({});
+          }
+          return res;
+        }),
+        catchError(() => {
           this.currentUserSubject.next({});
-        }
-        return res;
-      }),
-      catchError(() => {
-        this.currentUserSubject.next({});
-        return of({ authenticated: false });
-      })
-    );
+          return of({ authenticated: false });
+        })
+      );
   }
 
   /** Refresh access token **/
   refresh(): Observable<boolean> {
-    return this.http.get(`${this.apiUrl}/refresh`, { withCredentials: true }).pipe(
-      map(() => true),
-      catchError(() => {
-        this.logout();
-        return of(false);
-      })
-    );
+    return this.http
+      .get(`${this.apiUrl}/refresh`, { withCredentials: true })
+      .pipe(
+        map(() => true),
+        catchError(() => {
+          this.logout();
+          return of(false);
+        })
+      );
   }
 
   /** Logout **/
   logout(): void {
-    this.http.post(`${this.apiUrl}/logout`, {}, { withCredentials: true }).subscribe(() => {});
+    this.http
+      .post(`${this.apiUrl}/logout`, {}, { withCredentials: true })
+      .subscribe(() => {});
     this.currentUserSubject.next({});
     this.stateService.clearAll();
     localStorage.clear();
@@ -116,7 +135,11 @@ export class AuthService {
   }
 
   /** Update password **/
-  updatePassword(data: { password: string; confirmPassword: string; token: string }): Observable<any> {
+  updatePassword(data: {
+    password: string;
+    confirmPassword: string;
+    token: string;
+  }): Observable<any> {
     return this.http.post(`${this.apiUrl}/update-password`, data);
   }
 
@@ -126,7 +149,7 @@ export class AuthService {
   }
 
   getUserId(): number {
- return this.currentUserSubject.value.userId ?? 0;
+    return this.currentUserSubject.value.userId ?? 0;
   }
 
   getUserRoles(): string[] {

@@ -7,6 +7,7 @@ import { ResetPasswordComponent } from './common/Authentication/reset-password/r
 import { AuthGuard } from './core/Gaurds/auth.guard';
 import { RoleGuard } from './core/Gaurds/role.guard';
 import { GuestGuard } from './core/Gaurds/guest-guard';
+import { GoogleCallbackComponent } from './common/google-callback/google-callback.component';
 
 const routes: Routes = [
   {
@@ -15,6 +16,8 @@ const routes: Routes = [
     pathMatch: 'full',
     // canActivate: [GuestGaurd],
   },
+  { path: 'auth/google/callback', component: GoogleCallbackComponent },
+
   {
     path: '**',
     redirectTo: 'home',
