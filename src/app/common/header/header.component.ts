@@ -18,7 +18,7 @@ export class HeaderComponent {
 
   logout() {
     this.auth.logout();
-    window.location.reload();
+    
     this.router.navigate(['/auth']);
   }
 }
