@@ -94,17 +94,24 @@ export class AuthService {
   }
 
   /** Logout **/
-  logout(): void {
-    this.http
-      .post(`${this.apiUrl}/logout`, {}, { withCredentials: true })
-      .subscribe(() => {});
-    this.currentUserSubject.next({});
-    this.stateService.clearAll();
-    localStorage.clear();
-    sessionStorage.clear();
-    this.router.navigate(['/auth']);
-  }
 
+  logout(): void {
+    // Send a request to the backend to invalidate the refresh and access tokens
+    this.http.post(`${this.apiUrl}/logout`, {}, { withCredentials: true })
+      .subscribe(
+        () => {
+          this.currentUserSubject.next({});
+          this.stateService.clearAll();
+          this.router.navigate(['/auth']); // Redirect to the login page after logout
+        },
+        (error) => {
+          console.error('Logout failed', error);
+          this.currentUserSubject.next({});
+          this.stateService.clearAll();
+          this.router.navigate(['/auth']);
+        }
+      );
+  }
   /** Signup **/
   signup(userRegister: UserRegisterDetails): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
