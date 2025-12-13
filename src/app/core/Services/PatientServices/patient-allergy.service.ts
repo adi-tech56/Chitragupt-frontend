@@ -49,6 +49,7 @@ export class PatientAllergyService {
       {
         params: { term },
         withCredentials: true,
+        headers: { skipLoader: 'true' }
       }
     );
   }

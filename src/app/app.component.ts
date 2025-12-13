@@ -20,6 +20,8 @@ export class AppComponent implements OnInit {
     private cdr: ChangeDetectorRef
   ) { }
   ngOnInit() {
+
+  console.log("ngOnInit called"); 
     if (this.auth.isAuthenticated()) {
       this.tokenRefresh.startAutoRefresh();
       console.log("Auto reffresh login ")
