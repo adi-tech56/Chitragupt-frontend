@@ -1,0 +1,51 @@
+/* General desktop styles */
+.action-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Tooltip styling */
+.action-btn .tooltip-text {
+  visibility: hidden;
+  opacity: 0;
+  width: max-content;
+  background-color: #000;
+  color: #fff;
+  text-align: center;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: opacity 0.3s;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+.action-btn:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Small screens: icon-only square buttons */
+@media (max-width: 576px) {
+  .action-btn {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 4px;
+    justify-content: center;
+  }
+
+  .action-btn .desktop-text {
+    display: none; /* hide text */
+  }
+
+  .action-btn .desktop-icon {
+    margin: 0; /* remove desktop margin */
+  }
+}

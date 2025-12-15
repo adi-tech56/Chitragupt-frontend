@@ -71,7 +71,7 @@ export class RegisterComponent {
   }
 
   togglePasswordVisibility(field: 'password' | 'confirm'): void {
-    console.log(field);
+
     if (field === 'password') {
       this.showPassword = !this.showPassword;
     } else if (field === 'confirm') {
@@ -109,12 +109,12 @@ export class RegisterComponent {
     this.auth.signup(userRegister).subscribe({
       next: (res) => {
         this.response = res;
-        console.log('Post created successfully:', res);
+        
         this.toast.show('User registered success', 'success');
         this.signupSuccess.emit(res);
       },
    error: (err) => {
-  console.error('Error creating post:', err);
+  
 
   // Extract the backend error message safely
   const backendMessage =

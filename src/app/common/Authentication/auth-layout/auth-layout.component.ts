@@ -16,15 +16,9 @@ constructor(private router: Router) { }
     this.currentStep = step;
   }
   onLoginSuccess() {
-    // if (detailsIncomplete) {
-    //   this.userNeedsDetails = true;
-    //   this.goToStep('details');
-    // } else {
-      // redirect to main app/dashboard etc.
-      console.log('Login complete — navigate to dashboard');
-    
+
       this.router.navigate(['/user'])
-    // }
+   
   }
   onSignupSuccess(response: any) {
   this.signupResponse = response;  // store response

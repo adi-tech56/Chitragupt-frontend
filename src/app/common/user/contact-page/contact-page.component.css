@@ -202,3 +202,136 @@
     font-size: 32px;
   }
 }
+/* Button base */
+.add-emergency-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: all 0.2s ease;
+}
+
+/* Tooltip */
+.add-emergency-btn .tooltip-text {
+  visibility: hidden;
+  opacity: 0;
+  background: #000;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  transition: opacity 0.3s;
+  z-index: 10;
+}
+
+.add-emergency-btn:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* 🔥 Small screens: circular pulse icon */
+@media (max-width: 576px) {
+  .add-emergency-btn {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 50%;
+    justify-content: center;
+  }
+
+  .add-emergency-btn .btn-text {
+    display: none; /* hide text */
+  }
+
+  .add-emergency-btn i {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+
+  /* Pulse animation */
+  .add-emergency-btn::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: rgba(13, 110, 253, 0.4);
+    animation: pulse 1.5s infinite;
+    z-index: -1;
+  }
+}
+
+/* Pulse keyframes */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  70% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+/* Action buttons container */
+.contact-actions {
+  display: flex;
+  align-items: center;
+}
+
+/* Shared button style */
+.action-icon-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Tooltip */
+.action-icon-btn .tooltip-text {
+  visibility: hidden;
+  opacity: 0;
+  background: #000;
+  color: #fff;
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
+  z-index: 10;
+}
+
+.action-icon-btn:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* 📱 Small screens: icon-only buttons */
+@media (max-width: 576px) {
+  .action-icon-btn {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 6px;
+  }
+
+  .action-icon-btn .btn-text {
+    display: none;
+  }
+
+  .action-icon-btn i {
+    margin: 0;
+  }
+}

@@ -20,7 +20,7 @@ export class AppComponent implements OnInit {
     private cdr: ChangeDetectorRef
   ) { }
 ngOnInit() {
-  console.log('AppComponent init');
+ 
 
   this.auth.checkAuthStatus().subscribe(res => {
     if (res.authenticated) {

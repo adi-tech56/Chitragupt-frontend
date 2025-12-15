@@ -95,7 +95,7 @@ export class LoginComponent implements OnInit {
   onLogin() {
     if (this.loginForm.invalid) {
       this.formSubmit = false;
-      console.log("Form invalid")
+     this.toast.show('Please fill the form ','error');
       return;
     }
 
@@ -110,14 +110,14 @@ export class LoginComponent implements OnInit {
     this.auth.login(userData).subscribe({
       next: (res) => {
         this.response = res;
-        console.log('Post created successfully:', res);
+      
         this.toast.show('Login Succesful.',  'success');
         this.tokenRefresh.startAutoRefresh();
         this.loginSuccess.emit();
         this.loginError = '';
       },
       error: (err) => {
-        console.error('Error creating post:', err);
+     
         if (err.error && err.error.error) {
           const backendMsg = err.error.error;
 
