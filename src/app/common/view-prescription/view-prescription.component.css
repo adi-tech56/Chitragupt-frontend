@@ -1,12 +1,12 @@
 /* Default (large screens) */
-.add-btn {
+.icon-btn {
   position: relative;
   display: flex;
   align-items: center;
 }
 
 /* Tooltip styling */
-.add-btn .tooltip-text {
+.icon-btn .tooltip-text {
   visibility: hidden;
   opacity: 0;
   width: max-content;
@@ -28,14 +28,14 @@
 }
 
 /* Show tooltip on hover */
-.add-btn:hover .tooltip-text {
+.icon-btn:hover .tooltip-text {
   visibility: visible;
   opacity: 1;
 }
 
 /* Small screens */
 @media (max-width: 576px) {
-  .add-btn {
+  .icon-btn {
     width: 40px;
     height: 40px;
     padding: 0;
@@ -43,12 +43,12 @@
     justify-content: center;
   }
 
-  .add-btn .btn-text {
+  .icon-btn .btn-text {
     display: none; /* hide text */
   }
 
   /* Tooltip will show on hover/focus */
-  .add-btn .tooltip-text {
+  .icon-btn .tooltip-text {
     bottom: 150%; /* a bit higher above circle */
     font-size: 0.75rem;
   }

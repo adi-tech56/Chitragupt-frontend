@@ -91,3 +91,53 @@ input, select, textarea {
   height: 40px; /* adjust this to match your dropdown height */
   resize: none; /* optional: prevent manual resizing */
 }
+/* Remove medicaion course */
+/* Base button styling */
+.remove-course-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Tooltip */
+.remove-course-btn .tooltip-text {
+  visibility: hidden;
+  opacity: 0;
+  background-color: #000;
+  color: #fff;
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
+  z-index: 10;
+}
+
+.remove-course-btn:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+
+@media (max-width: 576px) {
+  .remove-course-btn {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 6px;
+  }
+
+  .remove-course-btn .btn-text {
+    display: none;
+  }
+
+  .remove-course-btn i {
+    margin: 0;
+  }
+}

@@ -17,7 +17,7 @@
   <a
   *ngIf="allMeds.length > 0"
   [routerLink]="['/medication/add']"
-  class="btn btn-outline-primary btn-sm ms-auto add-btn"
+  class="btn btn-outline-primary btn-sm ms-auto icon-btn"
 >
   <i class="fa-solid fa-plus"></i>
   <span class="btn-text ms-1">Add Prescription</span>
@@ -34,9 +34,11 @@
   <div class="card mb-4" *ngFor="let p of allMeds, let i = index">
     <div class="card-header  bg-primary text-white d-flex justify-content-between align-items-center mb-3">
       <h4 class="mb-0">Prescription {{ i+1 }}</h4>
-      <button class="btn btn-light d-flex align-items-center" (click)="downloadPdf(p.superPrescriptionId)">
-        <i class="fa-solid fa-download me-2"></i>
-        Download PDF
+      <button class="btn btn-light d-flex icon-btn" (click)="downloadPdf(p.superPrescriptionId)">
+        <i class="fa-solid fa-download "></i>
+       
+         <span class="btn-text ms-1">Download PDF</span>
+  <span class="tooltip-text">Download PDF</span>
       </button>
 
 

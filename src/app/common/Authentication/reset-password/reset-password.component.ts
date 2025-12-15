@@ -48,7 +48,7 @@ export class ResetPasswordComponent implements OnInit {
   ngOnInit(): void {
     // Extract the token from URL
     this.token = this.route.snapshot.queryParamMap.get('token') || '';
-    console.log('Extracted token:', this.token);
+    
   }
 
   onSubmit() {

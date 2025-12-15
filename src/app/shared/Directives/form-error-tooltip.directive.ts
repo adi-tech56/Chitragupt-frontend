@@ -31,10 +31,10 @@ ngOnChanges(changes: SimpleChanges) {
   }
 }
   ngAfterViewInit() {
-    console.log('ErrorTooltipDirective initialized:', this.el.nativeElement);
+   
 
     if (!this.control) {
-      console.warn('No form control passed to appErrorTooltip');
+     
       return;
     }
 
@@ -64,7 +64,6 @@ ngOnChanges(changes: SimpleChanges) {
     // Append icon next to input
     this.renderer.appendChild(this.el.nativeElement.parentNode, this.iconElement);
 
-    console.log('Tooltip icon created and appended.');
   }
 
 private updateTooltip() {
@@ -72,12 +71,12 @@ private updateTooltip() {
  
 
   const isInvalid = (this.control.touched || this.control.dirty || this.submitted) && this.control.invalid;
-  console.log('Updating tooltip. isInvalid?', isInvalid, 'Errors:', this.control.errors);
+
 
   if (isInvalid) {
 
     const message = this.getErrorMessage();
-    console.log('Tooltip message:', message);
+
 
     // Add invalid class
     this.renderer.addClass(this.el.nativeElement, 'is-invalid');
