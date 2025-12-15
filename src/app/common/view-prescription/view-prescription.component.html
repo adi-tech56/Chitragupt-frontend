@@ -1,22 +1,33 @@
 <div class="row position-relative mb-3">
 
-
   <div class="col-12 col-sm-1 d-flex justify-content-start mb-2">
     <button (click)="goBack()" class="btn btn-outline-primary btn-sm">
       <i class="fa-solid fa-angle-left"></i>
     </button>
   </div>
 
-<div class="col-12 col-sm-11 d-flex justify-content-center align-items-center">
-  <h2 class="text-primary fw-semibold">Your Prescriptions</h2>
-  <a *ngIf="allMeds.length > 0 " [routerLink]="['/medication/add']" class="btn btn-outline-primary btn-sm">
+  <div
+    class="col-12 col-sm-11 d-flex align-items-center justify-content-between"
+  >
+    <!-- Title -->
+    <h2 class="text-primary fw-semibold mx-auto m-0">
+      Your Prescriptions
+    </h2>
 
-    <i class="fa-solid fa-plus"></i> Add Prescription
-  </a>
+  <a
+  *ngIf="allMeds.length > 0"
+  [routerLink]="['/medication/add']"
+  class="btn btn-outline-primary btn-sm ms-auto add-btn"
+>
+  <i class="fa-solid fa-plus"></i>
+  <span class="btn-text ms-1">Add Prescription</span>
+  <span class="tooltip-text">Add Prescription</span>
+</a>
+
+  </div>
+
 </div>
 
-
-</div>
 
 <div  *ngIf="allMeds.length > 0; else noPrescriptions">
 

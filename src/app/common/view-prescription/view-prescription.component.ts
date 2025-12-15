@@ -26,6 +26,7 @@ export class ViewPrescriptionComponent implements OnInit {
   goBack() {
     this.location.back();
   }
+  
   // goToUpdatePage(med: any) {
   //   // Store medication in sessionStorage
   //   sessionStorage.setItem('medication', JSON.stringify(med));

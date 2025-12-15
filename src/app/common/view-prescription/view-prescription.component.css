@@ -1,0 +1,55 @@
+/* Default (large screens) */
+.add-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Tooltip styling */
+.add-btn .tooltip-text {
+  visibility: hidden;
+  opacity: 0;
+  width: max-content;
+  background-color: #000;
+  color: #fff;
+  text-align: center;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  
+  /* Position above the button */
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 120%;
+  transition: opacity 0.3s;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+/* Show tooltip on hover */
+.add-btn:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Small screens */
+@media (max-width: 576px) {
+  .add-btn {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 50%;
+    justify-content: center;
+  }
+
+  .add-btn .btn-text {
+    display: none; /* hide text */
+  }
+
+  /* Tooltip will show on hover/focus */
+  .add-btn .tooltip-text {
+    bottom: 150%; /* a bit higher above circle */
+    font-size: 0.75rem;
+  }
+}

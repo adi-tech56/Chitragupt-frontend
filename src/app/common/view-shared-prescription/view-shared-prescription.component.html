@@ -10,25 +10,32 @@
 >
   <div class="card mb-4" *ngFor="let p of allMeds; let i = index">
     <div
-      class="card-header bg-primary text-white d-flex justify-content-between align-items-center mb-3"
-    >
-      <h4 class="mb-0">Prescription {{ i + 1 }}</h4>
-      <button
-        class="btn btn-light"
-        (click)="downloadPdf(p.superPrescriptionId)"
-      >
-        <i class="fa-solid fa-download me-2"></i>
-        Download PDF
-      </button>
+  class="card-header bg-primary text-white d-flex justify-content-between align-items-center mb-3 flex-wrap"
+>
+  <h4 class="mb-0">Prescription {{ i + 1 }}</h4>
 
-      <button
-        class="btn btn-light d-flex align-items-center"
-        (click)="downloadBundle(p.superPrescriptionId)"
-      >
-        <i class="fa-solid fa-download me-2"></i>
-        Export Fhir
-      </button>
-    </div>
+  <div class="button-group d-flex gap-2">
+    <!-- Download PDF Button -->
+    <button
+      class="btn btn-light action-btn"
+      (click)="downloadPdf(p.superPrescriptionId)"
+    >
+      <i class="fa-solid fa-file-pdf me-2 desktop-icon"></i>
+      <span class="btn-text desktop-text">Download PDF</span>
+      <span class="tooltip-text">Download PDF</span>
+    </button>
+
+    <!-- Export FHIR Button -->
+    <button
+      class="btn btn-light action-btn"
+      (click)="downloadBundle(p.superPrescriptionId)"
+    >
+      <i class="fa-solid fa-file-export me-2 desktop-icon"></i>
+      <span class="btn-text desktop-text">Export FHIR</span>
+      <span class="tooltip-text">Export FHIR</span>
+    </button>
+  </div>
+</div>
 
     <div class="card-body">
       <div class="d-flex justify-content-between mb-2">

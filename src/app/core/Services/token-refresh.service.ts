@@ -6,7 +6,7 @@ import { AuthService } from './auth-service.service';
 })
 export class TokenRefreshService {
   private intervalId: any;
-  private REFRESH_INTERVAL_MS = 60* 1000; // Check every 30 seconds
+  private REFRESH_INTERVAL_MS =  5 * 60 * 1000;// Check every 5 minutes
 
   constructor(private auth: AuthService) { }
 
