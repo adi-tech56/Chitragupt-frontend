@@ -19,27 +19,29 @@ export class AppComponent implements OnInit {
     public loaderService: LoaderService,
     private cdr: ChangeDetectorRef
   ) { }
-  ngOnInit() {
+ngOnInit() {
+  console.log('AppComponent init');
 
-  console.log("ngOnInit called"); 
-    if (this.auth.isAuthenticated()) {
+  this.auth.checkAuthStatus().subscribe(res => {
+    if (res.authenticated) {
       this.tokenRefresh.startAutoRefresh();
-      console.log("Auto reffresh login ")
+      console.log('Auto refresh started after auth check');
     }
-   this.router.events.subscribe(event => {
-  if (event instanceof NavigationStart) {
-    setTimeout(() => this.loaderService.show());
-  }
+  });
 
-  if (
-    event instanceof NavigationEnd ||
-    event instanceof NavigationCancel ||
-    event instanceof NavigationError
-  ) {
-    setTimeout(() => this.loaderService.hide());
-  }
-});
+  this.router.events.subscribe(event => {
+    if (event instanceof NavigationStart) {
+      setTimeout(() => this.loaderService.show());
+    }
 
+    if (
+      event instanceof NavigationEnd ||
+      event instanceof NavigationCancel ||
+      event instanceof NavigationError
+    ) {
+      setTimeout(() => this.loaderService.hide());
+    }
+  });
+}
 
-  }
 }

@@ -6,11 +6,12 @@ import { AuthService } from './auth-service.service';
 })
 export class TokenRefreshService {
   private intervalId: any;
-  private REFRESH_INTERVAL_MS = 30 * 1000; // Check every 30 seconds
+  private REFRESH_INTERVAL_MS = 60* 1000; // Check every 30 seconds
 
   constructor(private auth: AuthService) { }
 
   startAutoRefresh() {
+     if (this.intervalId) return;
     this.stopAutoRefresh();
     console.log("Auto refresh started");
 

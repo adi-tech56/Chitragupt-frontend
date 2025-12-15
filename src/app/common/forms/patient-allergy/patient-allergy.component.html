@@ -125,7 +125,7 @@
 
                 <div class="col-md-6 mb-3">
                   <label class="form-label required">Onset Date(When the allergy started)</label>
-                  <input type="date" class="form-control" formControlName="onsetDate" />
+                  <input type="date" class="form-control" formControlName="onsetDate" [max]="today" />
                 </div>
               </div>
 

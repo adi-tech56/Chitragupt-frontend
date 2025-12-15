@@ -33,7 +33,7 @@
                             *ngIf="isRequired('prescriptionDate')" class="text-danger">*</span></label>
 
                     <div class="input-group">
-                        <input class="form-control" type="date" formControlName="prescriptionDate"
+                        <input class="form-control" type="date" formControlName="prescriptionDate" [max]="today"
                             [appErrorTooltip]="superPrescription.get('prescriptionDate')" [submitted]="isSubmitted"
                             [customMessages]="{
       required: 'Prescription Date is required.',
@@ -84,7 +84,7 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <div class="dropdown-container">
-                                <label class="form-label  fw-semibold">Reason
+                                <label class="form-label  fw-semibold">Disease Name
                                     <span *ngIf="isRequired(['prescription', currentStep, 'reason'])"
                                         class="text-danger">*</span>
                                 </label>
@@ -255,7 +255,8 @@
                                                         class="text-danger">*</span>
                                                 </label>
                                                 <input type="text" class="form-control" formControlName="amountUnitName"
-                                                    placeholder="Search unit for the amount">
+                                            placeholder="Search amount unit (e.g., Tablet, Syrup)"/>
+
                                                 <ul class="dropdown-menu show w-100" *ngIf="amountUnit.length > 0">
                                                     <li class="dropdown-item" *ngFor="let u of amountUnit"
                                                         (click)="selectAmountUnit(u, stepIndex, mIndex)">
@@ -271,7 +272,7 @@
                                                         class="text-danger">*</span>
                                                 </label>
                                                 <input type="text" class="form-control" formControlName="routeName"
-                                                    placeholder="Search medicine intake route">
+                                                    placeholder="Search intake route (e.g., Oral route)">
                                                 <ul class="dropdown-menu show w-100" *ngIf="routeUnit.length > 0">
                                                     <li class="dropdown-item" *ngFor="let r of routeUnit"
                                                         (click)="selectRoute(r, stepIndex, mIndex)">
