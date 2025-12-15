@@ -63,13 +63,23 @@ function dateRangeValidator(minDate: Date, maxDate: Date) {
     return null; // valid
   };
 }
+function noFutureDateValidator() {
+  return (control: AbstractControl) => {
+    if (!control.value) return null;
 
+    const selected = new Date(control.value);
+    const today = new Date();
+
+    return selected > today ? { maxDate: true } : null;
+  };
+}
 
 @Component({
   selector: 'app-add-update-prescription',
   templateUrl: './add-update-prescription.component.html',
   styleUrls: ['./add-update-prescription.component.css']
 })
+
 export class AddUpdatePrescriptionComponent implements OnInit, OnDestroy {
 
   mode: PrescriptionMode = 'add';
@@ -79,7 +89,7 @@ export class AddUpdatePrescriptionComponent implements OnInit, OnDestroy {
   superPrescription: FormGroup;
   currentStep = 0;
   timingDescriptions: string[][] = [];
-
+today = new Date().toISOString().split('T')[0];
   // for autocomplete
   conditions: any[] = [];
   medicines: any[] = [];
@@ -119,7 +129,7 @@ export class AddUpdatePrescriptionComponent implements OnInit, OnDestroy {
       doctorName: ['', Validators.required],
       prescriptionDate: ['', [
         Validators.required,
-        dateValidator,
+        dateValidator,noFutureDateValidator,
         dateRangeValidator(new Date('1700-01-01'), new Date('2040-12-31'))
       ]],
       notes: [''],
