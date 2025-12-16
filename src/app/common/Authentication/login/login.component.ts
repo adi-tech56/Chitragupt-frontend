@@ -98,7 +98,7 @@ export class LoginComponent implements OnInit {
      this.toast.show('Please fill the form ','error');
       return;
     }
-
+this.formSubmit=true;
     const { email, password } = this.loginForm.value;
 
 

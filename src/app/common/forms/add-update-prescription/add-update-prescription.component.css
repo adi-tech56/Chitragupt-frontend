@@ -64,7 +64,10 @@ ul.dropdown li:hover,
 select.dropdown-select option:hover {
   background-color: #f0f0f0;
 }
-
+.dropdown-list li:hover,
+.dropdown-list li.highlighted {
+  background-color: #dceaff;
+}
 /* Active/focused item style */
 ul.dropdown li.active,
 select.dropdown-select option:checked {
