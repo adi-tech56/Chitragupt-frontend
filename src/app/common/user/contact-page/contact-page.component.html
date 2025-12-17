@@ -180,8 +180,8 @@
                         isInvalid(contactForm.get('relationshipType'))
                       ">
                       <option value="">Select</option>
-                      <option *ngFor="let r of relationshipOptions" [value]="r">
-                        {{ r }}
+                      <option *ngFor="let r of relationshipOptions" [value]="r.code">
+                        {{ r.display }}
                       </option>
                     </select>
                     <div *ngIf="isInvalid(contactForm.get('relationshipType'))" class="invalid-feedback">

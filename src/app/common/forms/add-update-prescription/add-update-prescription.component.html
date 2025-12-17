@@ -169,25 +169,36 @@
                                                     *ngIf="isRequired(['prescription', currentStep, 'medications', mIndex, 'medicationId'])"
                                                     class="text-danger">*</span>
                                             </label>
-
-                                            <div class="input-group">
-                                                <input type="text" class="form-control" formControlName="medicationName"
-                                                    placeholder="Search medicine"
-                                                    [appErrorTooltip]="getMedicationControl(currentStep, mIndex, 'medicationName')"
-                                                    [submitted]="isSubmitted" [customMessages]="{
+                                            <div class="position-relative w-100">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control"
+                                                        formControlName="medicationName" placeholder="Search medicine"
+                                                        [appErrorTooltip]="getMedicationControl(currentStep, mIndex, 'medicationName')"
+                                                        [submitted]="isSubmitted" [customMessages]="{
                 required: 'Medicine is required.',
                 medicineInvalid: 'Please select a valid medicine from the dropdown.'
            }">
+                                                </div>
+                                                <ul class="list-group position-absolute w-100"
+                                                    style="z-index: 1100; max-height: 200px; overflow-y: auto"
+                                                    *ngIf="medicines.length > 0 || searchStatus.medication.hasSearched">
+
+                                                    <!-- Results -->
+                                                    <li *ngFor="let m of medicines" class="list-group-item"
+                                                        (click)="selectMedicine(m, currentStep, mIndex)">
+                                                        {{ m.brandName }}
+                                                    </li>
+
+                                                    <!-- No results -->
+                                                    <li *ngIf="medicines.length === 0 &&  searchStatus.medication.hasSearched && !searchStatus.medication.isSearching"
+                                                        class="list-group-item text-muted">
+                                                        No results found
+                                                    </li>
+
+                                                </ul>
                                             </div>
 
 
-
-                                            <ul class="dropdown-menu show w-100" *ngIf="medicines.length > 0">
-                                                <li *ngFor="let m of medicines" class="dropdown-item"
-                                                    (click)="selectMedicine(m, currentStep, mIndex)">
-                                                    {{ m.brandName }}
-                                                </li>
-                                            </ul>
                                         </div>
 
                                         <div class="col-md-6 mb-3">
@@ -215,8 +226,18 @@
                                                     *ngIf="isRequired(['prescription', currentStep, 'medications', mIndex, 'effectiveStartDate'])"
                                                     class="text-danger">*</span>
                                             </label>
-                                            <input type="date" class="form-control"
-                                                formControlName="effectiveStartDate">
+                                            <div class="input-group">
+                                                <input class="form-control" type="date"
+                                                    formControlName="effectiveStartDate"
+                                                    [appErrorTooltip]="getMedicationControl(currentStep, mIndex, 'effectiveStartDate')"
+                                                    [submitted]="isSubmitted" [customMessages]="{
+      required: 'Start Date is required.',
+      invalidDate:'Enter a valid date.',
+      minDateExceeded:'Date cannot be earlier than 1700.',
+      maxDateExceeded:'Date cannot be later than 2040'
+    }">
+                                            </div>
+
                                         </div>
 
                                         <div class="col">
@@ -225,7 +246,19 @@
                                                     *ngIf="isRequired(['prescription', currentStep, 'medications', mIndex, 'effectiveEndDate'])"
                                                     class="text-danger">*</span>
                                             </label>
-                                            <input type="date" class="form-control" formControlName="effectiveEndDate">
+                                            <div class="input-group">
+                                                <input class="form-control" type="date"
+                                                    formControlName="effectiveEndDate"
+                                                    [min]="getEffectiveStartDate(currentStep, mIndex)"
+                                                    [appErrorTooltip]="getMedicationControl(currentStep, mIndex, 'effectiveEndDate')"
+                                                    [submitted]="isSubmitted" [customMessages]="{
+           required: 'End Date is required.',
+           invalidDate:'Enter a valid date.',
+           minDateExceeded:'Date cannot be earlier than 1700.',
+           maxDateExceeded:'Date cannot be later than 2040',
+           previousDate: 'End date cannot be before start date'
+         }">
+                                            </div>
                                         </div>
                                     </div>
 
@@ -258,15 +291,31 @@
                                                         *ngIf="isRequired(['prescription', currentStep, 'medications', mIndex, 'dosage', 'amountUnitId'])"
                                                         class="text-danger">*</span>
                                                 </label>
-                                                <input type="text" class="form-control" formControlName="amountUnitName"
-                                                    placeholder="Search amount unit (e.g., Tablet, Syrup)" />
+                                                <div class="position-relative w-100">
+                                                    <input type="text" class="form-control"
+                                                        formControlName="amountUnitName"
+                                                        placeholder="Search amount unit (e.g., Tablet, Syrup)" />
+                                                    <ul class="list-group position-absolute w-100"
+                                                        style="z-index: 1100; max-height: 200px; overflow-y: auto"
+                                                        *ngIf="amountUnit.length > 0 || searchStatus.amountUnit.hasSearched">
 
-                                                <ul class="dropdown-menu show w-100" *ngIf="amountUnit.length > 0">
-                                                    <li class="dropdown-item" *ngFor="let u of amountUnit"
-                                                        (click)="selectAmountUnit(u, stepIndex, mIndex)">
-                                                        {{ u.conceptName }}
-                                                    </li>
-                                                </ul>
+                                                        <!-- Results -->
+                                                        <li *ngFor="let u of amountUnit" class="list-group-item"
+                                                            (click)="selectAmountUnit(u, stepIndex, mIndex)">
+                                                            {{ u.conceptName }}
+                                                        </li>
+
+                                                        <!-- No results -->
+                                                        <li *ngIf="amountUnit.length === 0 && searchStatus.amountUnit.hasSearched && !searchStatus.amountUnit.isSearching"
+                                                            class="list-group-item text-muted">
+                                                            No results found
+                                                        </li>
+
+                                                    </ul>
+                                                </div>
+
+
+
                                             </div>
 
                                             <div class="col-12 col-lg-4">
@@ -275,14 +324,29 @@
                                                         *ngIf="isRequired(['prescription', currentStep, 'medications', mIndex, 'dosage', 'routeId'])"
                                                         class="text-danger">*</span>
                                                 </label>
-                                                <input type="text" class="form-control" formControlName="routeName"
-                                                    placeholder="Search intake route (e.g., Oral route)">
-                                                <ul class="dropdown-menu show w-100" *ngIf="routeUnit.length > 0">
-                                                    <li class="dropdown-item" *ngFor="let r of routeUnit"
-                                                        (click)="selectRoute(r, stepIndex, mIndex)">
-                                                        {{ r.conceptName }}
-                                                    </li>
-                                                </ul>
+                                                <div class="position-relative w-100">
+                                                    <input type="text" class="form-control" formControlName="routeName"
+                                                        placeholder="Search intake route (e.g., Oral route)">
+                                                    <ul class="list-group position-absolute w-100"
+                                                        style="z-index: 1100; max-height: 200px; overflow-y: auto"
+                                                        *ngIf="routeUnit.length > 0 || searchStatus.route.hasSearched">
+
+                                                        <!-- Results -->
+                                                        <li *ngFor="let r of routeUnit" class="list-group-item"
+                                                            (click)="selectRoute(r, stepIndex, mIndex)">
+                                                            {{ r.conceptName }}
+                                                        </li>
+
+                                                        <!-- No results -->
+                                                        <li *ngIf="routeUnit.length === 0 && searchStatus.route.hasSearched && !searchStatus.route.isSearching"
+                                                            class="list-group-item text-muted">
+                                                            No results found
+                                                        </li>
+
+                                                    </ul>
+
+                                                </div>
+
                                             </div>
                                         </div>
 

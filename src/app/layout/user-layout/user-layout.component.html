@@ -1,36 +1,49 @@
 <div style="position: fixed; top: 0; left: 0; width: 100%; z-index: 1000">
- <app-header [showProfileButton]="!showStepper || (patientContactsComplete && patientDetailsComplete && patientAllergyComplete)"></app-header>
-
+  <app-header
+    [showProfileButton]="
+      patientContactsComplete &&
+      patientDetailsComplete &&
+      patientAllergyComplete
+    "
+  ></app-header>
 </div>
 
-<div style="margin-top: 60px;">
-  <!-- Stepper: only show on home page -->
-  <ng-container *ngIf="showStepper">
-    <app-patient-contact-details
-      *ngIf="!patientContactsComplete"
-      (contactSubmitted)="onContactSubmitted()"
-    ></app-patient-contact-details>
+<div style="margin-top: 60px">
+  <!-- Show contact form first -->
+  <app-patient-contact-details
+    *ngIf="!patientContactsComplete"
+    (contactSubmitted)="onContactSubmitted()"
+  ></app-patient-contact-details>
 
-    <app-patient-details
-      *ngIf="patientContactsComplete && !patientDetailsComplete"
-      (detailsSubmitted)="onDetailsSubmitted()"
-    ></app-patient-details>
+  <!-- Then show profile -->
+  <app-patient-details
+    *ngIf="patientContactsComplete && !patientDetailsComplete"
+    (detailsSubmitted)="onDetailsSubmitted()"
+  ></app-patient-details>
 
-    <app-patient-allergy
-      *ngIf="patientContactsComplete && patientDetailsComplete && !patientAllergyComplete"
-      (allergySubmitted)="onAllergySubmitted()"
-    ></app-patient-allergy>
-  </ng-container>
+  <!-- Then show allergy -->
+  <app-patient-allergy
+    *ngIf="
+      patientContactsComplete &&
+      patientDetailsComplete &&
+      !patientAllergyComplete
+    "
+    (allergySubmitted)="onAllergySubmitted()"
+  ></app-patient-allergy>
 
-  <!-- Final Layout / main content -->
+  <!-- Finally show dashboard -->
   <div
     class="user-layout"
-    *ngIf="patientContactsComplete && patientDetailsComplete && patientAllergyComplete || !showStepper"
+    *ngIf="
+      patientContactsComplete &&
+      patientDetailsComplete &&
+      patientAllergyComplete
+    "
   >
-    <div style="display: flex;">
+    <div style="display: flex">
       <app-sidebar></app-sidebar>
 
-      <div class="content-area" style="flex: 1; padding: 20px;">
+      <div class="content-area" style="flex: 1; padding: 20px">
         <h4>{{ greetingMessage }} {{ userName }}!</h4>
         <router-outlet></router-outlet>
       </div>

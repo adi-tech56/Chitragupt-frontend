@@ -73,7 +73,17 @@ function noFutureDateValidator() {
     return selected > today ? { maxDate: true } : null;
   };
 }
+ function noPreviousDateValidator(getMinDate: () => Date | null): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    if (!control.value) return null;
 
+    const selectedDate = new Date(control.value);
+    const minDate = getMinDate();
+    if (!minDate) return null;
+
+    return selectedDate < minDate ? { previousDate: true } : null; // ✅ key must match
+  };
+}
 @Component({
   selector: 'app-add-update-prescription',
   templateUrl: './add-update-prescription.component.html',
@@ -89,7 +99,7 @@ export class AddUpdatePrescriptionComponent implements OnInit, OnDestroy {
   superPrescription: FormGroup;
   currentStep = 0;
   timingDescriptions: string[][] = [];
-today = new Date().toISOString().split('T')[0];
+  today = new Date().toISOString().split('T')[0];
   // for autocomplete
   conditions: any[] = [];
   medicines: any[] = [];
@@ -97,6 +107,14 @@ today = new Date().toISOString().split('T')[0];
   periodUnit: any[] = [];
   amountUnit: any[] = [];
   routeUnit: any[] = [];
+
+  searchStatus = {
+    medication: { isSearching: false, hasSearched: false },
+    route: { isSearching: false, hasSearched: false },
+    amountUnit: { isSearching: false, hasSearched: false }
+  };
+
+
   openIndex: number | null = null;
   isSubmitted = false;
   // Toggle function for existing accordions
@@ -129,7 +147,7 @@ today = new Date().toISOString().split('T')[0];
       doctorName: ['', Validators.required],
       prescriptionDate: ['', [
         Validators.required,
-        dateValidator,noFutureDateValidator,
+        dateValidator, noFutureDateValidator,
         dateRangeValidator(new Date('1700-01-01'), new Date('2040-12-31'))
       ]],
       notes: [''],
@@ -220,6 +238,18 @@ today = new Date().toISOString().split('T')[0];
     const dd = ('0' + d.getDate()).slice(-2);
     return `${yyyy}-${mm}-${dd}`;
   }
+getEffectiveStartDate(stepIndex: number, medIndex: number): string | null {
+  const control = this.getMedicationControl(stepIndex, medIndex, 'effectiveStartDate');
+  if (control && control.value) {
+    const date = new Date(control.value);
+    // format as yyyy-MM-dd for the 'min' attribute
+    const yyyy = date.getFullYear();
+    const mm = (date.getMonth() + 1).toString().padStart(2, '0');
+    const dd = date.getDate().toString().padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+  return null; // no min date set if start date is empty
+}
 
   patchFormWithReceivedData() {
     const data = this.receivedData;
@@ -284,58 +314,98 @@ today = new Date().toISOString().split('T')[0];
     return this.superPrescription.get('prescription') as FormArray;
   }
 
-createPrescriptionGroup(): FormGroup {
-  const group = this.fb.group({
-    reason: ['', [Validators.required, conditionSelectedValidator()]],
-    reasonValid: [false],
-    notes: [''],
-    medications: this.fb.array([this.createMedicationGroup()])
-  });
-group.get('reason')!.valueChanges.subscribe(() => {
-  const ctrl = group.get('reason')!;
-  group.get('reasonValid')!.setValue(false, { emitEvent: false });
-  if (!ctrl.touched) {
-    ctrl.markAsTouched({ onlySelf: true });
+  createPrescriptionGroup(): FormGroup {
+    const group = this.fb.group({
+      reason: ['', [Validators.required, conditionSelectedValidator()]],
+      reasonValid: [false],
+      notes: [''],
+      medications: this.fb.array([this.createMedicationGroup()])
+    });
+    group.get('reason')!.valueChanges.subscribe(() => {
+      const ctrl = group.get('reason')!;
+      group.get('reasonValid')!.setValue(false, { emitEvent: false });
+      if (!ctrl.touched) {
+        ctrl.markAsTouched({ onlySelf: true });
+      }
+    });
+    return group;
+
   }
-});
+createMedicationGroup(isExisting = false): FormGroup {
+  const group: FormGroup = this.fb.group({
+    medicationId: [null, Validators.required],
+    medicationName: ['', [Validators.required, medicineSelectedValidator()]],
+    effectiveStartDate: ['', [
+      Validators.required,
+      dateValidator,
+      dateRangeValidator(new Date('1700-01-01'), new Date('2040-12-31'))
+    ]],
+    effectiveEndDate: ['', [
+      Validators.required,
+      dateValidator,
+      dateRangeValidator(new Date('1700-01-01'), new Date('2040-12-31')),
+      noPreviousDateValidator(() => {
+        const startValue = group.get('effectiveStartDate')?.value;
+        return startValue ? new Date(startValue) : null;
+      })
+    ]],
+    status: ['ACTIVE', Validators.required],
+    isExisting: [isExisting],
+    dosage: this.fb.group({
+      amount: [null, Validators.required],
+      amountUnitName: ['', Validators.required],
+      amountUnitId: [null, Validators.required],
+      routeName: ['', Validators.required],
+      routeId: [null, Validators.required],
+      instruction: ['']
+    }),
+    timing: this.fb.group({
+      frequency: [null, Validators.required],
+      period: [null, Validators.required],
+      periodUnit: ['', Validators.required],
+      timeOfDay: [''],
+      whenCode: ['']
+    })
+  });
+
   return group;
- 
 }
 
 
-  createMedicationGroup(isExisting: boolean = false): FormGroup {
-    return this.fb.group({
-      medicationId: [null, Validators.required],
-      medicationName: ['', [Validators.required, medicineSelectedValidator()]],
-      effectiveStartDate: ['', [
-        Validators.required,
-        dateValidator,
-        dateRangeValidator(new Date('1700-01-01'), new Date('2040-12-31'))
-      ]],
-      effectiveEndDate: ['', [
-        Validators.required,
-        dateValidator,
-        dateRangeValidator(new Date('1700-01-01'), new Date('2040-12-31'))
-      ]],
-      status: ['ACTIVE', Validators.required],
-      isExisting: [isExisting],
-      dosage: this.fb.group({
-        amount: [null, Validators.required],
-        amountUnitName: ['', Validators.required],
-        amountUnitId: [null, Validators.required],
-        routeName: ['', Validators.required],
-        routeId: [null, Validators.required],
-        instruction: ['']
-      }),
-      timing: this.fb.group({
-        frequency: [null, Validators.required],
-        period: [null, Validators.required],
-        periodUnit: ['', Validators.required],
-        timeOfDay: [''],
-        whenCode: ['']
-      })
-    });
-  }
+
+  // createMedicationGroup(isExisting: boolean = false): FormGroup {
+  //   return this.fb.group({
+  //     medicationId: [null, Validators.required],
+  //     medicationName: ['', [Validators.required, medicineSelectedValidator()]],
+  //     effectiveStartDate: ['', [
+  //       Validators.required,
+  //       dateValidator,
+  //       dateRangeValidator(new Date('1700-01-01'), new Date('2040-12-31'))
+  //     ]],
+  //     effectiveEndDate: ['', [
+  //       Validators.required,
+  //       dateValidator,
+  //       dateRangeValidator(new Date('1700-01-01'), new Date('2040-12-31'))
+  //     ]],
+  //     status: ['ACTIVE', Validators.required],
+  //     isExisting: [isExisting],
+  //     dosage: this.fb.group({
+  //       amount: [null, Validators.required],
+  //       amountUnitName: ['', Validators.required],
+  //       amountUnitId: [null, Validators.required],
+  //       routeName: ['', Validators.required],
+  //       routeId: [null, Validators.required],
+  //       instruction: ['']
+  //     }),
+  //     timing: this.fb.group({
+  //       frequency: [null, Validators.required],
+  //       period: [null, Validators.required],
+  //       periodUnit: ['', Validators.required],
+  //       timeOfDay: [''],
+  //       whenCode: ['']
+  //     })
+  //   });
+  // }
 
   initAutocompleteForStep(step: number) {
     this.subscribeReasonValueChanges(step);
@@ -527,11 +597,28 @@ group.get('reason')!.valueChanges.subscribe(() => {
         switchMap(term => {
           if (!term || term.length < 2 || this.skipMedicineFetch) {
             this.skipMedicineFetch = false;
+            this.searchStatus.medication.isSearching = false;
+            this.searchStatus.medication.hasSearched = false;
             return of([]);
           }
+          this.searchStatus.medication.isSearching = true;
+          this.searchStatus.medication.hasSearched = true;
+
           return this.autoComplete.medicineSearch(term);
         })
-      ).subscribe(data => this.medicines = data);
+      ).subscribe(
+        data => {
+          this.medicines = data;
+          this.searchStatus.medication.isSearching = false;
+
+        },
+        error => {
+          console.error('Search error:', error);
+          this.searchStatus.medication.isSearching = false;
+          this.medicines = [];
+
+        }
+      );
 
       this.medicineSubscriptions.push(sub);
     });
@@ -605,13 +692,26 @@ group.get('reason')!.valueChanges.subscribe(() => {
         switchMap(term => {
           if (!term || term.length < 2 || this.skipAmountCodeFetch) {
             this.skipAmountCodeFetch = false;
+            this.searchStatus.amountUnit.isSearching = false;
+            this.searchStatus.amountUnit.hasSearched = false;
             return of([]);
           }
+          this.searchStatus.amountUnit.isSearching = true;
+          this.searchStatus.amountUnit.hasSearched = true;
+
           return this.autoComplete.amountSearch(term); // call API
         })
       ).subscribe(data => {
         this.amountUnit = data;
-      });
+        this.searchStatus.amountUnit.isSearching = false;
+
+      },
+        error => {
+          console.error('Search error:', error);
+          this.searchStatus.amountUnit.isSearching = false;
+          this.amountUnit = [];
+
+        });
 
       this.amountSubscriptions.push(sub);
     });
@@ -694,11 +794,28 @@ group.get('reason')!.valueChanges.subscribe(() => {
         switchMap(term => {
           if (!term || term.length < 2 || this.skipRouteCodeFetch) {
             this.skipRouteCodeFetch = false;
+            this.searchStatus.route.isSearching = false;
+            this.searchStatus.route.hasSearched = false;
             return of([]);
           }
+          this.searchStatus.route.isSearching = true;
+          this.searchStatus.route.hasSearched = true;
+
           return this.autoComplete.routeSearch(term);
         })
-      ).subscribe(data => this.routeUnit = data);
+      ).subscribe(data => {
+        this.routeUnit = data
+        this.searchStatus.route.isSearching = false;
+
+      },
+
+        error => {
+          console.error('Search error:', error);
+          this.searchStatus.route.isSearching = false;
+          this.routeUnit = [];
+
+        }
+      );
 
       this.routeSubscriptions.push(sub);
     });
@@ -823,8 +940,9 @@ group.get('reason')!.valueChanges.subscribe(() => {
           this.goBack();
           this.dailyMeds.refreshMeds();
         },
-        error: err => {console.error("Save failed", err);
-           this.toast.show('Adding Prescription Failed.', 'error');
+        error: err => {
+          console.error("Save failed", err);
+          this.toast.show('Adding Prescription Failed.', 'error');
 
         }
       });
@@ -878,8 +996,9 @@ group.get('reason')!.valueChanges.subscribe(() => {
           this.goBack();
           this.dailyMeds.refreshMeds();
         },
-        error: err => {console.error("Save failed", err);
-           this.toast.show('Update Failed.', 'error');
+        error: err => {
+          console.error("Save failed", err);
+          this.toast.show('Update Failed.', 'error');
 
         }
       });
