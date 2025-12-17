@@ -292,9 +292,16 @@
                                                         class="text-danger">*</span>
                                                 </label>
                                                 <div class="position-relative w-100">
-                                                    <input type="text" class="form-control"
-                                                        formControlName="amountUnitName"
-                                                        placeholder="Search amount unit (e.g., Tablet, Syrup)" />
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control"
+                                                            formControlName="amountUnitName"
+                                                            placeholder="Search amount unit (e.g., Tablet, Syrup)"
+                                                            [appErrorTooltip]="getMedicationControl(currentStep, mIndex, 'dosage.amountUnitId')"
+                                                            [submitted]="isSubmitted" [customMessages]="{
+      required: 'Amount Unit is required.',  
+    }" />
+                                                    </div>
+
                                                     <ul class="list-group position-absolute w-100"
                                                         style="z-index: 1100; max-height: 200px; overflow-y: auto"
                                                         *ngIf="amountUnit.length > 0 || searchStatus.amountUnit.hasSearched">
@@ -325,8 +332,15 @@
                                                         class="text-danger">*</span>
                                                 </label>
                                                 <div class="position-relative w-100">
-                                                    <input type="text" class="form-control" formControlName="routeName"
-                                                        placeholder="Search intake route (e.g., Oral route)">
+                                                       <div class="input-group">
+                                                         <input type="text" class="form-control" formControlName="routeName"
+                                                        placeholder="Search intake route (e.g., Oral route)"
+                                                         [appErrorTooltip]="getMedicationControl(currentStep, mIndex, 'dosage.routeId')"
+                                                            [submitted]="isSubmitted" [customMessages]="{
+      required: 'Route  is required.',  
+    }" >
+                                                       </div>
+                                                   
                                                     <ul class="list-group position-absolute w-100"
                                                         style="z-index: 1100; max-height: 200px; overflow-y: auto"
                                                         *ngIf="routeUnit.length > 0 || searchStatus.route.hasSearched">
