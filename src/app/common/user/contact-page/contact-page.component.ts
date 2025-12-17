@@ -30,7 +30,7 @@ export class ContactPageComponent implements OnInit, OnDestroy {
   editingId: number | null = null;
 
   // dropdowns & dataset
-  relationshipOptions: string[] = [];
+  relationshipOptions: any[] = [];
   cityData: Array<{
     city: string;
     state: string;
@@ -87,18 +87,21 @@ export class ContactPageComponent implements OnInit, OnDestroy {
     const name = this.auth.getUserName();
     this.firstLetter = name ? name[0].toUpperCase() : '';
 
-    // load relationship types
-    this.http
+    // // load relationship types
+    // this.http
+    //   .get<any[]>('assets/data/relations-type.json')
+    //   .subscribe((data) => {
+    //     if (!data) return;
+    //     if (typeof data[0] === 'string')
+    //       this.relationshipOptions = data as string[];
+    //     else
+    //       this.relationshipOptions = (data as any[]).map(
+    //         (x) => x.display ?? x.code ?? x
+    //       );
+    //   });
+ this.http
       .get<any[]>('assets/data/relations-type.json')
-      .subscribe((data) => {
-        if (!data) return;
-        if (typeof data[0] === 'string')
-          this.relationshipOptions = data as string[];
-        else
-          this.relationshipOptions = (data as any[]).map(
-            (x) => x.display ?? x.code ?? x
-          );
-      });
+      .subscribe((data) => (this.relationshipOptions = data || []));
 
     // load city/state/country dataset
     this.http.get<any[]>('assets/data/india-locations.json').subscribe(
