@@ -278,16 +278,23 @@ export class PatientContactDetailsComponent implements OnInit, OnDestroy {
       if (type === 'country') this.showCountry[i] = false;
     }, 180);
   }
-  nextStep() {
-    const currentStepControls = this.getStepControls(this.currentStep);
+nextStep() {
+  const currentStepControls = this.getStepControls(this.currentStep);
 
-    if (currentStepControls.invalid) {
-      currentStepControls.markAllAsTouched();
-      return;
-    }
-
-    this.currentStep++;
+  if (currentStepControls.invalid) {
+    currentStepControls.markAllAsTouched();
+    return;
   }
+
+  // reset touched state of NEXT step before showing it
+  const nextControls = this.getStepControls(this.currentStep + 1);
+  if (nextControls) {
+    this.resetControlState(nextControls);
+  }
+
+  this.currentStep++;
+}
+
   getStepControls(step: number): AbstractControl {
     switch (step) {
       case 1:
@@ -306,10 +313,24 @@ export class PatientContactDetailsComponent implements OnInit, OnDestroy {
         return this.contactForm;
     }
   }
+private resetControlState(control: AbstractControl) {
+  control.markAsUntouched();
+  control.markAsPristine();
 
-  previousStep() {
-    if (this.currentStep > 1) this.currentStep--;
+  if (control instanceof FormGroup || control instanceof FormArray) {
+    Object.values(control.controls).forEach(c =>
+      this.resetControlState(c)
+    );
   }
+}
+previousStep() {
+  if (this.currentStep > 1) {
+    this.currentStep--;
+
+    const controls = this.getStepControls(this.currentStep);
+    this.resetControlState(controls);
+  }
+}
 
   onSubmit() {
     if (this.contactForm.invalid) {

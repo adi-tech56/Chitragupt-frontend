@@ -258,6 +258,7 @@
             class="btn btn-secondary"
             (click)="previousStep()"
             *ngIf="!(currentStep === 1)"
+             
           >
             Previous
           </button>
@@ -266,6 +267,7 @@
             class="btn btn-primary"
             *ngIf="currentStep < maxStep"
             (click)="nextStep()"
+            
           >
             Next
           </button>

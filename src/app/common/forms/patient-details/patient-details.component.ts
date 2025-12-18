@@ -33,7 +33,7 @@ export class PatientDetailsComponent {
     private toaster: ToastService
   ) {
     this.patientForm = this.fb.group({
-      birthDate: ['', [Validators.required, this.futureDateValidator]],
+      birthDate: ['', [Validators.required, this.noFutureDateValidator]],
       gender: ['', Validators.required],
       maritalStatus: ['', Validators.required],
       addresses: this.fb.array([this.createAddressGroup()]),
@@ -63,14 +63,15 @@ export class PatientDetailsComponent {
     });
   }
 
-  futureDateValidator(control: AbstractControl) {
-    if (!control.value) return null;
+  noFutureDateValidator() {
+    return (control: AbstractControl) => {
+      if (!control.value) return null;
 
-    const selected = new Date(control.value);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+      const selected = new Date(control.value);
+      const today = new Date();
 
-    return selected > today ? { futureDate: true } : null;
+      return selected > today ? { maxDate: true } : null;
+    };
   }
 
   phoneValidator(control: any) {
@@ -93,6 +94,16 @@ export class PatientDetailsComponent {
   get telecoms(): FormArray {
     return this.patientForm.get('telecoms') as FormArray;
   }
+private resetControlState(control: AbstractControl) {
+  control.markAsPristine();
+  control.markAsUntouched();
+
+  if (control instanceof FormGroup || control instanceof FormArray) {
+    Object.values(control.controls).forEach(c =>
+      this.resetControlState(c)
+    );
+  }
+}
 
   addAddress() {
     this.addresses.push(this.createAddressGroup());
@@ -135,28 +146,57 @@ export class PatientDetailsComponent {
     this.cityDropdownIndex = null;
   }
 
-  nextStep() {
-    if (
-      this.currentStep === 1 &&
-      (this.patientForm.get('birthDate')?.invalid ||
-        this.patientForm.get('gender')?.invalid ||
-        this.patientForm.get('maritalStatus')?.invalid)
-    ) {
-      this.patientForm.markAllAsTouched();
+ nextStep() {
+  // STEP 1 validation
+  if (this.currentStep === 1) {
+    const step1Controls = [
+      this.patientForm.get('birthDate'),
+      this.patientForm.get('gender'),
+      this.patientForm.get('maritalStatus'),
+    ];
+
+    const invalid = step1Controls.some(c => c?.invalid);
+
+    if (invalid) {
+      step1Controls.forEach(c => c?.markAsTouched());
+      this.toaster.show("Please fill the form",'error')
       return;
     }
 
-    if (this.currentStep === 2 && this.addresses.invalid) {
+    // Reset step 2 before entering
+    this.resetControlState(this.addresses);
+  }
+
+  // STEP 2 validation
+  if (this.currentStep === 2) {
+    if (this.addresses.invalid) {
       this.addresses.markAllAsTouched();
       return;
     }
 
-    this.currentStep++;
+    // Reset step 3 before entering
+    this.resetControlState(this.telecoms);
   }
 
-  previousStep() {
-    if (this.currentStep > 1) this.currentStep--;
+  this.currentStep++;
+}
+
+
+previousStep() {
+  if (this.currentStep > 1) {
+    this.currentStep--;
+
+    const control =
+      this.currentStep === 1
+        ? this.patientForm
+        : this.currentStep === 2
+        ? this.addresses
+        : this.telecoms;
+
+    this.resetControlState(control);
   }
+}
+
 
   onSubmit() {
     if (this.patientForm.invalid) {

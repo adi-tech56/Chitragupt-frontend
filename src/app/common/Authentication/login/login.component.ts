@@ -121,14 +121,11 @@ this.formSubmit=true;
         if (err.error && err.error.error) {
           const backendMsg = err.error.error;
 
-          if (backendMsg.includes('Bad credentials')) {
-       
-            this.toast.show('Incorrect password. Please try again.',  'error');
-
-          } else if (backendMsg.includes('Invalid email or password')) {
+          if (backendMsg.includes('Bad credentials') || backendMsg.includes('Invalid email or password')) {
        
             this.toast.show('Invalid email or password. Please check your credentials.',  'error');
-          } else if (backendMsg.includes('User signed up via OAuth')) {
+
+          }  else if (backendMsg.includes('User signed up via OAuth')) {
             this.toast.show('This account uses OAuth login. Please sign in with Google or set a password to use email login.','error');
           } else {
            this.toast.show( 'Login failed. ' + backendMsg,'error');
