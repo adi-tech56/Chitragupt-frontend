@@ -13,6 +13,9 @@ import { Location } from '@angular/common';
 })
 export class ViewSharedPrescriptionComponent {
   allMeds: PrescriptionResponse[] = [];
+  isForbidden = false;
+  errorMessage = '';
+
   constructor(
     private route: ActivatedRoute,
     private sharePrescriptionService: SharePrescriptionService,
@@ -20,7 +23,7 @@ export class ViewSharedPrescriptionComponent {
     private router: Router,
     private location: Location,
     private download: DownloadPrescriptionService
-  ) {}
+  ) { }
   goBack() {
     this.location.back();
   }
@@ -41,15 +44,30 @@ export class ViewSharedPrescriptionComponent {
     }
   }
 
-  ngOnInit() {
-    this.patientId = Number(this.route.snapshot.paramMap.get('id'));
-    this.sharePrescriptionService
-      .getPrescriptionsByPatient(this.patientId)
-      .subscribe((meds) => {
+ ngOnInit() {
+  this.patientId = Number(this.route.snapshot.paramMap.get('id'));
+
+  this.sharePrescriptionService
+    .getPrescriptionsByPatient(this.patientId)
+    .subscribe({
+      next: (meds) => {
         this.allMeds = meds;
-        console.log(meds);
-      });
-  }
+        this.isForbidden = false;
+      },
+      error: (err) => {
+        console.error(err);
+
+        if (err.status === 403) {
+          this.isForbidden = true;
+          this.errorMessage =
+            'You are not authorized to access this patient’s prescriptions.';
+        } else {
+          this.errorMessage = 'Something went wrong. Please try again later.';
+        }
+      },
+    });
+}
+
   downloadPdf(superPrescriptionId: number) {
     this.download
       .downloadSuperPrescriptionPdf(superPrescriptionId)
