@@ -1,4 +1,21 @@
-<div class="d-flex justify-content-between align-items-center mb-3">
+
+<!-- ACCESS DENIED -->
+<div *ngIf="isForbidden" class="container mt-5 text-center">
+  <div class="alert alert-danger p-4">
+    <h4 class="mb-3">
+      <i class="fa-solid fa-ban"></i> Access Denied
+    </h4>
+    <p>{{ errorMessage }}</p>
+  
+      <button (click)="goBack()" class="btn btn-outline-primary mt-3">
+    <i class="fa-solid fa-angle-left"></i>Go Back
+  </button>
+  </div>
+</div>
+
+<!-- ACTUAL PAGE CONTENT -->
+<div *ngIf="!isForbidden">
+  <div class="d-flex justify-content-between align-items-center mb-3">
   <button (click)="goBack()" class="btn btn-outline-primary btn-sm">
     <i class="fa-solid fa-angle-left"></i>
   </button>
@@ -114,3 +131,5 @@
     No prescriptions available.
   </h1>
 </ng-template>
+
+</div>
