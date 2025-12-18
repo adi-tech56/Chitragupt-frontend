@@ -176,6 +176,15 @@ export class ContactPageComponent implements OnInit, OnDestroy {
   get contactTelecoms(): FormArray {
     return this.contactForm.get('contactTelecoms') as FormArray;
   }
+getRelationshipDisplay(code: string): string {
+  if (!code || !this.relationshipOptions?.length) return '-';
+
+  const found = this.relationshipOptions.find(
+    (r: any) => r.code === code
+  );
+
+  return found?.display ?? code;
+}
 
   get contactAddresses(): FormArray {
     return this.contactForm.get('contactAddresses') as FormArray;

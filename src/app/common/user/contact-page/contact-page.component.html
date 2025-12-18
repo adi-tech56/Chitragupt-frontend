@@ -74,7 +74,9 @@
 
             <div class="col-md-4">
               <label class="form-label small text-primary">RELATIONSHIP</label>
-              <input class="form-control readonly-input" [value]="contact.relationshipType || '-'" readonly />
+              <input class="form-control readonly-input" [value]="getRelationshipDisplay(contact.relationshipType)"
+                readonly />
+
             </div>
           </div>
 
