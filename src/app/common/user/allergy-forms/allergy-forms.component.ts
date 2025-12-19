@@ -37,7 +37,7 @@ export class AllergyFormsComponent implements OnInit {
   allergyForm: FormGroup;
   suggestions: any[][] = [];
   today = new Date().toISOString().split('T')[0];
-  allergyId: number | null = null;
+  allergySlug: string | null = null;
   private skipConditionFetch = false;
 
   constructor(
@@ -58,13 +58,12 @@ export class AllergyFormsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.allergyId = Number(this.route.snapshot.paramMap.get('id'));
+    this.allergySlug = this.route.snapshot.paramMap.get('slug');
 
-    if (this.allergyId) {
+    if (this.allergySlug) {
       this.addAllergy();
-      this.loadExistingAllergy(this.allergyId);
+      this.loadExistingAllergy(this.allergySlug);
     } else {
-      // ADD MODE
       this.addAllergy();
     }
 
@@ -75,8 +74,8 @@ export class AllergyFormsComponent implements OnInit {
     });
   }
 
-  loadExistingAllergy(id: number) {
-    this.allergyService.getAllergyById(id).subscribe((a) => {
+  loadExistingAllergy(slug: string) {
+    this.allergyService.getAllergyBySlug(slug).subscribe((a) => {
       this.skipConditionFetch = true;
 
       const group = this.allergies.at(0);
@@ -90,7 +89,7 @@ export class AllergyFormsComponent implements OnInit {
           category: a.category,
           criticality: a.criticality,
           onsetDate: a.onsetDate,
-          allergyValid: true  
+          allergyValid: true,
         },
         { emitEvent: false }
       );
@@ -139,8 +138,8 @@ export class AllergyFormsComponent implements OnInit {
         control.valueChanges
           .pipe(
             debounceTime(200),
-            switchMap(text => {
-              group.get('allergyValid')?.setValue(false, { emitEvent: false }); 
+            switchMap((text) => {
+              group.get('allergyValid')?.setValue(false, { emitEvent: false });
 
               if (!text || text.length < 2 || this.skipConditionFetch) {
                 this.skipConditionFetch = false;
@@ -156,51 +155,48 @@ export class AllergyFormsComponent implements OnInit {
     });
   }
 
- selectAllergy(value: string, index: number) {
-  const group = this.allergies.at(index) as FormGroup;
-  const control = group.get('allergyName');
+  selectAllergy(value: string, index: number) {
+    const group = this.allergies.at(index) as FormGroup;
+    const control = group.get('allergyName');
 
-  control?.setValue(value, { emitEvent: false });
+    control?.setValue(value, { emitEvent: false });
 
+    group.get('allergyValid')?.setValue(true, { emitEvent: false });
 
-  group.get('allergyValid')?.setValue(true, { emitEvent: false });
+    if (control?.hasError('conditionInvalid')) {
+      const errors = { ...control.errors };
+      delete errors['conditionInvalid'];
+      control.setErrors(Object.keys(errors).length ? errors : null);
+    }
 
- 
-  if (control?.hasError('conditionInvalid')) {
-    const errors = { ...control.errors };
-    delete errors['conditionInvalid'];
-    control.setErrors(Object.keys(errors).length ? errors : null);
+    this.suggestions[index] = [];
+    this.skipConditionFetch = true;
   }
-
-  this.suggestions[index] = [];
-  this.skipConditionFetch = true;
-}
-
 
   get allergies(): FormArray {
     return this.allergyForm.get('allergies') as FormArray;
   }
 
   private createAllergyGroup(): FormGroup {
-  const group = this.fb.group({
-    allergyName: ['', [Validators.required, allergySelectedValidator()]],
-    allergyValid: [false],
-    clinicalStatus: ['', Validators.required],
-    verificationStatus: ['', Validators.required],
-    allergyType: ['', Validators.required],
-    category: ['', Validators.required],
-    criticality: ['', Validators.required],
-    onsetDate: ['', [Validators.required, this.noFutureDateValidator()]],
-  });
- group.get('allergyName')!.valueChanges.subscribe(() => {
-  const ctrl = group.get('allergyName')!;
-  group.get('allergyValid')!.setValue(false, { emitEvent: false });
-  if (!ctrl.touched) {
-    ctrl.markAsTouched({ onlySelf: true });
+    const group = this.fb.group({
+      allergyName: ['', [Validators.required, allergySelectedValidator()]],
+      allergyValid: [false],
+      clinicalStatus: ['', Validators.required],
+      verificationStatus: ['', Validators.required],
+      allergyType: ['', Validators.required],
+      category: ['', Validators.required],
+      criticality: ['', Validators.required],
+      onsetDate: ['', [Validators.required, this.noFutureDateValidator()]],
+    });
+    group.get('allergyName')!.valueChanges.subscribe(() => {
+      const ctrl = group.get('allergyName')!;
+      group.get('allergyValid')!.setValue(false, { emitEvent: false });
+      if (!ctrl.touched) {
+        ctrl.markAsTouched({ onlySelf: true });
+      }
+    });
+    return group;
   }
-});
-  return group;
-}
 
   noFutureDateValidator() {
     return (control: AbstractControl) => {
@@ -237,19 +233,18 @@ export class AllergyFormsComponent implements OnInit {
 
     const firstAllergy = this.allergies.at(0).value;
 
-    if (this.allergyId) {
+    if (this.allergySlug) {
       this.allergyService
-        .updateAllergy(this.allergyId, firstAllergy)
+        .updateAllergy(this.allergySlug, firstAllergy)
         .subscribe({
           next: () => {
             this.toaster.show('Allergy updated successfully!', 'success');
-            this.allergySubmitted.emit(); // notify parent to refresh list
+            this.allergySubmitted.emit();
           },
           error: () => {
             this.toaster.show('Error updating allergy.', 'error');
           },
         });
-
       return;
     }
 
