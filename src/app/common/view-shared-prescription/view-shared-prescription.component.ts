@@ -23,7 +23,7 @@ export class ViewSharedPrescriptionComponent {
     private router: Router,
     private location: Location,
     private download: DownloadPrescriptionService
-  ) { }
+  ) {}
   goBack() {
     this.location.back();
   }
@@ -35,7 +35,7 @@ export class ViewSharedPrescriptionComponent {
   }
 
   openIndex: number | null = null;
-  patientId!: number;
+  shareToken!: string;
   toggleAccordion(index: number) {
     if (this.openIndex === index) {
       this.openIndex = null;
@@ -44,29 +44,33 @@ export class ViewSharedPrescriptionComponent {
     }
   }
 
- ngOnInit() {
-  this.patientId = Number(this.route.snapshot.paramMap.get('id'));
+  ngOnInit() {
+    this.shareToken = this.route.snapshot.paramMap.get('token')!;
 
-  this.sharePrescriptionService
-    .getPrescriptionsByPatient(this.patientId)
-    .subscribe({
-      next: (meds) => {
-        this.allMeds = meds;
-        this.isForbidden = false;
-      },
-      error: (err) => {
-        console.error(err);
+    this.sharePrescriptionService
+      .getPrescriptionsByToken(this.shareToken)
+      .subscribe({
+        next: (res) => {
+          this.allMeds = res.prescriptions;
 
-        if (err.status === 403) {
-          this.isForbidden = true;
-          this.errorMessage =
-            'You are not authorized to access this patient’s prescriptions.';
-        } else {
-          this.errorMessage = 'Something went wrong. Please try again later.';
-        }
-      },
-    });
-}
+          // 🔁 IMPORTANT: rotate token
+          this.shareToken = res.token;
+
+          this.isForbidden = false;
+        },
+        error: (err) => {
+          console.error(err);
+
+          if (err.status === 401 || err.status === 403) {
+            this.isForbidden = true;
+            this.errorMessage =
+              'You are not authorized or the link has expired.';
+          } else {
+            this.errorMessage = 'Something went wrong. Please try again later.';
+          }
+        },
+      });
+  }
 
   downloadPdf(superPrescriptionId: number) {
     this.download

@@ -34,25 +34,23 @@ export class SharePrescriptionComponent implements OnInit {
   }
 
   loadSharedPatients() {
-  
     this.error = null;
     this.service.getSharedPatients().subscribe({
       next: (list) => {
-        // ensure distinct patients (if backend returns duplicates)
-        const seen = new Set<number>();
+        const seen = new Set<string>();
+
         this.sharedPatients = list.filter((p) => {
-          if (!p.patientId) return false;
-          if (seen.has(p.patientId)) return false;
-          seen.add(p.patientId);
+          if (!p.shareToken) return false;
+          if (seen.has(p.shareToken)) return false;
+          seen.add(p.shareToken);
           return true;
         });
-        console.log(this.sharedPatients);
 
+        console.log('Shared patients:', this.sharedPatients);
       },
       error: (err) => {
         console.error('Failed to load shared patients', err);
         this.error = 'Failed to load patients. Please try again later.';
-     
       },
     });
   }
