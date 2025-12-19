@@ -35,11 +35,11 @@ export class AllergyListComponent implements OnInit {
   }
 
   updateAllergy(allergy: any) {
-    this.router.navigate(['/user/allergyForm', allergy.id]);
+    this.router.navigate(['/user/allergyForm', allergy.slug]);
   }
 
-  deleteAllergy(id: number) {
-    this.allergyService.deleteAllergy(id).subscribe(() => {
+  deleteAllergy(slug: string) {
+    this.allergyService.deleteAllergy(slug).subscribe(() => {
       this.toaster.show('Allergy deleted', 'success');
       this.loadAllergies();
     });

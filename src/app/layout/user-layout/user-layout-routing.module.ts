@@ -27,7 +27,7 @@ const routes: Routes = [
       { path: 'profile', component: ProfilePageComponent },
       { path: 'emergencyContact', component: ContactPageComponent },
       { path: 'allergyForm', component: AllergyFormsComponent },
-      { path: 'allergyForm/:id', component: AllergyFormsComponent },
+      { path: 'allergyForm/:slug', component: AllergyFormsComponent },
       { path: 'allergyList', component: AllergyListComponent },
 
       {

@@ -27,30 +27,28 @@ export class PatientAllergyService {
     return this.http.get(this.baseUrl);
   }
 
-  // DELETE ALLERGY
-  deleteAllergy(allergyId: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/delete/${allergyId}`);
+  deleteAllergy(slug: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/delete/${slug}`);
   }
 
-  updateAllergy(allergyId: number, payload: any): Observable<any> {
-    return this.http.put(`${this.baseUrl}/update/${allergyId}`, payload);
+  // ✅ UPDATE BY SLUG
+  updateAllergy(slug: string, payload: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/update/${slug}`, payload);
   }
 
-  getAllergyById(id: number): Observable<any> {
-    return this.http.get(`${this.baseUrl}/${id}`);
+  // ✅ FETCH BY SLUG
+  getAllergyBySlug(slug: string): Observable<any> {
+    return this.http.get(`${this.baseUrl}/${slug}`);
   }
 
   // AUTOCOMPLETE
   conditionSearch(term: string): Observable<string[]> {
     if (!term || term.length < 2) return of([]);
 
-    return this.http.get<string[]>(
-      `patient/medication/conditions`,
-      {
-        params: { term },
-        withCredentials: true,
-        headers: { skipLoader: 'true' }
-      }
-    );
+    return this.http.get<string[]>(`patient/medication/conditions`, {
+      params: { term },
+      withCredentials: true,
+      headers: { skipLoader: 'true' },
+    });
   }
 }
