@@ -11,7 +11,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { PatientContactService } from 'src/app/core/Services/PatientServices/patient-contact.service';
 import { AuthService } from 'src/app/core/Services/auth-service.service';
-import { LocationService } from 'src/app/core/Services/PatientServices/locationService.service';
+import { LocationService } from 'src/app/core/Services/location-service';
 import { Location } from '@angular/common';
 import { ToastService } from 'src/app/core/Services/toast.service';
 declare var bootstrap: any;
@@ -50,6 +50,7 @@ export class ContactPageComponent implements OnInit, OnDestroy {
   showCity: boolean[] = [];
   removedTelecomIds: number[] = [];
   removedAddressIds: number[] = [];
+  isPostalAutoFilled: boolean[] = [];
 
   // store one Subscription per address (composite subscription)
   private subs: Subscription[] = [];
@@ -99,38 +100,37 @@ export class ContactPageComponent implements OnInit, OnDestroy {
     //         (x) => x.display ?? x.code ?? x
     //       );
     //   });
- this.http
+    this.http
       .get<any[]>('assets/data/relations-type.json')
       .subscribe((data) => (this.relationshipOptions = data || []));
 
-    // load city/state/country dataset
-    this.http.get<any[]>('assets/data/india-locations.json').subscribe(
-      (list) => {
-        this.cityData = list || [];
-        this.citiesList = Array.from(
-          new Set(this.cityData.map((x) => x.city))
-        ).sort();
-        this.statesList = Array.from(
-          new Set(this.cityData.map((x) => x.state))
-        ).sort();
-        this.countries = Array.from(
-          new Set(this.cityData.map((x) => x.country))
-        ).sort();
+    // // load city/state/country dataset
+    // this.http.get<any[]>('assets/data/india-locations.json').subscribe(
+    //   (list) => {
+    //     this.cityData = list || [];
+    //     this.citiesList = Array.from(
+    //       new Set(this.cityData.map((x) => x.city))
+    //     ).sort();
+    //     this.statesList = Array.from(
+    //       new Set(this.cityData.map((x) => x.state))
+    //     ).sort();
+    //     this.countries = Array.from(
+    //       new Set(this.cityData.map((x) => x.country))
+    //     ).sort();
 
-        // initialise filtered lists for first address
-        this.filteredCities[0] = this.citiesList.slice(0, 200);
-        this.filteredStates[0] = this.statesList.slice(0, 200);
-        this.filteredCountries[0] = this.countries.slice(0, 200);
-      },
-      (err) => console.warn('Failed to load india-locations.json', err)
-    );
+    //     // initialise filtered lists for first address
+    //     this.filteredCities[0] = this.citiesList.slice(0, 200);
+    //     this.filteredStates[0] = this.statesList.slice(0, 200);
+    //     this.filteredCountries[0] = this.countries.slice(0, 200);
+    //   },
+    //   (err) => console.warn('Failed to load india-locations.json', err)
+    // );
 
-    // ensure ui flags exist for index 0
-    this.showCountry[0] = false;
-    this.showState[0] = false;
-    this.showCity[0] = false;
-
-    // wire up autocomplete for first address index
+    // // ensure ui flags exist for index 0
+    // this.showCountry[0] = false;
+    // this.showState[0] = false;
+    // this.showCity[0] = false;
+    this.isPostalAutoFilled[0] = false;
     this.setupAddressAutocomplete(0);
   }
 
@@ -139,21 +139,23 @@ export class ContactPageComponent implements OnInit, OnDestroy {
   }
 
   /** form group factories **/
-  createAddressGroup(): FormGroup {
-    return this.fb.group({
-      id: [null],
-      useCode: ['', Validators.required],
-      addressType: [''],
-      text: ['', Validators.required],
-      line1: [''],
-      line2: [''],
-      city: ['', Validators.required],
-      district: [''],
-      state: ['', Validators.required],
-      postalCode: ['', Validators.required],
-      country: ['', Validators.required],
-    });
-  }
+createAddressGroup(): FormGroup {
+  return this.fb.group({
+    id: [null],
+    useCode: ['', Validators.required],
+    addressType: [''],
+    text: ['', Validators.required],
+    line1: [''],
+    line2: [''],
+    postalCode: ['', Validators.required],
+    city: [{ value: '', disabled: true }, Validators.required],
+    state: [{ value: '', disabled: true }, Validators.required],
+    country: ['India', Validators.required],
+  });
+}
+
+
+ 
 
   createTelecomGroup(
     system: 'email' | 'phone',
@@ -176,15 +178,15 @@ export class ContactPageComponent implements OnInit, OnDestroy {
   get contactTelecoms(): FormArray {
     return this.contactForm.get('contactTelecoms') as FormArray;
   }
-getRelationshipDisplay(code: string): string {
-  if (!code || !this.relationshipOptions?.length) return '-';
+  getRelationshipDisplay(code: string): string {
+    if (!code || !this.relationshipOptions?.length) return '-';
 
-  const found = this.relationshipOptions.find(
-    (r: any) => r.code === code
-  );
+    const found = this.relationshipOptions.find(
+      (r: any) => r.code === code
+    );
 
-  return found?.display ?? code;
-}
+    return found?.display ?? code;
+  }
 
   get contactAddresses(): FormArray {
     return this.contactForm.get('contactAddresses') as FormArray;
@@ -234,15 +236,10 @@ getRelationshipDisplay(code: string): string {
     this.contactAddresses.push(this.createAddressGroup());
     const idx = this.contactAddresses.length - 1;
 
-    this.filteredCountries[idx] = this.countries.slice(0, 200);
-    this.filteredStates[idx] = this.statesList.slice(0, 200);
-    this.filteredCities[idx] = this.citiesList.slice(0, 200);
-
-    this.showCountry[idx] = false;
-    this.showState[idx] = false;
-    this.showCity[idx] = false;
+    this.isPostalAutoFilled[idx] = false;
 
     this.setupAddressAutocomplete(idx);
+
   }
 
   removeAddress(index: number) {
@@ -257,14 +254,9 @@ getRelationshipDisplay(code: string): string {
       s.unsubscribe();
       this.subs.splice(index, 1);
     }
-
+    this.isPostalAutoFilled.splice(index, 1);
     this.contactAddresses.removeAt(index);
-    this.filteredCountries.splice(index, 1);
-    this.filteredStates.splice(index, 1);
-    this.filteredCities.splice(index, 1);
-    this.showCity.splice(index, 1);
-    this.showState.splice(index, 1);
-    this.showCountry.splice(index, 1);
+
   }
 
   /**
@@ -303,99 +295,114 @@ getRelationshipDisplay(code: string): string {
     if (sys === 'email') return 'user@example.com';
     return 'eg : 9876546758';
   }
+private resetCityState(
+  group: FormGroup,
+  index: number,
+  enable: boolean
+) {
+  group.patchValue({ city: '', state: '' });
+
+  if (enable) {
+    group.get('city')?.enable();
+    group.get('state')?.enable();
+  } else {
+    group.get('city')?.disable();
+    group.get('state')?.disable();
+  }
+
+  this.isPostalAutoFilled[index] = false;
+}
 
   /** address autocomplete setup (same as your previous implementation) **/
-  setupAddressAutocomplete(index: number) {
-    this.filteredCountries[index] =
-      this.filteredCountries[index] || this.countries.slice(0, 200);
-    this.filteredStates[index] =
-      this.filteredStates[index] || this.statesList.slice(0, 200);
-    this.filteredCities[index] =
-      this.filteredCities[index] || this.citiesList.slice(0, 200);
+/** Called on postal code value change */
+setupAddressAutocomplete(index: number) {
+  const group = this.contactAddresses.at(index) as FormGroup;
 
-    this.showCountry[index] = this.showCountry[index] ?? false;
-    this.showState[index] = this.showState[index] ?? false;
-    this.showCity[index] = this.showCity[index] ?? false;
+  const sub = group.get('postalCode')!.valueChanges
+    .pipe(debounceTime(400), distinctUntilChanged())
+    .subscribe((postalCode: string) => {
+      const country = group.get('country')?.value;
+      if (!postalCode || !country) return;
 
-    const group = this.contactAddresses.at(index) as FormGroup;
-    const composite = new Subscription();
+      let regex: RegExp;
+      let countryCode = '';
 
-    const subC = group
-      .get('country')!
-      .valueChanges.pipe(debounceTime(200), distinctUntilChanged())
-      .subscribe((val) => {
-        this.filteredCountries[index] = this.filterOptions(this.countries, val);
-      });
-    composite.add(subC);
+      if (country === 'India') {
+        regex = /^[1-9][0-9]{5}$/;
+        countryCode = 'IN';
+      } else if (country === 'USA') {
+        regex = /^\d{5}(-\d{4})?$/;
+        countryCode = 'US';
+      } else {
+        regex = /.*/;
+      }
 
-    const subS = group
-      .get('state')!
-      .valueChanges.pipe(debounceTime(200), distinctUntilChanged())
-      .subscribe((val) => {
-        this.filteredStates[index] = this.filterOptions(this.statesList, val);
-      });
-    composite.add(subS);
+      const postalCtrl = group.get('postalCode')!;
 
-    const subCity = group
-      .get('city')!
-      .valueChanges.pipe(debounceTime(200), distinctUntilChanged())
-      .subscribe((val) => {
-        this.filteredCities[index] = this.filterOptions(this.citiesList, val);
-      });
-    composite.add(subCity);
+      /** ❌ Invalid format → stop */
+      if (!regex.test(postalCode)) {
+        postalCtrl.setErrors({ pattern: true });
+        this.resetCityState(group, index, false);
+        return;
+      }
 
-    this.subs[index] = composite;
-  }
+      postalCtrl.setErrors(null);
 
-  private filterOptions(list: string[], value: any): string[] {
-    const q = (value || '').toString().toLowerCase().trim();
-    if (!q) return list.slice(0, 200);
-    return list.filter((x) => x.toLowerCase().includes(q)).slice(0, 200);
-  }
+      /** ✅ Call backend */
+      this.locationService.lookupByPostalCode(countryCode, postalCode)
+        .subscribe({
+          next: (res) => {
+            group.patchValue({
+              city: res.city,
+              state: res.state,
+              country: res.country === 'IN' ? 'India' :
+                       res.country === 'US' ? 'USA' : res.country,
+            });
 
-  selectCountry(i: number, value: string) {
-    const group = this.contactAddresses.at(i) as FormGroup;
-    group.get('country')?.setValue(value);
-    this.showCountry[i] = false;
-  }
+            group.get('city')?.disable();
+            group.get('state')?.disable();
+            this.isPostalAutoFilled[index] = true;
+          },
+          error: () => {
+            this.resetCityState(group, index, true);
+            this.toaster.show(
+              'Postal code not found. Please enter city and state manually.',
+              'warning'
+            );
+          },
+        });
+    });
 
-  selectState(i: number, value: string) {
-    const group = this.contactAddresses.at(i) as FormGroup;
-    group.get('state')?.setValue(value);
-    this.showState[i] = false;
-  }
+  this.subs.push(sub);
+}
 
-  selectCity(i: number, city: string) {
-    const group = this.contactAddresses.at(i) as FormGroup;
-    group.get('city')?.setValue(city);
-    const found = this.cityData.find(
-      (c) => c.city.toLowerCase() === city.toLowerCase()
-    );
-    if (found) {
-      group.get('state')?.setValue(found.state);
-      group.get('country')?.setValue(found.country);
-      group.get('postalCode')?.setValue(found.postalCode);
-    }
-    this.showCity[i] = false;
-  }
 
-  hideDropdownLater(i: number, type: 'city' | 'state' | 'country') {
-    setTimeout(() => {
-      if (type === 'city') this.showCity[i] = false;
-      if (type === 'state') this.showState[i] = false;
-      if (type === 'country') this.showCountry[i] = false;
-    }, 180);
-  }
+/** Called on country change to update postal validators dynamically */
+onCountryChange(index: number) {
+  const group = this.contactAddresses.at(index) as FormGroup;
+
+  group.patchValue({
+    postalCode: '',
+    city: '',
+    state: '',
+  });
+
+  group.get('city')?.disable();
+  group.get('state')?.disable();
+
+  this.isPostalAutoFilled[index] = false;
+}
+
 
   /** Load contacts from backend */
   loadContacts() {
-  
+
     this.contactService.getContact().subscribe({
       next: (res: any) => {
         this.contacts = res?.contacts ?? [];
       },
       error: (err) => console.error('Failed to load contacts', err),
-     
+
     });
   }
 
@@ -501,20 +508,20 @@ getRelationshipDisplay(code: string): string {
       contact.contactAddresses && contact.contactAddresses.length
         ? contact.contactAddresses
         : [
-            {
-              id: null,
-              useCode: '',
-              addressType: '',
-              text: '',
-              line1: '',
-              line2: '',
-              city: '',
-              district: '',
-              state: '',
-              postalCode: '',
-              country: '',
-            },
-          ];
+          {
+            id: null,
+            useCode: '',
+            addressType: '',
+            text: '',
+            line1: '',
+            line2: '',
+            city: '',
+            district: '',
+            state: '',
+            postalCode: '',
+            country: '',
+          },
+        ];
 
     addrList.forEach((a: any, idx: number) => {
       this.contactAddresses.push(
@@ -609,7 +616,7 @@ getRelationshipDisplay(code: string): string {
 
     // payload already matches backend dto keys
     const payload = {
-      ...this.contactForm.value,
+      ...this.contactForm.getRawValue(),
       patientId: this.auth.getUserId(),
       removedTelecomIds: this.removedTelecomIds,
       removedAddressIds: this.removedAddressIds,

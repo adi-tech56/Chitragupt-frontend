@@ -291,26 +291,9 @@
 
                           <div class="col-md-6 mb-3 position-relative">
                             <label>City <span class="text-danger">*</span></label>
-                            <input class="form-control" formControlName="city" (focus)="showCity[ai] = true"
-                              (input)="showCity[ai] = true" (blur)="hideDropdownLater(ai, 'city')" [class.is-invalid]="
-                                isInvalid(addresses.at(ai).get('city'))
-                              " />
-                            <ul *ngIf="showCity[ai]" class="list-group position-absolute w-100" style="
-                                z-index: 1100;
-                                max-height: 200px;
-                                overflow-y: auto;
-                              ">
-                              <li class="list-group-item" *ngFor="let c of filteredCities[ai]"
-                                (mousedown)="selectCity(ai, c)">
-                                {{ c }}
-                              </li>
-                              <li class="list-group-item text-muted" *ngIf="
-                                  !filteredCities[ai] ||
-                                  filteredCities[ai].length === 0
-                                ">
-                                No results
-                              </li>
-                            </ul>
+                            <input class="form-control" formControlName="city" readonly
+                              [class.is-invalid]="isInvalid(addresses.at(ai).get('city'))" />
+
                             <div *ngIf="isInvalid(addresses.at(ai).get('city'))" class="invalid-feedback">
                               City is required.
                             </div>
@@ -318,26 +301,9 @@
 
                           <div class="col-md-6 mb-3 position-relative">
                             <label>State <span class="text-danger">*</span></label>
-                            <input class="form-control" formControlName="state" (focus)="showState[ai] = true"
-                              (input)="showState[ai] = true" (blur)="hideDropdownLater(ai, 'state')" [class.is-invalid]="
-                                isInvalid(addresses.at(ai).get('state'))
-                              " />
-                            <ul *ngIf="showState[ai]" class="list-group position-absolute w-100" style="
-                                z-index: 1100;
-                                max-height: 200px;
-                                overflow-y: auto;
-                              ">
-                              <li class="list-group-item" *ngFor="let s of filteredStates[ai]"
-                                (mousedown)="selectState(ai, s)">
-                                {{ s }}
-                              </li>
-                              <li class="list-group-item text-muted" *ngIf="
-                                  !filteredStates[ai] ||
-                                  filteredStates[ai].length === 0
-                                ">
-                                No results
-                              </li>
-                            </ul>
+                            <input class="form-control" formControlName="state" readonly
+                              [class.is-invalid]="isInvalid(addresses.at(ai).get('state'))" />
+
                             <div *ngIf="isInvalid(addresses.at(ai).get('state'))" class="invalid-feedback">
                               State is required.
                             </div>
@@ -346,32 +312,19 @@
                           <div class="col-md-6 mb-3">
                             <label>Postal Code
                               <span class="text-danger">*</span></label>
-                            <input class="form-control" formControlName="postalCode" readonly />
+                            <input class="form-control" formControlName="postalCode"
+                              [class.is-invalid]="isInvalid(addresses.at(ai).get('postalCode'))" />
+
                           </div>
 
                           <div class="col-md-6 mb-3 position-relative">
                             <label>Country <span class="text-danger">*</span></label>
-                            <input class="form-control" formControlName="country" (focus)="showCountry[ai] = true"
-                              (input)="showCountry[ai] = true" (blur)="hideDropdownLater(ai, 'country')"
-                              [class.is-invalid]="
-                                isInvalid(addresses.at(ai).get('country'))
-                              " />
-                            <ul *ngIf="showCountry[ai]" class="list-group position-absolute w-100" style="
-                                z-index: 1100;
-                                max-height: 200px;
-                                overflow-y: auto;
-                              ">
-                              <li class="list-group-item" *ngFor="let c of filteredCountries[ai]"
-                                (mousedown)="selectCountry(ai, c)">
-                                {{ c }}
-                              </li>
-                              <li class="list-group-item text-muted" *ngIf="
-                                  !filteredCountries[ai] ||
-                                  filteredCountries[ai].length === 0
-                                ">
-                                No results
-                              </li>
-                            </ul>
+                            <select class="form-select" formControlName="country" (change)="onCountryChange(ai)"
+                              [class.is-invalid]="isInvalid(addresses.at(ai).get('country'))">
+                              <option value="India">India</option>
+                              <option value="USA">USA</option>
+                            </select>
+
                             <div *ngIf="isInvalid(addresses.at(ai).get('country'))" class="invalid-feedback">
                               Country is required.
                             </div>

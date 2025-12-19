@@ -95,7 +95,7 @@
                 </div>
 
                 <!-- city -->
-                <div class="col-md-6 mb-3 position-relative">
+                <!-- <div class="col-md-6 mb-3 position-relative">
                   <label class="required">City</label>
                   <div class="input-group">
                     <input class="form-control" formControlName="city" [appErrorTooltip]="address.get('city')"
@@ -112,10 +112,56 @@
                   </ul>
 
 
+                </div> -->
+                <!-- city -->
+                <!-- City -->
+                <!-- Postal Code -->
+                  <div class="col-md-6 mb-3">
+                  <label class="required">Country</label>
+                  <div class="input-group">
+                    <select class="form-select" formControlName="country" [appErrorTooltip]="address.get('country')"
+                     (change)="onCountryChange(i)" >
+                     
+                      <option value="India">India</option>
+                      <option value="USA">United States</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="required">Postal Code</label>
+                  <div class="input-group">
+                   <input class="form-control" formControlName="postalCode"
+  [appErrorTooltip]="address.get('postalCode')" />
+
+                  </div>
                 </div>
 
+                <!-- Country -->
+               
+                <div class="col-md-6 mb-3">
+                  <label class="required">Place Name/ City</label>
+                  <div class="input-group">
+                
+                    <input class="form-control" formControlName="city" readonly
+                      [appErrorTooltip]="address.get('city')" />
+
+                  </div>
+                </div>
+
+                <!-- State -->
+                <div class="col-md-6 mb-3">
+                  <label class="required">State</label>
+                  <div class="input-group">
+                    <input class="form-control" formControlName="state" readonly
+                      [appErrorTooltip]="address.get('state')" />
+
+                  </div>
+                </div>
+
+
+
                 <!-- state -->
-                <div class="col-md-6 mb-3 position-relative">
+                <!-- <div class="col-md-6 mb-3 position-relative">
                   <label class="required">State</label>
                   <div class="input-group">
                     <input class="form-control" formControlName="state" [appErrorTooltip]="address.get('state')"
@@ -133,20 +179,20 @@
                   </ul>
 
 
-                </div>
+                </div> -->
 
                 <!-- postalCode -->
-                <div class="col-md-6 mb-3">
+                <!-- <div class="col-md-6 mb-3">
                   <label class="required">Postal Code</label>
                   <div class="input-group">
                     <input class="form-control" formControlName="postalCode"
                       [appErrorTooltip]="address.get('postalCode')" readonly />
                   </div>
 
-                </div>
+                </div> -->
 
                 <!-- country -->
-                <div class="col-md-6 mb-3 position-relative">
+                <!-- <div class="col-md-6 mb-3 position-relative">
                   <label class="required">Country</label>
                   <div class="input-group">
                     <input class="form-control" formControlName="country" [appErrorTooltip]="address.get('country')"
@@ -165,7 +211,7 @@
                   </ul>
 
 
-                </div>
+                </div> -->
               </div>
 
               <button type="button" class="btn btn-outline-danger btn-sm" (click)="removeAddress(i)"
