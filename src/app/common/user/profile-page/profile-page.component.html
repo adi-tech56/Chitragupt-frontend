@@ -322,8 +322,80 @@
               <h5 class="modal-title">Edit Address</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+    <div class="modal-body">
+  <div class="mb-3">
+    <label class="form-label">Address <span class="text-danger">*</span></label>
+    <textarea
+      class="form-control"
+      rows="3"
+      [(ngModel)]="addressForm.text"
+      [class.is-invalid]="isAddressInvalid('text')"
+    ></textarea>
+    <div *ngIf="isAddressInvalid('text')" class="invalid-feedback">
+      Address is required.
+    </div>
+  </div>
 
-            <div class="modal-body">
+  <div class="row g-3">
+    <div class="col-md-6">
+      <label class="form-label">City <span class="text-danger">*</span></label>
+      <input
+        class="form-control"
+        [(ngModel)]="addressForm.city"
+        readonly
+        [class.is-invalid]="isAddressInvalid('city')"
+      />
+      <div *ngIf="isAddressInvalid('city')" class="invalid-feedback">
+        City is required.
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">State <span class="text-danger">*</span></label>
+      <input
+        class="form-control"
+        [(ngModel)]="addressForm.state"
+        readonly
+        [class.is-invalid]="isAddressInvalid('state')"
+      />
+      <div *ngIf="isAddressInvalid('state')" class="invalid-feedback">
+        State is required.
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Postal Code <span class="text-danger">*</span></label>
+      <input
+        id="postalCodeInput"
+        class="form-control"
+        [(ngModel)]="addressForm.postalCode"
+        (ngModelChange)="onPostalCodeChange($event)"
+        [class.is-invalid]="isAddressInvalid('postalCode')"
+      />
+      <div *ngIf="isAddressInvalid('postalCode')" class="invalid-feedback">
+        Postal code is required.
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Country <span class="text-danger">*</span></label>
+      <select
+        class="form-select"
+        [(ngModel)]="addressForm.country"
+        [class.is-invalid]="isAddressInvalid('country')"
+      >
+        <option [ngValue]="'India'">India</option>
+        <option [ngValue]="'USA'">USA</option>
+      </select>
+      <div *ngIf="isAddressInvalid('country')" class="invalid-feedback">
+        Country is required.
+      </div>
+    </div>
+  </div>
+</div>
+
+
+            <!-- <div class="modal-body">
               <div class="mb-3">
                 <label class="form-label">Address <span class="text-danger">*</span></label>
                 <textarea class="form-control" rows="3" [(ngModel)]="addressForm.text"
@@ -403,7 +475,7 @@
                   </div>
                 </div>
               </div>
-            </div>
+            </div> -->
 
             <div class="modal-footer">
               <button class="btn btn-secondary" data-bs-dismiss="modal">

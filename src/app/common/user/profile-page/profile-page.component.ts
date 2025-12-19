@@ -6,8 +6,9 @@ import { AuthService } from 'src/app/core/Services/auth-service.service';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { ExportPrescriptionService } from 'src/app/core/Services/PrescriptionServices/export-prescription.service';
-import { debounceTime } from 'rxjs/operators';
+import { debounceTime, tap } from 'rxjs/operators';
 import { ToastService } from 'src/app/core/Services/toast.service';
+import { LocationService } from 'src/app/core/Services/location-service';
 
 declare var bootstrap: any;
 
@@ -17,7 +18,7 @@ declare var bootstrap: any;
   styleUrls: ['./profile-page.component.css'],
 })
 export class ProfilePageComponent implements OnInit {
-  
+
   firstLetter = '';
   basicInfo: any = {};
   addresses: any[] = [];
@@ -40,24 +41,24 @@ export class ProfilePageComponent implements OnInit {
   telecomForm: any = { id: null, system: '', value: '' };
 
   // location/autocomplete datasets (same as emergency contact)
-  cityData: Array<{
-    city: string;
-    state: string;
-    country: string;
-    postalCode: string;
-  }> = [];
-  countries: string[] = [];
-  statesList: string[] = [];
-  citiesList: string[] = [];
+  // cityData: Array<{
+  //   city: string;
+  //   state: string;
+  //   country: string;
+  //   postalCode: string;
+  // }> = [];
+  // countries: string[] = [];
+  // statesList: string[] = [];
+  // citiesList: string[] = [];
 
-  filteredCountries: string[] = [];
-  filteredStates: string[] = [];
-  filteredCities: string[] = [];
+  // filteredCountries: string[] = [];
+  // filteredStates: string[] = [];
+  // filteredCities: string[] = [];
   maritalTypes: string[] = [];
 
-  showCountry = false;
-  showState = false;
-  showCity = false;
+  // showCountry = false;
+  // showState = false;
+  // showCity = false;
 
   telecomErrors: { system?: string | null; value?: string | null } = {};
 
@@ -73,8 +74,9 @@ export class ProfilePageComponent implements OnInit {
     private http: HttpClient,
     private router: Router,
     private fhirService: ExportPrescriptionService,
-    private toaster: ToastService
-  ) {}
+    private toaster: ToastService,
+    private locationService:LocationService
+  ) { }
 
   ngOnInit(): void {
     this.loadAll();
@@ -85,31 +87,43 @@ export class ProfilePageComponent implements OnInit {
       },
       error: () => console.warn('Failed to load relations-type.json'),
     });
-
-    this.http.get<any[]>('assets/data/india-locations.json').subscribe({
-      next: (list) => {
-        this.cityData = list || [];
-        this.citiesList = Array.from(
-          new Set(this.cityData.map((x) => x.city))
-        ).sort();
-        this.statesList = Array.from(
-          new Set(this.cityData.map((x) => x.state))
-        ).sort();
-        this.countries = Array.from(
-          new Set(this.cityData.map((x) => x.country))
-        ).sort();
-
-        // init filtered lists
-        this.filteredCities = this.citiesList.slice(0, 200);
-        this.filteredStates = this.statesList.slice(0, 200);
-        this.filteredCountries = this.countries.slice(0, 200);
-      },
-      error: (err) => console.warn('Failed to load india-locations.json', err),
-    });
+      const postalInput = document.getElementById('postalCodeInput');
+  if (postalInput) {
+    postalInput.addEventListener('input', this.debounce(() => {
+      this.lookupPostalCode();
+    }, 300));
   }
 
+    // this.http.get<any[]>('assets/data/india-locations.json').subscribe({
+    //   next: (list) => {
+    //     this.cityData = list || [];
+    //     this.citiesList = Array.from(
+    //       new Set(this.cityData.map((x) => x.city))
+    //     ).sort();
+    //     this.statesList = Array.from(
+    //       new Set(this.cityData.map((x) => x.state))
+    //     ).sort();
+    //     this.countries = Array.from(
+    //       new Set(this.cityData.map((x) => x.country))
+    //     ).sort();
+
+    //     // init filtered lists
+    //     this.filteredCities = this.citiesList.slice(0, 200);
+    //     this.filteredStates = this.statesList.slice(0, 200);
+    //     this.filteredCountries = this.countries.slice(0, 200);
+    //   },
+    //   error: (err) => console.warn('Failed to load india-locations.json', err),
+    // });
+  }
+debounce(func: Function, wait: number) {
+  let timeout: any;
+  return (...args: any[]) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+}
   loadAll() {
-    
+
     this.profileService.getProfile().subscribe({
       next: (res: any) => {
         if (res && res.hasProfile && res.profile) {
@@ -124,7 +138,7 @@ export class ProfilePageComponent implements OnInit {
       },
       complete: () => {
         this.loadAllergies();
-      
+
       },
     });
   }
@@ -303,135 +317,221 @@ export class ProfilePageComponent implements OnInit {
     };
 
     // init filtered lists and hide dropdowns
-    this.filteredCities = this.citiesList.slice(0, 200);
-    this.filteredStates = this.statesList.slice(0, 200);
-    this.filteredCountries = this.countries.slice(0, 200);
-    this.showCity = false;
-    this.showState = false;
-    this.showCountry = false;
+    // this.filteredCities = this.citiesList.slice(0, 200);
+    // this.filteredStates = this.statesList.slice(0, 200);
+    // this.filteredCountries = this.countries.slice(0, 200);
+    // this.showCity = false;
+    // this.showState = false;
+    // this.showCountry = false;
 
     const modalEl = document.getElementById('editAddressModal')!;
     const modal = new bootstrap.Modal(modalEl);
     modal.show();
   }
+lookupPostalCode() {
+  const postalCode = this.addressForm.postalCode;
+  const country = this.addressForm.country || 'India';
 
-  onAddressInput(type: 'city' | 'state' | 'country') {
-    const v = (this.addressForm as any)[type] || '';
-    const q = v.toString().toLowerCase().trim();
-    if (type === 'city') {
-      this.filteredCities = !q
-        ? this.citiesList.slice(0, 200)
-        : this.citiesList
-            .filter((x) => x.toLowerCase().includes(q))
-            .slice(0, 200);
-    } else if (type === 'state') {
-      this.filteredStates = !q
-        ? this.statesList.slice(0, 200)
-        : this.statesList
-            .filter((x) => x.toLowerCase().includes(q))
-            .slice(0, 200);
-    } else {
-      this.filteredCountries = !q
-        ? this.countries.slice(0, 200)
-        : this.countries
-            .filter((x) => x.toLowerCase().includes(q))
-            .slice(0, 200);
-    }
-  }
+  let countryCode: string;
+  if (country === 'India') countryCode = 'IN';
+  else if (country.toLowerCase() === 'usa') countryCode = 'US';
+  else countryCode = '';
 
-  selectAddressCity(city: string) {
-    this.addressForm.city = city;
-    const found = this.cityData.find(
-      (c) => c.city.toLowerCase() === city.toLowerCase()
-    );
-    if (found) {
-      this.addressForm.state = found.state;
-      this.addressForm.country = found.country;
-      this.addressForm.postalCode = found.postalCode;
-    }
-    this.showCity = false;
-  }
+  if (!postalCode || !countryCode) return this.http.get<any>(''); // dummy fallback
 
-  selectAddressState(state: string) {
-    this.addressForm.state = state;
-    this.showState = false;
-  }
+  // Return the observable instead of subscribing here
+  return this.locationService.lookupByPostalCode(countryCode, postalCode).pipe(
+    // tap is optional, you can also process in subscribe
+    tap((res: any) => {
+      let countryName = res.country;
+      if (res.country === 'IN') countryName = 'India';
+      else if (res.country === 'US') countryName = 'USA';
 
-  selectAddressCountry(country: string) {
-    this.addressForm.country = country;
-    this.showCountry = false;
-  }
+      this.addressForm.city = res.city;
+      this.addressForm.state = res.state;
+      this.addressForm.country = countryName;
+    })
+  );
+}
 
-  hideAddressDropdownLater(type: 'city' | 'state' | 'country') {
-    setTimeout(() => {
-      if (type === 'city') this.showCity = false;
-      if (type === 'state') this.showState = false;
-      if (type === 'country') this.showCountry = false;
-    }, 180);
-  }
+validatePostalCode() {
+  const postalCode = this.addressForm.postalCode;
+  const country = this.addressForm.country;
+  let regex: RegExp;
+
+  if (country === 'India') regex = /^[1-9][0-9]{5}$/;
+  else if (country.toLowerCase() === 'usa') regex = /^\d{5}(-\d{4})?$/;
+  else regex = /.*/;
+
+  return regex.test(postalCode);
+}
+
+  // onAddressInput(type: 'city' | 'state' | 'country') {
+  //   const v = (this.addressForm as any)[type] || '';
+  //   const q = v.toString().toLowerCase().trim();
+  //   // if (type === 'city') {
+  //   //   this.filteredCities = !q
+  //   //     ? this.citiesList.slice(0, 200)
+  //   //     : this.citiesList
+  //   //         .filter((x) => x.toLowerCase().includes(q))
+  //   //         .slice(0, 200);
+  //   // } else if (type === 'state') {
+  //   //   this.filteredStates = !q
+  //   //     ? this.statesList.slice(0, 200)
+  //   //     : this.statesList
+  //   //         .filter((x) => x.toLowerCase().includes(q))
+  //   //         .slice(0, 200);
+  //   // } else {
+  //   //   this.filteredCountries = !q
+  //   //     ? this.countries.slice(0, 200)
+  //   //     : this.countries
+  //   //         .filter((x) => x.toLowerCase().includes(q))
+  //   //         .slice(0, 200);
+  //   // }
+  // }
+
+  // selectAddressCity(city: string) {
+  //   this.addressForm.city = city;
+  //   const found = this.cityData.find(
+  //     (c) => c.city.toLowerCase() === city.toLowerCase()
+  //   );
+  //   if (found) {
+  //     this.addressForm.state = found.state;
+  //     this.addressForm.country = found.country;
+  //     this.addressForm.postalCode = found.postalCode;
+  //   }
+  //   this.showCity = false;
+  // }
+
+  // selectAddressState(state: string) {
+  //   this.addressForm.state = state;
+  //   this.showState = false;
+  // }
+
+  // selectAddressCountry(country: string) {
+  //   this.addressForm.country = country;
+  //   this.showCountry = false;
+  // }
+
+  // hideAddressDropdownLater(type: 'city' | 'state' | 'country') {
+  //   setTimeout(() => {
+  //     if (type === 'city') this.showCity = false;
+  //     if (type === 'state') this.showState = false;
+  //     if (type === 'country') this.showCountry = false;
+  //   }, 180);
+  // }
 
   isAddressInvalid(field: string) {
     // simple required checks used in template
     if (!this.addressForm) return false;
     if (field === 'text') return !this.addressForm.text?.trim();
-    if (field === 'city') return !this.addressForm.city?.trim();
-    if (field === 'state') return !this.addressForm.state?.trim();
+    // if (field === 'city') return !this.addressForm.city?.trim();
+    // if (field === 'state') return !this.addressForm.state?.trim();
     if (field === 'postalCode') return !this.addressForm.postalCode?.trim();
     if (field === 'country') return !this.addressForm.country?.trim();
     return false;
   }
+onPostalCodeChange(value: string) {
+  this.addressForm.postalCode = value;
 
-  saveAddress() {
-    const patientId = this.auth.getUserId();
-    if (!patientId) {
-      this.toaster.show('User not identified', 'error');
-      return;
-    }
-
-    // validate
-    if (
-      this.isAddressInvalid('text') ||
-      this.isAddressInvalid('city') ||
-      this.isAddressInvalid('state') ||
-      this.isAddressInvalid('postalCode') ||
-      this.isAddressInvalid('country')
-    ) {
-      this.toaster.show('Please fill required address fields.', 'error');
-      return;
-    }
-
-    const dto: any = {
-      addresses: [
-        {
-          id: this.addressForm.id,
-          text: this.addressForm.text,
-          city: this.addressForm.city,
-          state: this.addressForm.state,
-          postalCode: this.addressForm.postalCode,
-          country: this.addressForm.country,
-        },
-      ],
-    };
-
-    this.profileService.saveProfile(patientId, dto).subscribe({
-      next: (res: any) => {
-        const idx = this.addresses.findIndex(
-          (a) => a.id === this.addressForm.id
-        );
-        const updated = { ...this.addressForm };
-        if (idx >= 0)
-          this.addresses[idx] = { ...this.addresses[idx], ...updated };
-        else this.addresses.push(updated);
-        (
-          document.querySelector('#editAddressModal .btn-close') as HTMLElement
-        )?.click();
-      },
-      error: (err) => {
-        console.error('Failed to save address', err);
-        this.toaster.show('Failed to save address', 'error');
-      },
-    });
+  if (!value || !this.addressForm.country) {
+    this.addressForm.city = '';
+    this.addressForm.state = '';
+    return;
   }
+
+  const postal$ = this.locationService.lookupByPostalCode(
+    this.addressForm.country === 'India' ? 'IN' : 'US',
+    value
+  );
+
+  postal$.subscribe({
+    next: (res: any) => {
+      if (!res) return;
+
+      // Map country code to name
+      let countryName = res.country;
+      if (res.country === 'IN') countryName = 'India';
+      else if (res.country === 'US') countryName = 'USA';
+
+      // Update form fields
+      this.addressForm.city = res.city || '';
+      this.addressForm.state = res.state || '';
+      this.addressForm.country = countryName;
+
+      // Trigger change detection if needed
+      // this.cdRef.detectChanges(); // Only if using OnPush strategy
+    },
+    error: () => {
+      this.toaster.show('Invalid postal code, cannot fetch city/state.', 'error');
+      this.addressForm.city = '';
+      this.addressForm.state = '';
+    },
+  });
+}
+
+saveAddress() {
+  const patientId = this.auth.getUserId();
+  if (!patientId) {
+    this.toaster.show('User not identified', 'error');
+    return;
+  }
+
+  if (!this.addressForm.postalCode || !this.validatePostalCode()) {
+    this.toaster.show('Please enter a valid postal code.', 'error');
+    return;
+  }
+
+  // Lookup postal code and save inside the response
+  this.lookupPostalCode().subscribe({
+    next: () => {
+      // validate required fields after lookup
+      if (
+        this.isAddressInvalid('text') ||
+        this.isAddressInvalid('postalCode') ||
+        this.isAddressInvalid('country')
+      ) {
+        this.toaster.show('Please fill required address fields.', 'error');
+        return;
+      }
+
+      const dto: any = {
+        addresses: [
+          {
+            id: this.addressForm.id,
+            text: this.addressForm.text,
+            city: this.addressForm.city,
+            state: this.addressForm.state,
+            postalCode: this.addressForm.postalCode,
+            country: this.addressForm.country,
+          },
+        ],
+      };
+
+      this.profileService.saveProfile(patientId, dto).subscribe({
+        next: (res: any) => {
+          const idx = this.addresses.findIndex(
+            (a) => a.id === this.addressForm.id
+          );
+          const updated = { ...this.addressForm };
+          if (idx >= 0)
+            this.addresses[idx] = { ...this.addresses[idx], ...updated };
+          else this.addresses.push(updated);
+
+          (document.querySelector('#editAddressModal .btn-close') as HTMLElement)
+            ?.click();
+        },
+        error: (err) => {
+          console.error('Failed to save address', err);
+          this.toaster.show('Failed to save address', 'error');
+        },
+      });
+    },
+    error: () => {
+      this.toaster.show('Invalid postal code, cannot fetch city/state.', 'error');
+    },
+  });
+}
 
   deleteAddress(index: number, address: any) {
     if (!address?.id) {
