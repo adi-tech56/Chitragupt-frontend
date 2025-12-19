@@ -16,7 +16,7 @@ export class SharePrescriptionService {
     return this.http.get<EmergencyContactPatientDto[]>(`${this.API_BASE}`);
   }
 
-  getPrescriptionsByPatient(patientId: number): Observable<any> {
-    return this.http.get(`${this.API_BASE}/view/${patientId}`);
+  getPrescriptionsByToken(token: string): Observable<any> {
+    return this.http.get(`${this.API_BASE}/view/${token}`);
   }
 }

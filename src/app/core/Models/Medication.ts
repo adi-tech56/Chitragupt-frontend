@@ -49,7 +49,7 @@ export interface TimingData {
 
 export interface PrescriptionResponse {
   superPrescriptionId: number;
-  patientId: number;
+  shareToken: string;
   doctorName: string;
   prescriptionDate: string;
   notes: string;
@@ -116,7 +116,8 @@ export interface PatientMedicationLogs {
 }
 
 export interface EmergencyContactPatientDto {
-  patientId: number;
+  shareToken: string;
+  // patientId?: number;
   firstName?: string;
   middleName?: string;
   lastName?: string;

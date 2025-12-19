@@ -29,7 +29,7 @@ const routes: Routes = [
       { path: 'allergyForm', component: AllergyFormsComponent },
       { path: 'allergyForm/:id', component: AllergyFormsComponent },
       { path: 'allergyList', component: AllergyListComponent },
-    
+
       {
         path: 'medication',
         canActivate: [AuthGuard, RoleGuard],
@@ -52,7 +52,7 @@ const routes: Routes = [
         data: { roles: ['PATIENT'] },
       },
       {
-        path: 'viewsharePrescription/:id',
+        path: 'viewsharePrescription/:token',
         component: ViewSharedPrescriptionComponent,
         canActivate: [AuthGuard, RoleGuard],
         data: { roles: ['PATIENT'] },
